@@ -2,7 +2,7 @@ import "./_test-setup.ts";
 import { assertEquals, assertThrows } from "@std/assert";
 import { html, render } from "lit";
 import { FieldApi, FormApi } from "@kintools/form-core";
-import { watch } from "./Watch.ts";
+import { watch } from "./watch.ts";
 
 Deno.test("watch", async (t) => {
   await t.step(

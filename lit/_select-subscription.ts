@@ -1,5 +1,5 @@
 // Package-internal: the subscribe/select/equal/cache algorithm shared by
-// `WatchControllerImpl` (WatchController.ts) and `WatchDirective` (Watch.ts),
+// `WatchControllerImpl` (WatchController.ts) and `WatchDirective` (watch.ts),
 // via `SelectSubscription`. Not exported from index.ts.
 
 import { shallowEqual } from "@kintools/form-core";

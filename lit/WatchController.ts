@@ -1,7 +1,7 @@
 /**
  * A `ReactiveController` subscription to a `FieldApi`/`FormApi`, via
  * {@linkcode WatchController}, for a reusable component to subscribe its
- * whole `render()` without going through {@linkcode watch} (`./Watch.ts`).
+ * whole `render()` without going through {@linkcode watch} (`./watch.ts`).
  *
  * @module
  */
@@ -57,7 +57,7 @@ export interface WatchController<TSelected> {
  *
  * The `useWatch` equivalent for a reusable Lit component that wants its own
  * `render()` to update on `api` changes, without wrapping its whole output
- * in {@linkcode watch} (`./Watch.ts`):
+ * in {@linkcode watch} (`./watch.ts`):
  *
  * @example
  * ```ts

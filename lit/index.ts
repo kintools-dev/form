@@ -7,5 +7,5 @@
 
 export * from "@kintools/form-core";
 export * from "./WatchController.ts";
-export * from "./Watch.ts";
+export * from "./watch.ts";
 export * from "./MultistepController.ts";
