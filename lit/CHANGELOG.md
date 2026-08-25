@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.4 - 2026-08-25
+
+- Fixed the README's `WatchController` example naming its component
+  `MyTextField` instead of the canonical `TextField`.
+
 ## 0.1.3 - 2026-08-20
 
 - Renamed from `@kin-form/lit` to `@kintools/form-lit`. Now also published to

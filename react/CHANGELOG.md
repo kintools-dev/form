@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.8 - 2026-08-25
+
+- Restructured the README's `Watch` section: `Watch` now covers only one-off/
+  prototyping usage, with a new "Building reusable field components" section for
+  the `useWatch`-based pattern.
+
 ## 0.1.7 - 2026-08-20
 
 - Renamed from `@kin-form/react` to `@kintools/form-react`. Now also published
