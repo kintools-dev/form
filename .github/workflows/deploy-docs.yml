@@ -1,0 +1,14 @@
+name: Deploy docs
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger kintools.dev rebuild
+        run: curl -fsS -X POST "${{ secrets.KINTOOLS_DEV_DEPLOY_HOOK }}"
