@@ -4,7 +4,7 @@
 
 Kin Form is pre-1.0. Security fixes are made to the latest published version of
 each package (`core`, `react`, `devtools-react`, `validators`) on
-[JSR](https://jsr.io/@kin-form); older versions are not backported.
+[JSR](https://jsr.io/@kintools); older versions are not backported.
 
 ## Reporting a vulnerability
 
