@@ -1,5 +1,5 @@
 /**
- * Types used in `@kin-form`.
+ * Types used in Kin Form.
  * @module
  */
 

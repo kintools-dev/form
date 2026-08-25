@@ -5,7 +5,7 @@ title: ""
 labels: bug
 ---
 
-**Package and version** e.g. `@kin-form/react@0.1.1`
+**Package and version** e.g. `@kintools/form-react@0.1.1`
 
 **Describe the bug** A clear, concise description of what's wrong.
 

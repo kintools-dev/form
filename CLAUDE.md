@@ -5,8 +5,8 @@ code in this repository.
 
 ## What this is
 
-`kin-form` is a framework-agnostic form-state library, published as JSR
-packages, structured as a Deno workspace with four members:
+Kin Form is a framework-agnostic form-state library, published as JSR packages,
+structured as a Deno workspace with four members:
 
 - `core/` (`@kintools/form-core`) — the actual form engine (`FieldApi`,
   `FormApi`). No UI framework dependency. Kept deliberately small and stable —
@@ -36,7 +36,7 @@ run and type-checked directly.
 
 ## Commands
 
-Run everything from the repo root (`d:\kin\kin-form`), which is the Deno
+Run everything from the repo root (`d:\kin\kintools\form`), which is the Deno
 workspace root (`deno.json` lists
 `workspace: ["core", "docs", "examples/*", "react", "devtools-react", "validators"]`).
 

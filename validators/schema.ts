@@ -1,5 +1,5 @@
 /**
- * Standard Schema (https://standardschema.dev) adapter for `@kin-form`.
+ * Standard Schema (https://standardschema.dev) adapter for Kin Form.
  * @module
  */
 
@@ -11,7 +11,7 @@ import type {
 } from "@kintools/form-core";
 
 /**
- * Converts a Standard Schema `Issue`'s `path` into `@kin-form`'s dot-joined
+ * Converts a Standard Schema `Issue`'s `path` into Kin Form's dot-joined
  * path convention (see `DeepKeyOrRoot`).
  *
  * For example, `[{ key: "items" }, 0, { key: "name" }]`

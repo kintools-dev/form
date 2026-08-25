@@ -9,8 +9,8 @@
 ![100% type-safe](https://img.shields.io/badge/100%25%20type--safe-166534?style=flat)
 ![Zero dependencies](https://img.shields.io/badge/Zero%20dependencies-166534?style=flat)
 
-[Documentation](https://kin-form.pages.dev) ·
-[Get Started](https://kin-form.pages.dev/guide/getting-started)
+[Documentation](https://kintools.dev/form) ·
+[Get Started](https://kintools.dev/form/guide/getting-started)
 
 Build your field components once. Reuse them everywhere.
 
@@ -32,7 +32,7 @@ Each component receives a resolved `FieldApi`, not a path or form context.
 Define the UI and behavior once, then mount it anywhere its value type fits. Kin
 Form keeps that component independently subscribed, so a change only updates the
 part of the form that depends on it. See
-[Form Composition](https://kin-form.pages.dev/guide/form-composition) for the
+[Form Composition](https://kintools.dev/form/guide/form-composition) for the
 full pattern.
 
 ## Feature matrix
@@ -76,7 +76,7 @@ Form). One scenario from a shared ~84-field benchmark form driven through the
 same update plan against each library. Reproduce with
 `deno task --cwd scripts speed-bench`.
 
-See the [full comparison](https://kin-form.pages.dev/comparison/) for the
+See the [full comparison](https://kintools.dev/form/comparison/) for the
 complete scenario breakdown (nested/array updates, validation, mount cost),
 methodology notes, and code-by-code comparisons.
 

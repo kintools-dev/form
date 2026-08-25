@@ -1,5 +1,5 @@
 /**
- * Measures minified + gzipped bundle size for @kin-form packages and a set
+ * Measures minified + gzipped bundle size for Kin Form's packages and a set
  * of comparable form libraries, using one bundler/minifier configuration for
  * everyone so the numbers in the root readme's feature matrix are fair and
  * reproducible. Run from the repo root:
@@ -96,7 +96,7 @@ const subjects: Subject[] = [
   },
   {
     ...virtualSubject(
-      "@kin-form (core + react, typical usage)",
+      "Kin Form (core + react, typical usage)",
       "kin-form",
       `export * from "${CORE_ENTRY}";\nexport * from "${REACT_ENTRY}";`,
       ["react"],
@@ -108,7 +108,7 @@ const subjects: Subject[] = [
   },
   {
     ...virtualSubject(
-      "@kin-form (core + lit, typical usage)",
+      "Kin Form (core + lit, typical usage)",
       "kin-form",
       `export * from "${CORE_ENTRY}";\nexport * from "${LIT_ENTRY}";`,
       ["lit/async-directive.js"],

@@ -1,5 +1,5 @@
 /**
- * Common validator factories for `@kin-form`.
+ * Common validator factories for Kin Form.
  *
  * Every factory takes an optional trailing `message`, returned as the
  * `ValidationError` when the check fails. It defaults to the factory's own

@@ -3,7 +3,7 @@
 [![JSR @kintools/form-validators](https://jsr.io/badges/@kintools/form-validators)](https://jsr.io/@kintools/form-validators)
 ![License: MIT](https://img.shields.io/badge/License-MIT-166534?style=flat)
 
-Common validator factories for [`@kin-form`](../core/README.md). Split out from
+Common validator factories for [Kin Form](../core/README.md). Split out from
 `@kintools/form-core` on purpose: validator wording and edge cases churn far
 more than the engine does, so it's versioned separately.
 
