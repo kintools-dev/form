@@ -13,6 +13,7 @@ Guiding principle: everything shipped either teaches a concept or builds trust.
 - Docs homepage rewritten to lead with why the library exists, not the
   feature/benchmark grid
 - `llms.txt`, a sitemap, and standard meta tags on the docs site
+- Lit bindings shipped as `@kintools/form-lit`
 
 ## In progress: teach and prove
 
@@ -28,9 +29,11 @@ Guiding principle: everything shipped either teaches a concept or builds trust.
 ## Later: scale
 
 - Publishing to npm alongside JSR, once the above is real (see
-  [TODO.md](./TODO.md) for why this is deliberately sequenced later)
-- Additional framework bindings (Vue/Solid) on top of the already
+  [TODO.md](./TODO.md) for why this is deliberately sequenced later); CI is
+  already wired for it, just not yet triggered for a release
+- Further framework bindings (Vue/Solid) on top of the already
   framework-agnostic `core`, once there's a real reason to, not to look active
+  (Lit bindings already shipped as `@kintools/form-lit`)
 - Expanding `@kintools/form-validators` based on real issues filed, not
   speculative gaps
 
