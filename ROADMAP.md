@@ -14,6 +14,7 @@ Guiding principle: everything shipped either teaches a concept or builds trust.
   feature/benchmark grid
 - `llms.txt`, a sitemap, and standard meta tags on the docs site
 - Lit bindings shipped as `@kintools/form-lit`
+- Published to npm alongside JSR
 
 ## In progress: teach and prove
 
@@ -28,9 +29,6 @@ Guiding principle: everything shipped either teaches a concept or builds trust.
 
 ## Later: scale
 
-- Publishing to npm alongside JSR, once the above is real (see
-  [TODO.md](./TODO.md) for why this is deliberately sequenced later); CI is
-  already wired for it, just not yet triggered for a release
 - Further framework bindings (Vue/Solid) on top of the already
   framework-agnostic `core`, once there's a real reason to, not to look active
   (Lit bindings already shipped as `@kintools/form-lit`)
