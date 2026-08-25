@@ -1,3 +1,7 @@
+---
+description: "The BaseApi to FieldApi to FormApi class hierarchy, the shared state every node exposes (value, error, touched, validating, dirty, name, id), and how field() resolves a typed path relative to the node it's called on."
+---
+
 # Concepts
 
 Every node in a Kin Form tree (a leaf input, a nested object, a nested array, or

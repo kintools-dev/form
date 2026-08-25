@@ -1,3 +1,7 @@
+---
+description: "A feature matrix, API-surface matrix, bundle-size chart, and wall-clock performance benchmarks (re-renders per scenario) comparing Kin Form against other form libraries, with a link to the detailed React Hook Form comparison."
+---
+
 # Overview
 
 ## Feature matrix

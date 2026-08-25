@@ -1,3 +1,7 @@
+---
+description: "A side-by-side code comparison of Kin Form against react-hook-form@7.81.0 across field binding, per-node validation and debouncing, schema validation, cross-field validation, dirty tracking, submission handling, async initial values, reactivity, form composition, and multistep forms."
+---
+
 # vs React Hook Form
 
 React Hook Form is the most widely used of the three (by a wide and growing

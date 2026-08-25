@@ -1,3 +1,7 @@
+---
+description: "Building reusable field components (TextField, NumberField, AddressField for nested objects, ItemsField for arrays, SubmitButton) around useWatch/WatchController instead of repeating a render prop at every call site."
+---
+
 # Form Composition
 
 <FrameworkText>

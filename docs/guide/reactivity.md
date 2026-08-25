@@ -1,3 +1,7 @@
+---
+description: "How Kin Form's pub/sub model works under the hood (subscribe/notify, batched notifications) and how to subscribe from React (useWatch, Watch) or Lit (watch, WatchController), including narrowing re-renders with select."
+---
+
 # Reactivity
 
 Every node in the tree (field, group, or form) is a pub/sub primitive under the

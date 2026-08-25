@@ -1,3 +1,7 @@
+---
+description: "How the dependents option re-validates sibling fields (relative to the parent, not the form root) whenever a field's value changes, such as re-checking confirmPassword when password changes, and how it differs from reading a sibling's value directly."
+---
+
 # Linked Fields
 
 Every node is the same [`FieldApi`](/form/guide/concepts) class, so `dependents`

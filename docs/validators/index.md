@@ -1,3 +1,7 @@
+---
+description: "Reference for @kintools/form-validators' factories (required, minLength, maxLength, min, max, url, email, pattern, maxFileSize, password), why default messages double as i18n keys, and the toSchemaValidator() Standard Schema adapter."
+---
+
 # Validators
 
 Common validator factories for Kin Form, published as

@@ -1,3 +1,7 @@
+---
+description: "Server-rendering a @kintools/form-react form: why field.id shouldn't be used as a DOM id (use useId() instead), and passing server-loaded data straight into initialValue instead of reconciling with reset()."
+---
+
 # Server-Side Rendering (SSR)
 
 <Container type="info">

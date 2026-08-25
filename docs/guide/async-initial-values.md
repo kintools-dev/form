@@ -1,3 +1,7 @@
+---
+description: "Two ways to populate a form once its real initial value arrives asynchronously: constructing with a placeholder and calling reset() when data loads, versus delaying the form's mount until the data is ready."
+---
+
 # Async Initial Values
 
 `initialValue` is only read once, at construction. It's also the

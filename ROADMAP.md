@@ -12,7 +12,9 @@ Guiding principle: everything shipped either teaches a concept or builds trust.
 - CI running on every push and pull request, not only on release tags
 - Docs homepage rewritten to lead with why the library exists, not the
   feature/benchmark grid
-- `llms.txt`, a sitemap, and standard meta tags on the docs site
+- `llms.txt`, `llms-full.txt`, per-page raw markdown mirrors, a sitemap, an
+  AI-crawler-aware `robots.txt`, and distinct per-page meta descriptions on the
+  docs site
 - Lit bindings shipped as `@kintools/form-lit`
 - Published to npm alongside JSR
 

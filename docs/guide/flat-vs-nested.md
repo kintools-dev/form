@@ -1,3 +1,7 @@
+---
+description: "When to model a nested value as its own FieldApi per level versus flatten it to dotted paths off the form root, comparing the same checkout form built both ways and showing that schemaValidator works identically either way while hand-written per-field validators favor nesting."
+---
+
 # Flat vs. Nested Structure
 
 Kin Form doesn't force one tree shape for a nested value. You can build a form
