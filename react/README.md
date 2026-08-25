@@ -90,26 +90,22 @@ its `name` argument from a string literal works reliably without one.
 
 A render-prop component that subscribes to any already-resolved
 `FieldApi`/`FormApi`, without writing a custom component around `useWatch`
-yourself:
+yourself. Handy for a one-off field, or for prototyping:
 
 ```tsx
-function EmailInput({ parent }: { parent: FieldApi<{ email: string }> }) {
-  return (
-    <Watch
-      api={parent.field("email", {
-        validators: [(f) => (f.value ? null : "Email is required")],
-      })}
-    >
-      {(field) => (
-        <input
-          value={field.value}
-          onBlur={field.handleBlur}
-          onChange={(e) => field.handleChange(e.target.value)}
-        />
-      )}
-    </Watch>
-  );
-}
+<Watch
+  api={form.field("email", {
+    validators: [(f) => (f.value ? null : "Email is required")],
+  })}
+>
+  {(field) => (
+    <input
+      value={field.value}
+      onBlur={field.handleBlur}
+      onChange={(e) => field.handleChange(e.target.value)}
+    />
+  )}
+</Watch>;
 ```
 
 `children` always receives `api` as its first argument; pass `select` to
@@ -133,8 +129,42 @@ then call `field`/`Watch` again on it:
 </Watch>;
 ```
 
-For an array, a field's own _value_ is the array, so array methods are called on
-it with `""`, which stays generic over where in the tree it's mounted:
+## Building reusable field components
+
+A repeating UI pattern shouldn't stay a `<Watch>` render prop copy-pasted at
+every call site: turn it into a named, reusable component built directly on
+`useWatch` instead.
+
+```tsx
+function TextField<TParentValue>(
+  { api, label }: { api: FieldApi<string, TParentValue>; label: string },
+) {
+  const field = useWatch(api);
+
+  return (
+    <label>
+      {label}
+      <input
+        value={field.value}
+        onBlur={field.handleBlur}
+        onChange={(e) => field.handleChange(e.target.value)}
+      />
+      {field.invalid && field.touched && <span>{field.error}</span>}
+    </label>
+  );
+}
+```
+
+```tsx
+<TextField
+  api={form.field("email", { validators: required("Email is required") })}
+  label="Email"
+/>;
+```
+
+The same shape works for a nested object or array: an already-resolved `api` in,
+`useWatch` (if the component itself needs to re-render) or array mutation
+helpers out, typed generically over where in the tree it's mounted:
 
 ```tsx
 function ArrayField<Item>(
@@ -144,10 +174,8 @@ function ArrayField<Item>(
 }
 ```
 
-For a field that appears in multiple places, define a reusable component around
-`Watch` (or `useWatch` directly) instead (e.g. `TextField`, `AddressField`)
-rather than repeating a `<Watch>` render prop everywhere; see
-[Form Composition](../docs/guide/form-composition.md).
+See [Form Composition](../docs/guide/form-composition.md) for `AddressField`,
+`ItemsField`, and `SubmitButton` built the same way.
 
 ## `useMultistep`
 

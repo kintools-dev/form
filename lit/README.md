@@ -131,7 +131,7 @@ component that wants its own `render()` to update on `api` changes, without
 wrapping its whole output in `watch`:
 
 ```ts
-class MyTextField extends LitElement {
+class TextField extends LitElement {
   @property({ attribute: false })
   accessor api!: FieldApi<string, unknown>;
 
