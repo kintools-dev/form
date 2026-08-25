@@ -21,6 +21,8 @@ const CORE_ENTRY = new URL("../core/index.ts", import.meta.url).pathname
   .slice(1);
 const REACT_ENTRY = new URL("../react/index.ts", import.meta.url).pathname
   .slice(1);
+const LIT_ENTRY = new URL("../lit/index.ts", import.meta.url).pathname
+  .slice(1);
 const VALIDATORS_ENTRY = new URL("../validators/index.ts", import.meta.url)
   .pathname.slice(1);
 
@@ -76,6 +78,18 @@ const subjects: Subject[] = [
     external: [CORE_SPECIFIER, "react"],
   },
   {
+    name: "@kintools/form-lit (bindings only, on top of core)",
+    group: "kin-form",
+    input: LIT_ENTRY,
+    // Core is measured on its own above; externalize it here so this row
+    // isolates the weight of the Lit bindings themselves. Only
+    // "lit/async-directive.js" carries runtime code (watch.ts's directive) --
+    // WatchController.ts/MultistepController.ts import only types from the
+    // bare "lit" specifier, which erase at build time and need no
+    // externalizing of their own.
+    external: [CORE_SPECIFIER, "lit/async-directive.js"],
+  },
+  {
     name: "@kintools/form-validators",
     group: "kin-form",
     input: VALIDATORS_ENTRY,
@@ -92,6 +106,15 @@ const subjects: Subject[] = [
     // as a second, unresolved external import.
     alias: { [CORE_SPECIFIER]: CORE_ENTRY },
   },
+  {
+    ...virtualSubject(
+      "@kin-form (core + lit, typical usage)",
+      "kin-form",
+      `export * from "${CORE_ENTRY}";\nexport * from "${LIT_ENTRY}";`,
+      ["lit/async-directive.js"],
+    ),
+    alias: { [CORE_SPECIFIER]: CORE_ENTRY },
+  },
   virtualSubject(
     "react-hook-form",
     "other",
@@ -106,12 +129,6 @@ const subjects: Subject[] = [
     "@tanstack/react-form",
     "other",
     `export * from "@tanstack/react-form";`,
-    ["react", "react-dom"],
-  ),
-  virtualSubject(
-    "final-form + react-final-form",
-    "other",
-    `export * from "final-form";\nexport * from "react-final-form";`,
     ["react", "react-dom"],
   ),
 ];
