@@ -10,7 +10,7 @@ fits, across forms and applications.
 
 Because a leaf, a nested group, an array item, and the form root share the same
 state model, the component pattern never changes as a form grows. See
-[Form Composition](/guide/form-composition) for the complete pattern.
+[Form Composition](/form/guide/form-composition) for the complete pattern.
 
 That reuse crosses form boundaries, not just within one form's own subtree.
 `FieldApi<TValue, TParentValue = never>` decouples a field's own value type from
@@ -97,7 +97,7 @@ type, no manual generics needed.
 
 ### Validation that doesn't fight you
 
-kin-form supports flexible validation strategies: sync or async, per-node or
+Kin Form supports flexible validation strategies: sync or async, per-node or
 per-subtree.
 
 - **`validators`**: plain sync functions on any node (field, group, or form):
@@ -172,7 +172,8 @@ where they diverge from the premise above.
   how many components actually re-render.
 - Heavier: 13.0 KB gzip.
 
-See [vs React Hook Form](/comparison/react-hook-form) for the full comparison.
+See [vs React Hook Form](/form/comparison/react-hook-form) for the full
+comparison.
 
 ### Formik
 
@@ -188,17 +189,19 @@ See [vs React Hook Form](/comparison/react-hook-form) for the full comparison.
   rules are awkward to wire up.
 - Heaviest bundle of the three: 18.5 KB.
 - The slowest of the three in Kin Form's own benchmark; see
-  [the full numbers](/comparison/) before taking that at face value.
+  [the full numbers](/form/comparison/) before taking that at face value.
 
 ## What's next
 
-- [Getting Started](/guide/getting-started) — install and build your first form
-- [Concepts](/guide/concepts) — the tree model, shared state, and typed paths
-- [Basic](/guide/basic) — building `TextField` from a one-off subscription, the
-  pattern the rest of these guides lean on
-- [Per-node Validation](/guide/per-node-validation) and
-  [Schema Validation](/guide/schema-validation)
-- [Nested Objects](/guide/nested-objects) and
-  [Dynamic Arrays](/guide/dynamic-arrays)
-- [Linked Fields](/guide/linked-fields) and [Listeners](/guide/listeners) —
-  reacting to a value changing
+- [Getting Started](/form/guide/getting-started) — install and build your first
+  form
+- [Concepts](/form/guide/concepts) — the tree model, shared state, and typed
+  paths
+- [Basic](/form/guide/basic) — building `TextField` from a one-off subscription,
+  the pattern the rest of these guides lean on
+- [Per-node Validation](/form/guide/per-node-validation) and
+  [Schema Validation](/form/guide/schema-validation)
+- [Nested Objects](/form/guide/nested-objects) and
+  [Dynamic Arrays](/form/guide/dynamic-arrays)
+- [Linked Fields](/form/guide/linked-fields) and
+  [Listeners](/form/guide/listeners) — reacting to a value changing

@@ -14,12 +14,12 @@ const unsubscribe = field.subscribe(() => {
 unsubscribe();
 ```
 
-::: info
+<Container type="info">
 
 Registering or unregistering a child field doesn't notify through this channel;
 that's `onChildrenChanged`, meant for introspection tooling like devtools.
 
-:::
+</Container>
 
 ## Batching
 
@@ -52,28 +52,34 @@ twice, once per `value` set.
 ## Subscribing from your UI layer
 
 <FrameworkText>
-<template #react>
+<FrameworkSlot name="react">
 
 `useWatch` (or `Watch`, its render-prop form) subscribes the calling component
 via `useSyncExternalStore`, re-rendering on every notify by default:
 
-</template>
-<template #lit>
+</FrameworkSlot>
+<FrameworkSlot name="lit">
 
 `watch` (a directive, for one-off use inline in a template) or `WatchController`
 (a `ReactiveController`, for a whole component's `render()`) subscribes to
 `api`, requesting an update on every notify by default:
 
-</template>
+</FrameworkSlot>
 </FrameworkText>
 
-::: code-group
+<CodeGroup>
 
-```tsx [React]
+<CodeGroupItem label="React">
+
+```tsx
 const field = useWatch(parent.field("email"));
 ```
 
-```ts [Lit]
+</CodeGroupItem>
+
+<CodeGroupItem label="Lit">
+
+```lit
 #watch = new WatchController(this, () => parent.field("email"));
 
 override render() {
@@ -82,24 +88,26 @@ override render() {
 }
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 ### Don't subscribe in the component that owns the form
 
 <FrameworkText>
-<template #react>
+<FrameworkSlot name="react">
 
 `useForm` deliberately doesn't subscribe the calling component (see
-[Basic](/guide/basic)) so that typing into one field doesn't re-render the whole
-form. Calling `useWatch` in that same component undoes that: the component now
-re-renders on every notify anyway, just like it would if `useForm` subscribed by
-itself. If you catch yourself reaching for `useWatch` right next to a `useForm`
-call, extract that `useWatch` call and the UI it drives into their own component
-(`TextField`, `SubmitButton`, ...), and pass the already-resolved
-`FieldApi`/`FormApi` down as a prop instead.
+[Basic](/form/guide/basic)) so that typing into one field doesn't re-render the
+whole form. Calling `useWatch` in that same component undoes that: the component
+now re-renders on every notify anyway, just like it would if `useForm`
+subscribed by itself. If you catch yourself reaching for `useWatch` right next
+to a `useForm` call, extract that `useWatch` call and the UI it drives into
+their own component (`TextField`, `SubmitButton`, ...), and pass the
+already-resolved `FieldApi`/`FormApi` down as a prop instead.
 
-</template>
-<template #lit>
+</FrameworkSlot>
+<FrameworkSlot name="lit">
 
 Don't create a `FormApi` and a `WatchController` in the same component: the
 `WatchController` requests an update on every notify, so the whole form
@@ -107,23 +115,29 @@ re-renders on every change. Extract that `WatchController` and the UI it drives
 into their own custom element (`text-field`, `submit-button`, ...), and pass the
 already-resolved `FieldApi`/`FormApi` down as a property instead.
 
-</template>
+</FrameworkSlot>
 </FrameworkText>
 
 ### Narrowing what runs
 
 Pass `select` to re-render only when the properties you actually read change:
 
-::: code-group
+<CodeGroup>
 
-```tsx [React]
+<CodeGroupItem label="React">
+
+```tsx
 const [value, invalid, touched] = useWatch(
   parent.field("email"),
   (f) => [f.value, f.invalid, f.touched] as const,
 );
 ```
 
-```ts [Lit]
+</CodeGroupItem>
+
+<CodeGroupItem label="Lit">
+
+```lit
 #watch = new WatchController(
   this,
   () => parent.field("email"),
@@ -133,7 +147,9 @@ const [value, invalid, touched] = useWatch(
 // this.#watch.value is [value, invalid, touched]
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 `select`'s result is compared shallowly by default (own keys for a record,
 index-by-index for an array/tuple), so returning a fresh literal like the tuple
@@ -142,7 +158,7 @@ above doesn't force a re-render on every notify.
 ### Selecting a derived value
 
 <FrameworkText>
-<template #react>
+<FrameworkSlot name="react">
 
 `Watch` is a general-purpose subscription component for any already-resolved
 `FieldApi`/`FormApi`, without writing a custom component around `useWatch`.
@@ -150,8 +166,8 @@ above doesn't force a re-render on every notify.
 to narrow the subscription to a selected value, passed as `children`'s second
 argument.
 
-</template>
-<template #lit>
+</FrameworkSlot>
+<FrameworkSlot name="lit">
 
 `watch` is a general-purpose subscription directive for any already-resolved
 `FieldApi`/`FormApi`, for one-off use inline in a template without writing a
@@ -159,12 +175,14 @@ custom component. `render` always receives the field/form as its first argument;
 pass `select` between `api` and `render` to narrow the subscription to a
 selected value, passed as `render`'s second argument.
 
-</template>
+</FrameworkSlot>
 </FrameworkText>
 
-::: code-group
+<CodeGroup>
 
-```tsx [React]
+<CodeGroupItem label="React">
+
+```tsx
 // Re-render only when `submitting || !dirty` changes.
 <Watch api={form} select={(f) => f.submitting || !f.dirty}>
   {(form, disabled) => (
@@ -180,7 +198,11 @@ selected value, passed as `render`'s second argument.
 </Watch>
 ```
 
-```ts [Lit]
+</CodeGroupItem>
+
+<CodeGroupItem label="Lit">
+
+```lit
 // Re-render only when `submitting || !dirty` changes.
 watch(
   form,
@@ -199,25 +221,27 @@ watch(
 );
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 <FrameworkText>
-<template #react>
+<FrameworkSlot name="react">
 
 `useWatch` is the hook `Watch` is built on — use it directly to build reusable
 components such as `TextField`, `AddressField`, `SubmitButton`, and so on.
 
-</template>
-<template #lit>
+</FrameworkSlot>
+<FrameworkSlot name="lit">
 
 `WatchController` is the reusable-component equivalent of `watch` — use it
 directly to build reusable components such as `TextField`, `AddressField`,
 `SubmitButton`, and so on.
 
-</template>
+</FrameworkSlot>
 </FrameworkText>
 
 ## What's next
 
-- [Listeners](/guide/listeners) — `onValueChanged`, the value-specific case
+- [Listeners](/form/guide/listeners) — `onValueChanged`, the value-specific case
   built on top of this

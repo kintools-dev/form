@@ -2,15 +2,16 @@
 
 ## Two kinds of validation
 
-kin-form has two independent validation mechanisms, and most forms use both:
+Kin Form has two independent validation mechanisms, and most forms use both:
 
 - **Per-node validation** (this page): `validators`/`asyncValidator`, attached
   to any individual field, group, or form. Each node owns its own rule(s) and
   its own `error`.
-- **[Schema validation](/guide/schema-validation)**: a single `schemaValidator`
-  attached to a group or form, validating the _whole subtree's_ value in one
-  pass (typically with zod/valibot) and reporting results back onto individual
-  fields by path, without each field needing its own rule.
+- **[Schema validation](/form/guide/schema-validation)**: a single
+  `schemaValidator` attached to a group or form, validating the _whole
+  subtree's_ value in one pass (typically with zod/valibot) and reporting
+  results back onto individual fields by path, without each field needing its
+  own rule.
 
 They're additive, not exclusive: a field's `error` (from its own
 `validators`/`asyncValidator`) and its `schemaError` (its slice of a parent's
@@ -20,7 +21,7 @@ per-node validation for rules that live naturally on one field (`required`,
 `min`, an async uniqueness check); reach for schema validation when you already
 have (or want) one schema describing the whole form, or for a check spanning
 several fields at once (a cross-field `.refine()`) without hand-wiring
-[dependents](/guide/linked-fields).
+[dependents](/form/guide/linked-fields).
 
 ## Validators
 
@@ -44,10 +45,10 @@ form.field("email", {
 ```
 
 Validators run **in order**; the first truthy result wins. A single validator
-(not wrapped in an array) is also accepted. See [Validators](/validators/) for
-the built-in factories (`required`, `minLength`, `email`, `password`, ...), or
-[Schema Validation](/guide/schema-validation) to validate a whole group or form
-with zod/valibot instead of one hand-written validator per field.
+(not wrapped in an array) is also accepted. See [Validators](/form/validators/)
+for the built-in factories (`required`, `minLength`, `email`, `password`, ...),
+or [Schema Validation](/form/guide/schema-validation) to validate a whole group
+or form with zod/valibot instead of one hand-written validator per field.
 
 Reassigning `validators` to a new value does **not** itself trigger a new
 validation run; it takes effect the next time something actually triggers one (a
@@ -83,11 +84,12 @@ form.field("username", {
 It only runs once every `validators` entry has already passed, so an
 expensive/network-calling check never fires for a value already known invalid by
 a cheap one. `validators` are always immediate, never debounced;
-`asyncValidator` and [`schemaValidator`](/guide/schema-validation) are the two
-places `validationDebounceMs` applies. Rapid successive changes (fast typing)
-coalesce into a single run fired after the debounce window, rather than one per
-keystroke. `handleBlur` flushes any still-pending debounced run immediately, so
-the user isn't left waiting out the window after moving on from the field.
+`asyncValidator` and [`schemaValidator`](/form/guide/schema-validation) are the
+two places `validationDebounceMs` applies. Rapid successive changes (fast
+typing) coalesce into a single run fired after the debounce window, rather than
+one per keystroke. `handleBlur` flushes any still-pending debounced run
+immediately, so the user isn't left waiting out the window after moving on from
+the field.
 
 Singular, unlike `validators`: there's no real use case for stacking multiple
 async checks on one field the way there is for small sync rules; combine them
@@ -113,7 +115,7 @@ re-run `validators` at all (they're already current from the last value change).
 Pass `validate(true)` to force a full re-run, including `validators`, when
 something a validator reads changed out of band, not reflected in this node's
 own `value`, `validators`, or `asyncValidator` (e.g. external state, or a
-sibling field this one isn't a [dependent](/guide/linked-fields) of):
+sibling field this one isn't a [dependent](/form/guide/linked-fields) of):
 
 ```ts
 // Re-check "available" against a username tracked outside the form tree.
@@ -140,12 +142,12 @@ form.field("shipping", {
 ```
 
 This is still _per-node_ validation: one message, on this one group's own
-`error`, not [schema validation](/guide/schema-validation)'s `schemaErrorMap`.
-Reach for this when you have one or two ad hoc cross-field rules; reach for
-`schemaValidator` when you want a whole schema (and its own per-path messages)
-validating the group at once.
+`error`, not [schema validation](/form/guide/schema-validation)'s
+`schemaErrorMap`. Reach for this when you have one or two ad hoc cross-field
+rules; reach for `schemaValidator` when you want a whole schema (and its own
+per-path messages) validating the group at once.
 
 A group's `invalid` reflects **itself or any descendant**, so a group-level
 error like this surfaces the same way a child field's error would. For a rule
 that only needs to _re-run a sibling's own validators_ rather than add a new
-one, see [Linked Fields](/guide/linked-fields) instead.
+one, see [Linked Fields](/form/guide/linked-fields) instead.

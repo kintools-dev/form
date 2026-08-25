@@ -1,6 +1,6 @@
 # Linked Fields
 
-Every node is the same [`FieldApi`](/guide/concepts) class, so `dependents`
+Every node is the same [`FieldApi`](/form/guide/concepts) class, so `dependents`
 works the same on a leaf field, group, or the form root.
 
 Declare `dependents` to re-validate sibling fields whenever _this_ field's value
@@ -22,7 +22,7 @@ Every time `password` changes, `confirmPassword` is force-validated.
 nested field only reaches its own siblings, not the whole tree.
 
 `dependents` only re-runs a sibling's _validators_; it can't push a new value or
-run arbitrary code. For that, see [Listeners](/guide/listeners).
+run arbitrary code. For that, see [Listeners](/form/guide/listeners).
 
 ## Multiple dependents
 

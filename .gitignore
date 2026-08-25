@@ -14,10 +14,6 @@ dist-ssr
 .next
 *.local
 
-# VitePress
-docs/.vitepress/dist
-docs/.vitepress/cache
-docs/.vitepress/.temp
 
 TODO.md
 

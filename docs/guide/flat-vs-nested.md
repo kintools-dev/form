@@ -22,10 +22,10 @@ only needs to know its own slice of the form, not the whole shape. An
 `AddressField` built against `FieldApi<Address, TParentValue>` works the same
 whether it's mounted at `shipping`, `billing`, or any other path in any other
 form; see
-[Nested fields: `AddressField`](/guide/form-composition#nested-fields-addressfield).
+[Nested fields: `AddressField`](/form/guide/form-composition#nested-fields-addressfield).
 
 Both examples below address the same model, using the `TextField` from
-[Form Composition](/guide/form-composition#leaf-fields-textfield-numberfield):
+[Form Composition](/form/guide/form-composition#leaf-fields-textfield-numberfield):
 
 ```ts
 type Item = {
@@ -60,9 +60,11 @@ FormApi<Checkout>
           └─ field("quantity")  FieldApi<number>
 ```
 
-::: code-group
+<CodeGroup>
 
-```tsx [React]
+<CodeGroupItem label="React">
+
+```tsx
 function CheckoutForm() {
   const form = useForm<Checkout>({ initialValue });
   const shippingGroup = form.field("shipping");
@@ -108,7 +110,11 @@ function CheckoutForm() {
 }
 ```
 
-```ts [Lit]
+</CodeGroupItem>
+
+<CodeGroupItem label="Lit">
+
+```lit
 import { html, LitElement } from "lit";
 import { customElement } from "lit/decorators.js";
 import { repeat } from "lit/directives/repeat.js";
@@ -180,13 +186,15 @@ class CheckoutForm extends LitElement {
 }
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 Each level is its own node: `shippingGroup.invalid`/`shippingGroup.touched`
 aggregate from just its own children, and `shippingGroup` can carry `validators`
 or a `schemaValidator` scoped to the address alone. See
-[Nested Objects](/guide/nested-objects) and
-[Form Composition](/guide/form-composition#nested-fields-addressfield) for
+[Nested Objects](/form/guide/nested-objects) and
+[Form Composition](/form/guide/form-composition#nested-fields-addressfield) for
 building reusable `AddressField`/`ItemsField` components.
 
 ## Flat: dotted paths off the root
@@ -203,9 +211,11 @@ FormApi<Checkout>
 └─ field("items.0.quantity")  FieldApi<number>
 ```
 
-::: code-group
+<CodeGroup>
 
-```tsx [React]
+<CodeGroupItem label="React">
+
+```tsx
 function CheckoutForm() {
   const form = useForm<Checkout>({ initialValue });
 
@@ -250,7 +260,11 @@ function CheckoutForm() {
 }
 ```
 
-```ts [Lit]
+</CodeGroupItem>
+
+<CodeGroupItem label="Lit">
+
+```lit
 import { html, LitElement } from "lit";
 import { customElement } from "lit/decorators.js";
 import { repeat } from "lit/directives/repeat.js";
@@ -318,26 +332,31 @@ class CheckoutForm extends LitElement {
 }
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 There's no `shipping`-level or `items`-level aggregate state: every field
 reports directly to `form`. See
-[Resolve the intermediate field first](/guide/nested-objects#resolve-the-intermediate-field-first).
+[Resolve the intermediate field first](/form/guide/nested-objects#resolve-the-intermediate-field-first).
 
-:::: tip
+<Container type="tip">
 
-The [array mutation helpers](/guide/dynamic-arrays) still work without resolving
-`items` as its own field: they only need the array's name, not a resolved node,
-e.g. `form.pushItem("items", { code: "", quantity: 1 })`. What's missing is a
-stable per-item key, since that only exists on a resolved `FieldApi`.
+The [array mutation helpers](/form/guide/dynamic-arrays) still work without
+resolving `items` as its own field: they only need the array's name, not a
+resolved node, e.g. `form.pushItem("items", { code: "", quantity: 1 })`. What's
+missing is a stable per-item key, since that only exists on a resolved
+`FieldApi`.
 
 If reordering is needed, stamp one on yourself. A `Symbol`-keyed property stays
 out of `Object.keys`/`JSON.stringify` (so it won't leak into submission or trip
 up a schema's `.strict()`), unlike a regular field:
 
-::: code-group
+<CodeGroup>
 
-```tsx [React]
+<CodeGroupItem label="React">
+
+```tsx
 let itemKey = 0;
 const ITEM_KEY = Symbol();
 
@@ -358,7 +377,11 @@ const addItem = useCallback(() => {
 <div key={item[ITEM_KEY]}>
 ```
 
-```ts [Lit]
+</CodeGroupItem>
+
+<CodeGroupItem label="Lit">
+
+```lit
 let itemKey = 0;
 const ITEM_KEY = Symbol();
 
@@ -380,19 +403,21 @@ readonly #addItem = () => {
 // repeat(items, (item) => item[ITEM_KEY], ...)
 ```
 
-:::
+</CodeGroupItem>
 
-::::
+</CodeGroup>
+
+</Container>
 
 ## `schemaValidator` works either way
 
-A [schema validator](/guide/schema-validation) checks the whole tree in one pass
-and already produces a flat, dot-joined path -> message map (`schemaErrorMap`);
-`field.schemaError` reads a field's own slice by walking up through any
-intermediate fields to find it. So unlike hand-written per-field `validators`, a
-`schemaValidator` doesn't push you toward one shape over the other: nest where
-it's worth its own `validators`/aggregate `touched`/`invalid`, stay flat where
-it isn't, without worrying about where the schema was attached.
+A [schema validator](/form/guide/schema-validation) checks the whole tree in one
+pass and already produces a flat, dot-joined path -> message map
+(`schemaErrorMap`); `field.schemaError` reads a field's own slice by walking up
+through any intermediate fields to find it. So unlike hand-written per-field
+`validators`, a `schemaValidator` doesn't push you toward one shape over the
+other: nest where it's worth its own `validators`/aggregate `touched`/`invalid`,
+stay flat where it isn't, without worrying about where the schema was attached.
 
 Hand-written per-field `validators` don't have that shortcut: a node boundary is
 the only way to scope aggregate `invalid`/`touched` to a subtree, or attach a
@@ -421,9 +446,10 @@ FormApi<Checkout>
 
 ## What's next
 
-- [Nested Objects](/guide/nested-objects) and
-  [Dynamic Arrays](/guide/dynamic-arrays) — everything the child registry adds
-- [Schema Validation](/guide/schema-validation) — `schemaErrorMap`, and how
+- [Nested Objects](/form/guide/nested-objects) and
+  [Dynamic Arrays](/form/guide/dynamic-arrays) — everything the child registry
+  adds
+- [Schema Validation](/form/guide/schema-validation) — `schemaErrorMap`, and how
   `schemaError` resolves through nested fields
-- [Form Composition](/guide/form-composition) — reusable field components for
-  either shape
+- [Form Composition](/form/guide/form-composition) — reusable field components
+  for either shape

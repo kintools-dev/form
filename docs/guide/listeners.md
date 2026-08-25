@@ -23,9 +23,11 @@ Since every nested field's change bubbles up into the root's own `value`, one
 `onValueChanged` on the form reacts to _any_ edit in the tree, without wiring a
 handler onto each individual field:
 
-::: code-group
+<CodeGroup>
 
-```ts [React]
+<CodeGroupItem label="React">
+
+```ts
 const form = useForm({
   initialValue: draft,
   onValueChanged: (form) => {
@@ -34,7 +36,11 @@ const form = useForm({
 });
 ```
 
-```ts [Lit]
+</CodeGroupItem>
+
+<CodeGroupItem label="Lit">
+
+```lit
 #form = new FormApi({
   initialValue: draft,
   onValueChanged: (form) => {
@@ -43,7 +49,9 @@ const form = useForm({
 });
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 ## Debouncing
 
@@ -55,9 +63,11 @@ it in a timer. That's left to you on purpose. Trailing vs. leading edge,
 `maxWait`, and so on are real choices a single built-in policy wouldn't fit
 everyone.
 
-::: code-group
+<CodeGroup>
 
-```tsx [React]
+<CodeGroupItem label="React">
+
+```tsx
 // Memoize the debounced function so it survives useForm's every-render
 // updateOptions refresh instead of resetting its timer on every keystroke.
 const persist = useMemo(
@@ -70,7 +80,11 @@ const form = useForm({
 });
 ```
 
-```ts [Lit]
+</CodeGroupItem>
+
+<CodeGroupItem label="Lit">
+
+```lit
 // A stable class field, unlike a React hook's fresh closure every render, so
 // no memoization is needed to keep the debounce timer alive.
 #form = new FormApi({
@@ -82,18 +96,22 @@ const form = useForm({
 });
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 ## Listening for `touched`/`invalid`/`validating`
 
 There's no dedicated callback for those: `onValueChanged` is deliberately scoped
 to values, the case that comes up most in practice (validation side effects,
 persistence). To react to a different property, subscribe directly; see
-[Reactivity](/guide/reactivity).
+[Reactivity](/form/guide/reactivity).
 
-::: code-group
+<CodeGroup>
 
-```tsx [React]
+<CodeGroupItem label="React">
+
+```tsx
 const touched = useWatch(field, (f) => f.touched);
 
 useEffect(() => {
@@ -101,7 +119,11 @@ useEffect(() => {
 }, [touched]);
 ```
 
-```ts [Lit]
+</CodeGroupItem>
+
+<CodeGroupItem label="Lit">
+
+```lit
 #unsubscribe?: VoidFunction;
 
 override connectedCallback() {
@@ -117,4 +139,6 @@ override disconnectedCallback() {
 }
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>

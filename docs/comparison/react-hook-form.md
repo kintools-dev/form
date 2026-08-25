@@ -2,7 +2,7 @@
 
 React Hook Form is the most widely used of the three (by a wide and growing
 margin), so it's the one worth the deepest comparison. This page works through
-the same topics the [guide](/guide/) covers, one at a time, against
+the same topics the [guide](/form/guide/) covers, one at a time, against
 `react-hook-form@7.81.0`.
 
 ## Field registration & binding model
@@ -11,9 +11,11 @@ the same topics the [guide](/guide/) covers, one at a time, against
 
 <SideBySide>
 
-::: code-group
+<CodeGroup>
 
-```tsx{15} [Kin Form]
+<CodeGroupItem label="Kin Form">
+
+```tsx {15}
 import { useForm, Watch } from "@kintools/form-react";
 import { required } from "@kintools/form-validators";
 
@@ -46,7 +48,11 @@ function LoginForm() {
 }
 ```
 
-```tsx{15} [React Hook Form]
+</CodeGroupItem>
+
+<CodeGroupItem label="React Hook Form">
+
+```tsx {15}
 import { useForm } from "react-hook-form";
 
 type LoginValues = { email: string };
@@ -70,7 +76,9 @@ function LoginForm() {
 }
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 </SideBySide>
 
@@ -98,9 +106,11 @@ else, both sides bind to a controlled `<TextInput>` component, so
 
 <SideBySide>
 
-::: code-group
+<CodeGroup>
 
-```tsx{14} [Kin Form]
+<CodeGroupItem label="Kin Form">
+
+```tsx {14}
 import { useForm, Watch } from "@kintools/form-react";
 import { required } from "@kintools/form-validators";
 
@@ -129,7 +139,11 @@ function ProfileForm() {
 }
 ```
 
-```tsx{13-15} [React Hook Form]
+</CodeGroupItem>
+
+<CodeGroupItem label="React Hook Form">
+
+```tsx {13-15}
 import { Controller, useForm } from "react-hook-form";
 
 type ProfileValues = { country: string };
@@ -159,7 +173,9 @@ function ProfileForm() {
 }
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 </SideBySide>
 
@@ -179,9 +195,11 @@ reusable components rather than inlined in one form.
 
 <SideBySide>
 
-::: code-group
+<CodeGroup>
 
-```tsx{13} [Kin Form]
+<CodeGroupItem label="Kin Form">
+
+```tsx {13}
 import { useForm, Watch } from "@kintools/form-react";
 
 function SignupForm() {
@@ -205,7 +223,11 @@ function SignupForm() {
 }
 ```
 
-```tsx{10-17} [React Hook Form]
+</CodeGroupItem>
+
+<CodeGroupItem label="React Hook Form">
+
+```tsx {10-17}
 import { Controller, useForm } from "react-hook-form";
 import { useMemo } from "react";
 import debounce from "lodash/debounce";
@@ -237,7 +259,9 @@ function SignupForm() {
 }
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 </SideBySide>
 
@@ -260,9 +284,11 @@ Both adapters can be used with any Standard Schema library: zod, valibot, ...
 
 <SideBySide>
 
-::: code-group
+<CodeGroup>
 
-```tsx{20-21} [Kin Form]
+<CodeGroupItem label="Kin Form">
+
+```tsx {20-21}
 import { useForm, Watch } from "@kintools/form-react";
 import { required, toSchemaValidator } from "@kintools/form-validators";
 import { z } from "zod";
@@ -296,7 +322,11 @@ function SignupForm() {
 }
 ```
 
-```tsx{21-22} [React Hook Form]
+</CodeGroupItem>
+
+<CodeGroupItem label="React Hook Form">
+
+```tsx {21-22}
 import { Controller, useForm } from "react-hook-form";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { z } from "zod";
@@ -330,7 +360,9 @@ function SignupForm() {
 }
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 </SideBySide>
 
@@ -349,9 +381,11 @@ amounts of wiring.
 
 <SideBySide>
 
-::: code-group
+<CodeGroup>
 
-```tsx{8,20-22} [Kin Form]
+<CodeGroupItem label="Kin Form">
+
+```tsx {8,20-22}
 function SignupForm() {
   const form = useForm<Signup>({
     initialValue: { email: "", password: "", confirmPassword: "" },
@@ -371,9 +405,8 @@ function SignupForm() {
 
       <Watch
         api={form.field("confirmPassword", {
-          validators: (field) => field.value !== form.value.password
-            ? "Passwords must match"
-            : null,
+          validators: (field) =>
+            field.value !== form.value.password ? "Passwords must match" : null,
         })}
       >
         {(field) => (
@@ -392,7 +425,11 @@ function SignupForm() {
 }
 ```
 
-```tsx{17-18,28-29} [React Hook Form]
+</CodeGroupItem>
+
+<CodeGroupItem label="React Hook Form">
+
+```tsx {17-18,28-29}
 function SignupForm() {
   const { control, trigger, getValues } = useForm<Signup>({
     defaultValues: { email: "", password: "", confirmPassword: "" },
@@ -439,7 +476,9 @@ function SignupForm() {
 }
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 </SideBySide>
 
@@ -457,9 +496,11 @@ Both track dirtiness at both levels (whole form and per field), but differently.
 
 <SideBySide>
 
-::: code-group
+<CodeGroup>
 
-```tsx{14,20} [Kin Form]
+<CodeGroupItem label="Kin Form">
+
+```tsx {14,20}
 function ProfileForm() {
   const form = useForm({
     initialValue: { firstName: "", lastName: "" },
@@ -491,7 +532,11 @@ function ProfileForm() {
 }
 ```
 
-```tsx{6,23,25} [React Hook Form]
+</CodeGroupItem>
+
+<CodeGroupItem label="React Hook Form">
+
+```tsx {6,23,25}
 function ProfileForm() {
   const {
     control,
@@ -511,9 +556,11 @@ function ProfileForm() {
           <TextInput value={field.value} onChange={field.onChange} />
         )}
       />
-      {/* Looks scoped to firstName, but the subscription (established when
+      {
+        /* Looks scoped to firstName, but the subscription (established when
           dirtyFields was pulled off formState above) is to the whole object:
-          this re-renders when ANY field becomes dirty, not just firstName. */}
+          this re-renders when ANY field becomes dirty, not just firstName. */
+      }
       {dirtyFields.firstName && <span>Edited</span>}
 
       <button disabled={!isDirty} onClick={reset}>
@@ -524,7 +571,9 @@ function ProfileForm() {
 }
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 </SideBySide>
 
@@ -544,9 +593,11 @@ but only one also separates "submission itself failed."
 
 <SideBySide>
 
-::: code-group
+<CodeGroup>
 
-```tsx{6-11} [Kin Form]
+<CodeGroupItem label="Kin Form">
+
+```tsx {6-11}
 const form = useForm<Signup>({
   initialValue: { email: "", password: "" },
   onSubmit: async (form) => {
@@ -564,7 +615,11 @@ const form = useForm<Signup>({
 <form onSubmit={form.handleSubmit}>
 ```
 
-```tsx{9-12} [React Hook Form]
+</CodeGroupItem>
+
+<CodeGroupItem label="React Hook Form">
+
+```tsx {9-12}
 const { handleSubmit } = useForm<Signup>({
   defaultValues: { email: "", password: "" },
 });
@@ -584,7 +639,9 @@ const { handleSubmit } = useForm<Signup>({
 )}>
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 </SideBySide>
 
@@ -603,9 +660,11 @@ This is a place React Hook Form is genuinely nicer.
 
 <SideBySide>
 
-::: code-group
+<CodeGroup>
 
-```tsx{7-8} [Kin Form]
+<CodeGroupItem label="Kin Form">
+
+```tsx {7-8}
 function ProfilePage() {
   const { data, isLoading } = useQuery({
     queryKey: ["profile"],
@@ -630,7 +689,11 @@ function ProfileForm({ initialValue }: { initialValue: Profile }) {
 }
 ```
 
-```tsx{3} [React Hook Form]
+</CodeGroupItem>
+
+<CodeGroupItem label="React Hook Form">
+
+```tsx {3}
 function ProfilePage() {
   const { register, handleSubmit, formState: { isLoading } } = useForm({
     defaultValues: fetchProfile, // resolved automatically
@@ -646,7 +709,9 @@ function ProfilePage() {
 }
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 </SideBySide>
 
@@ -670,9 +735,11 @@ error or touched status means also subscribing to `useFormState`.
 
 <SideBySide>
 
-::: code-group
+<CodeGroup>
 
-```tsx{5-8} [Kin Form]
+<CodeGroupItem label="Kin Form">
+
+```tsx {5-8}
 import { type FieldApi, useWatch } from "@kintools/form-react";
 
 function Field<TParentValue>({ api }: { api: FieldApi<string, TParentValue> }) {
@@ -693,7 +760,11 @@ function Field<TParentValue>({ api }: { api: FieldApi<string, TParentValue> }) {
 <Field api={form.field("email")} />;
 ```
 
-```tsx{8-9,12-14} [React Hook Form]
+</CodeGroupItem>
+
+<CodeGroupItem label="React Hook Form">
+
+```tsx {8-9,12-14}
 import { useFormState, useWatch } from "react-hook-form";
 import type { FieldValues, UseControllerProps } from "react-hook-form";
 
@@ -720,7 +791,9 @@ function Field<T extends FieldValues>(
 <Field control={control} name="email" />;
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 </SideBySide>
 
@@ -761,9 +834,11 @@ against core React Hook Form, without this addon.
 
 <SideBySide>
 
-::: code-group
+<CodeGroup>
 
-```tsx{4} [Kin Form]
+<CodeGroupItem label="Kin Form">
+
+```tsx {4}
 import { type FieldApi, useWatch } from "@kintools/form-react";
 
 function TextField<TParent>(
@@ -790,7 +865,11 @@ function TextField<TParent>(
 />;
 ```
 
-```tsx{11} [React Hook Form]
+</CodeGroupItem>
+
+<CodeGroupItem label="React Hook Form">
+
+```tsx {11}
 import { useController } from "react-hook-form";
 import type {
   FieldPathByValue,
@@ -827,7 +906,9 @@ function TextField<T extends FieldValues>(
 />;
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 </SideBySide>
 
@@ -850,9 +931,11 @@ and billing) instead of an array:
 
 <SideBySide>
 
-::: code-group
+<CodeGroup>
 
-```tsx{6} [Kin Form]
+<CodeGroupItem label="Kin Form">
+
+```tsx {6}
 import { type FieldApi } from "@kintools/form-react";
 
 type Address = { line1: string; city: string };
@@ -872,7 +955,11 @@ function AddressField<TParentValue>(
 <AddressField api={form.field("billing")} />
 ```
 
-```tsx{10,18,23} [React Hook Form]
+</CodeGroupItem>
+
+<CodeGroupItem label="React Hook Form">
+
+```tsx {10,18,23}
 import type {
   FieldPathByValue,
   FieldValues,
@@ -906,7 +993,9 @@ function AddressField<T extends FieldValues>(
 <AddressField control={control} name="billing" />
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 </SideBySide>
 
@@ -926,9 +1015,11 @@ identity across a reorder, plus its own mutation helpers:
 
 <SideBySide>
 
-::: code-group
+<CodeGroup>
 
-```tsx{4,15,33} [Kin Form]
+<CodeGroupItem label="Kin Form">
+
+```tsx {4,15,33}
 import { FieldApi, useForm, useWatch } from "@kintools/form-react";
 
 function ItemsField<TParentValue>(
@@ -972,9 +1063,9 @@ function ItemField(
   return (
     <div>
       <TextInput
-         value={api.value}
-         onBlur={api.handleBlur}
-         onChange={api.handleChange}
+        value={api.value}
+        onBlur={api.handleBlur}
+        onChange={api.handleChange}
       />
       <button disabled={!onMoveUp} onClick={onMoveUp}>Move up</button>
       <button disabled={!onMoveDown} onClick={onMoveDown}>Move down</button>
@@ -994,7 +1085,11 @@ function Form() {
 }
 ```
 
-```tsx{21-22,25-27,33,53} [React Hook Form]
+</CodeGroupItem>
+
+<CodeGroupItem label="React Hook Form">
+
+```tsx {21-22,25-27,33,36-39,53}
 import {
   useController,
   useFieldArray,
@@ -1085,7 +1180,9 @@ function Form() {
 }
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 </SideBySide>
 
@@ -1102,14 +1199,16 @@ function Form() {
 ## Multistep forms
 
 Neither ships an official multi-step/wizard _component_. Kin Form ships a
-dedicated hook instead, [`useMultistep`](/guide/multistep); React Hook Form's
-docs demonstrate the hand-rolled version.
+dedicated hook instead, [`useMultistep`](/form/guide/multistep); React Hook
+Form's docs demonstrate the hand-rolled version.
 
 <SideBySide>
 
-::: code-group
+<CodeGroup>
 
-```tsx{16-20,28-29,35-37} [Kin Form]
+<CodeGroupItem label="Kin Form">
+
+```tsx {16-20,28-29,35-37}
 import { useForm, useMultistep } from "@kintools/form-react";
 
 type Signup = {
@@ -1127,7 +1226,7 @@ function SignupWizard() {
   // `next` checks if the current step is valid before advancing.
   const { stepName, stepField, isLastStep, next } = useMultistep(
     form,
-     // Step names, matching form's value shape.
+    // Step names, matching form's value shape.
     ["credentials", "address"] as const,
   );
 
@@ -1135,8 +1234,10 @@ function SignupWizard() {
     <form onSubmit={form.handleSubmit}>
       {stepName === "credentials" && (
         <>
-          {/* Field names are relative to the current step,
-           so it's easy to extract a step's UI into a reusable component. */}
+          {
+            /* Field names are relative to the current step,
+           so it's easy to extract a step's UI into a reusable component. */
+          }
           <TextField api={stepField.field("email")} label="Email" />
           <TextField api={stepField.field("password")} label="Password" />
         </>
@@ -1152,7 +1253,11 @@ function SignupWizard() {
 }
 ```
 
-```tsx{10-13,23,27,38,43,51-53} [React Hook Form]
+</CodeGroupItem>
+
+<CodeGroupItem label="React Hook Form">
+
+```tsx {10-13,23,27,38,43,51-53}
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -1211,7 +1316,9 @@ function SignupWizard() {
 }
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 </SideBySide>
 

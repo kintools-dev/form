@@ -1,0 +1,84 @@
+{
+  "title": "Kin Form",
+  "description": "Fast, lightweight, framework-agnostic form state library for TypeScript. Zero-dependencies core, 100% type-safe field paths, React bindings built in.",
+  "nav": [
+    { "text": "Guide", "link": "/guide/" },
+    { "text": "Validators", "link": "/validators/" },
+    { "text": "Comparison", "link": "/comparison/" },
+    { "text": "API Reference", "link": "https://jsr.io/@kintools/form-core" }
+  ],
+  "sidebar": {
+    "/guide/": [
+      {
+        "text": "Introduction",
+        "items": [
+          { "text": "Why Kin Form?", "link": "/guide/" },
+          { "text": "Getting Started", "link": "/guide/getting-started" },
+          { "text": "Concepts", "link": "/guide/concepts" },
+          { "text": "Basic", "link": "/guide/basic" }
+        ]
+      },
+      {
+        "text": "Guides",
+        "items": [
+          {
+            "text": "Per-node Validation",
+            "link": "/guide/per-node-validation"
+          },
+          { "text": "Schema Validation", "link": "/guide/schema-validation" },
+          { "text": "Linked Fields", "link": "/guide/linked-fields" },
+          { "text": "Listeners", "link": "/guide/listeners" },
+          { "text": "Nested Objects", "link": "/guide/nested-objects" },
+          { "text": "Dynamic Arrays", "link": "/guide/dynamic-arrays" },
+          {
+            "text": "Flat vs. Nested Structure",
+            "link": "/guide/flat-vs-nested"
+          },
+          {
+            "text": "Dirty Tracking & Reset",
+            "link": "/guide/dirty-tracking-and-reset"
+          },
+          {
+            "text": "Submission Handling",
+            "link": "/guide/submission-handling"
+          },
+          {
+            "text": "Async Initial Values",
+            "link": "/guide/async-initial-values"
+          },
+          { "text": "Reactivity", "link": "/guide/reactivity" },
+          { "text": "Form Composition", "link": "/guide/form-composition" },
+          { "text": "Multistep Forms", "link": "/guide/multistep" },
+          { "text": "Devtools", "link": "/guide/devtools" },
+          { "text": "Server-Side Rendering (SSR)", "link": "/guide/ssr" },
+          { "text": "Common Pitfalls", "link": "/guide/common-pitfalls" }
+        ]
+      }
+    ],
+    "/validators/": [
+      {
+        "text": "Validators",
+        "items": [{ "text": "Overview", "link": "/validators/" }]
+      }
+    ],
+    "/comparison/": [
+      {
+        "text": "Comparison",
+        "items": [
+          { "text": "Overview", "link": "/comparison/" },
+          {
+            "text": "vs React Hook Form",
+            "link": "/comparison/react-hook-form"
+          }
+        ]
+      }
+    ]
+  },
+  "socialLinks": [
+    { "icon": "github", "link": "https://github.com/kintools-dev/form" }
+  ],
+  "editLink": {
+    "pattern": "https://github.com/kintools-dev/form/edit/main/docs/:path",
+    "text": "Edit this page on GitHub"
+  }
+}

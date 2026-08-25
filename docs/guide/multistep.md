@@ -1,26 +1,28 @@
 # Multistep Forms
 
 <FrameworkText>
-<template #react>
+<FrameworkSlot name="react">
 
 `useMultistep` orchestrates a wizard's current-step state on top of one step per
 named `FieldApi`. It validates the current step, waits for it to settle, and
 gates the advance, so a hand-rolled multistep form doesn't repeat that per step.
 
-</template>
-<template #lit>
+</FrameworkSlot>
+<FrameworkSlot name="lit">
 
 `MultistepController` orchestrates a wizard's current-step state on top of one
 step per named `FieldApi`. It validates the current step, waits for it to
 settle, and gates the advance, so a hand-rolled multistep form doesn't repeat
 that per step.
 
-</template>
+</FrameworkSlot>
 </FrameworkText>
 
-::: code-group
+<CodeGroup>
 
-```tsx [React]
+<CodeGroupItem label="React">
+
+```tsx
 import { useForm, useMultistep, Watch } from "@kintools/form-react";
 
 type Checkout = {
@@ -60,7 +62,11 @@ function CheckoutWizard() {
 }
 ```
 
-```ts [Lit]
+</CodeGroupItem>
+
+<CodeGroupItem label="Lit">
+
+```lit
 import { html, LitElement } from "lit";
 import { customElement } from "lit/decorators.js";
 import { FormApi, MultistepController } from "@kintools/form-lit";
@@ -127,20 +133,22 @@ class CheckoutWizard extends LitElement {
 }
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 ## Step names
 
 <FrameworkText>
-<template #react>
+<FrameworkSlot name="react">
 
 Each entry in the second argument of `useMultistep` (`stepNames`) is the
 `DeepKey` of that step's own `FieldApi`, or `null` for a step with no `FieldApi`
 (e.g. a final review screen that only reads other steps' values). `next()`
 treats a `null` step as always valid, skipping straight to `onBeforeNext`.
 
-</template>
-<template #lit>
+</FrameworkSlot>
+<FrameworkSlot name="lit">
 
 Each entry in `MultistepController`'s third constructor argument (`stepNames`)
 is the `DeepKey` of that step's own `FieldApi`, or `null` for a step with no
@@ -148,7 +156,7 @@ is the `DeepKey` of that step's own `FieldApi`, or `null` for a step with no
 `next()` treats a `null` step as always valid, skipping straight to
 `onBeforeNext`.
 
-</template>
+</FrameworkSlot>
 </FrameworkText>
 
 ## `next()`
@@ -166,9 +174,11 @@ is the `DeepKey` of that step's own `FieldApi`, or `null` for a step with no
 advances: the hook for persisting progress (e.g. saving a draft) or branching to
 a non-linear next step:
 
-::: code-group
+<CodeGroup>
 
-```tsx [React]
+<CodeGroupItem label="React">
+
+```tsx
 const wizard = useMultistep(form, ["account", "shipping", "billing", null], {
   onBeforeNext: async ({ form, stepName }) => {
     await saveDraft(form.value);
@@ -181,7 +191,11 @@ const wizard = useMultistep(form, ["account", "shipping", "billing", null], {
 });
 ```
 
-```ts [Lit]
+</CodeGroupItem>
+
+<CodeGroupItem label="Lit">
+
+```lit
 #wizard = new MultistepController(
   this,
   this.#form,
@@ -199,7 +213,9 @@ const wizard = useMultistep(form, ["account", "shipping", "billing", null], {
 );
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 Returning `false` (or throwing) cancels the advance, leaving `stepIndex`
 unchanged. Returning a step name (or `null`) redirects there instead.
@@ -220,18 +236,26 @@ wizard.jump("payment"); // By step name.
 Runs after `stepIndex` actually changes, from `next()`, `back()`, or `jump()`
 alike. Purely informational: it can't cancel anything.
 
-::: code-group
+<CodeGroup>
 
-```tsx [React]
+<CodeGroupItem label="React">
+
+```tsx
 useMultistep(form, steps, {
   onStepChanged: ({ stepIndex }) => trackWizardStep(stepIndex),
 });
 ```
 
-```ts [Lit]
+</CodeGroupItem>
+
+<CodeGroupItem label="Lit">
+
+```lit
 #wizard = new MultistepController(this, this.#form, steps, {
   onStepChanged: ({ stepIndex }) => trackWizardStep(stepIndex),
 });
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>

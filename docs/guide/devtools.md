@@ -1,10 +1,10 @@
 # Devtools
 
-::: info
+<Container type="info">
 
 React only for now: other framework bindings are planned.
 
-:::
+</Container>
 
 `@kintools/form-devtools-react` is an inspector panel for visualizing a
 `@kintools/form-react` form's live tree state during development: every
@@ -13,21 +13,33 @@ change.
 
 ## Install
 
-::: code-group
+<CodeGroup>
 
-```sh [npm]
+<CodeGroupItem label="npm">
+
+```sh
 npm add @kintools/form-devtools-react
 ```
 
-```sh [pnpm]
+</CodeGroupItem>
+
+<CodeGroupItem label="pnpm">
+
+```sh
 pnpm add @kintools/form-devtools-react
 ```
 
-```sh [deno]
+</CodeGroupItem>
+
+<CodeGroupItem label="deno">
+
+```sh
 deno add jsr:@kintools/form-devtools-react
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 ## Setup
 

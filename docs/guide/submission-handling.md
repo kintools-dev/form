@@ -1,8 +1,10 @@
 # Submission Handling
 
-::: code-group
+<CodeGroup>
 
-```tsx [React]
+<CodeGroupItem label="React">
+
+```tsx
 function LoginForm() {
   const form = useForm({
     initialValue: { email: "", password: "" },
@@ -18,7 +20,11 @@ function LoginForm() {
 }
 ```
 
-```ts [Lit]
+</CodeGroupItem>
+
+<CodeGroupItem label="Lit">
+
+```lit
 @customElement("login-form")
 class LoginForm extends LitElement {
   #form = new FormApi({
@@ -41,7 +47,9 @@ class LoginForm extends LitElement {
 }
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 `handleSubmit`:
 
@@ -61,9 +69,11 @@ shown above.
 `submitting` (and `dirty`, for a "nothing to save" state) are ordinary reactive
 state, so gate the button like any other field property:
 
-::: code-group
+<CodeGroup>
 
-```tsx [React]
+<CodeGroupItem label="React">
+
+```tsx
 <Watch api={form} select={(f) => [f.submitting, f.dirty] as const}>
   {(form, [submitting, dirty]) => (
     <button type="submit" disabled={submitting || !dirty}>
@@ -73,7 +83,11 @@ state, so gate the button like any other field property:
 </Watch>;
 ```
 
-```ts [Lit]
+</CodeGroupItem>
+
+<CodeGroupItem label="Lit">
+
+```lit
 watch(
   form,
   (f) => [f.submitting, f.dirty] as const,
@@ -84,7 +98,9 @@ watch(
 );
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 ## Disabling the whole form while submitting
 
@@ -94,9 +110,11 @@ cascades from a field down through every already-registered descendant, so
 `form.disabled = true` reaches every field in the tree without watching
 `submitting` anywhere:
 
-::: code-group
+<CodeGroup>
 
-```tsx [React]
+<CodeGroupItem label="React">
+
+```tsx
 const form = useForm({
   initialValue: { email: "", password: "" },
   onSubmit: async (form) => {
@@ -110,7 +128,11 @@ const form = useForm({
 });
 ```
 
-```ts [Lit]
+</CodeGroupItem>
+
+<CodeGroupItem label="Lit">
+
+```lit
 #form = new FormApi({
   initialValue: { email: "", password: "" },
   onSubmit: async (form) => {
@@ -124,54 +146,65 @@ const form = useForm({
 });
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 <FrameworkText>
-<template #react>
+<FrameworkSlot name="react">
 
 `disabled` on its own only skips validation; it doesn't reach the DOM by itself.
 For it to actually disable an input, the component rendering that input has to
 read its own field's `disabled` and fold it into whatever `disabled` prop the
-caller passed in, the same way `TextField` does (see [Basic](/guide/basic)):
+caller passed in, the same way `TextField` does (see
+[Basic](/form/guide/basic)):
 
-</template>
-<template #lit>
+</FrameworkSlot>
+<FrameworkSlot name="lit">
 
 `disabled` on its own only skips validation; it doesn't reach the DOM by itself.
 For it to actually disable an input, the component rendering that input has to
 read its own field's `disabled` and fold it into whatever `disabled` property
-the caller set, the same way `text-field` does (see [Basic](/guide/basic)):
+the caller set, the same way `text-field` does (see [Basic](/form/guide/basic)):
 
-</template>
+</FrameworkSlot>
 </FrameworkText>
 
-::: code-group
+<CodeGroup>
 
-```tsx [React]
+<CodeGroupItem label="React">
+
+```tsx
 const isDisabled = disabled || field.disabled;
 ```
 
-```ts [Lit]
+</CodeGroupItem>
+
+<CodeGroupItem label="Lit">
+
+```lit
 const isDisabled = this.disabled || field.disabled;
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 <FrameworkText>
-<template #react>
+<FrameworkSlot name="react">
 
 Each `TextField` is already subscribed to just its own field via `useWatch`, so
 disabling a 50-field form during submit re-renders only the fields whose
 `disabled` actually flipped, not `LoginForm` itself.
 
-</template>
-<template #lit>
+</FrameworkSlot>
+<FrameworkSlot name="lit">
 
 Each `text-field` is already subscribed to just its own field via
 `WatchController`, so disabling a 50-field form during submit updates only the
 fields whose `disabled` actually flipped, not `login-form` itself.
 
-</template>
+</FrameworkSlot>
 </FrameworkText>
 
 ## What's next

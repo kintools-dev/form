@@ -15,7 +15,7 @@ git config core.hooksPath .git-hooks   # enables the pre-commit fmt/lint/test ho
 - `devtools-react/` (`@kintools/form-devtools-react`), a dev-only inspector
   panel
 - `validators/` (`@kintools/form-validators`), common validator factories
-- `docs/`, the VitePress documentation site
+- `docs/`, documentation content (Markdown + images), rendered by kintools.dev
 - `examples/react/`, a runnable example app
 
 See [CLAUDE.md](./CLAUDE.md) for the full architecture writeup.

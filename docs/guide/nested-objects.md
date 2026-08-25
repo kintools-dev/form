@@ -1,8 +1,8 @@
 # Nested Objects
 
 A nested object in your form's value is represented by the same `FieldApi` (see
-[Concepts](/guide/concepts)), decomposed into its own lazily-populated registry
-of child fields instead of edited as one atomic value.
+[Concepts](/form/guide/concepts)), decomposed into its own lazily-populated
+registry of child fields instead of edited as one atomic value.
 
 ```ts
 const form = new FormApi({
@@ -27,7 +27,7 @@ You only _have_ to do this if something needs `"address"` as its own node — it
 own `validators`/`schemaValidator`, or its own aggregated `touched`/`invalid`.
 Otherwise, addressing the nested value directly by its flat dotted path
 (`form.field("address.line1")`) is fine: it's the normal shape for
-[schema-validated forms](/guide/schema-validation#flat-trees-no-intermediate-fields-needed),
+[schema-validated forms](/form/guide/schema-validation#flat-trees-no-intermediate-fields-needed),
 which don't need an intermediate field per nesting level.
 
 What's **not** allowed is registering the same path both ways — resolving
@@ -50,11 +50,13 @@ duplicate. Use whichever form you reach for consistently for that path.
 `parent.field(name)` works the same way regardless of whether the path resolves
 to a leaf or a nested object: a group `api` is passed into a reusable component
 the same way a leaf `api` is, following the same shape as `TextField` in
-[Basic](/guide/basic#promoting-to-a-reusable-textfield):
+[Basic](/form/guide/basic#promoting-to-a-reusable-textfield):
 
-::: code-group
+<CodeGroup>
 
-```tsx [React]
+<CodeGroupItem label="React">
+
+```tsx
 import type { ReactNode } from "react";
 import type { FieldApi } from "@kintools/form-react";
 
@@ -74,7 +76,11 @@ export function AddressField<TParentValue>(
 }
 ```
 
-```ts [Lit]
+</CodeGroupItem>
+
+<CodeGroupItem label="Lit">
+
+```lit
 import { html, LitElement } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import type { FieldApi } from "@kintools/form-lit";
@@ -96,7 +102,9 @@ class AddressField extends LitElement {
 }
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 ## Aggregated state
 
@@ -131,19 +139,20 @@ for (const [name, field] of form.children) {
 `onChildrenChanged(cb)` notifies when the _set_ of children changes (a field
 registered or unregistered), not when an existing child's state changes. It's a
 separate channel from the ordinary `subscribe`/`notify` path (see
-[Reactivity](/guide/reactivity)), meant for introspection tooling (like the
-[devtools panel](/guide/devtools)) rather than typical `useWatch` consumers.
+[Reactivity](/form/guide/reactivity)), meant for introspection tooling (like the
+[devtools panel](/form/guide/devtools)) rather than typical `useWatch`
+consumers.
 
 A child is unregistered automatically once its path stops existing in its
-parent's value, whether from [`removeItem`](/guide/dynamic-arrays) or any other
-value change, cancelling its pending debounced validation and unregistering its
-own children first.
+parent's value, whether from [`removeItem`](/form/guide/dynamic-arrays) or any
+other value change, cancelling its pending debounced validation and
+unregistering its own children first.
 
 ## What's next
 
-- [Dynamic Arrays](/guide/dynamic-arrays) — the array-specific half of the child
-  registry
-- [Flat vs. Nested Structure](/guide/flat-vs-nested) — choosing nested fields
-  vs. flat dotted paths, level by level
+- [Dynamic Arrays](/form/guide/dynamic-arrays) — the array-specific half of the
+  child registry
+- [Flat vs. Nested Structure](/form/guide/flat-vs-nested) — choosing nested
+  fields vs. flat dotted paths, level by level
 - [`FieldApi`](https://jsr.io/@kintools/form-core/doc/index.ts/~/FieldApi) —
   full reference on JSR

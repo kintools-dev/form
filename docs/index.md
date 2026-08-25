@@ -6,25 +6,22 @@ layout: home
 markdownStyles: false
 ---
 
-<div class="home">
+<Home>
 
-<section class="hero">
-  <h1 class="section-header">Kin Form</h1>
-  <p class="lede">Build your field components once. Reuse them everywhere.</p>
-  <p class="prose">A framework-agnostic form state library for TypeScript.</p>
-  <div class="actions">
-    <a class="btn-primary" href="/guide/getting-started">Get Started</a>
-    <a class="btn-secondary" href="https://github.com/kintools-dev/form">View on GitHub</a>
-  </div>
-</section>
+<Hero title="Kin Form" lede="Build your field components once. Reuse them everywhere." description="A framework-agnostic form state library for TypeScript.">
+  <Button href="/form/guide/getting-started">Get Started</Button>
+  <Button href="https://github.com/kintools-dev/form" variant="secondary" external>View on GitHub</Button>
+</Hero>
 
-<section class="reuse">
-<h2 class="section-header">The payoff</h2>
-<p class="lede">Forms read like composition, not wiring.</p>
+<Section>
+<SectionHeader>The payoff</SectionHeader>
+<Lede>Forms read like composition, not wiring.</Lede>
 
-::: code-group
+<CodeGroup>
 
-```tsx [React]
+<CodeGroupItem label="React">
+
+```tsx
 <form onSubmit={form.handleSubmit}>
   <TextField api={form.field("email")} label="Email" />
   <AddressField api={form.field("shipping")} />
@@ -34,7 +31,11 @@ markdownStyles: false
 </form>;
 ```
 
-```ts [Lit]
+</CodeGroupItem>
+
+<CodeGroupItem label="Lit">
+
+```lit
 html`
   <form @submit=${form.handleSubmit}>
     <text-field .api=${form.field("email")} label="Email"></text-field>
@@ -46,153 +47,132 @@ html`
 `;
 ```
 
-:::
+</CodeGroupItem>
 
-<p class="prose">Each component receives a resolved <code>FieldApi</code>, not a path or form context. Define the UI and behavior once, then mount it anywhere its value type fits. Kin Form keeps that component independently subscribed, so a change only updates the part of the form that depends on it.</p>
-<p><a class="cta" href="/guide/form-composition">Build reusable field components →</a></p>
-</section>
+</CodeGroup>
 
-<section class="why">
-<h2 class="section-header">Why it exists</h2>
-<p class="prose">Reusable field components <a class="cta" href="/comparison/react-hook-form#nested-group-field">become awkward</a> when a library treats the form as the only stateful object and fields as proxies into it. Nested objects, arrays, and shared validation then need their own special mechanisms.</p>
-<p class="prose">Kin Form treats a form as a tree where every node (leaf, group, or the form itself) is the same thing, with its own state, configuration, and subscribers. That is why one component pattern works at every level.</p>
-<p class="prose">Nothing forces one shape on a given value. Same <code>{ email, address: { line1, line2 } }</code>, three valid trees:</p>
-<div class="why-trees">
+<Prose>Each component receives a resolved <code>FieldApi</code>, not a path or
+form context. Define the UI and behavior once, then mount it anywhere its value
+type fits. Kin Form keeps that component independently subscribed, so a change
+only updates the part of the form that depends on it.</Prose>
 
-<div class="tree-example">
-<svg class="tree-diagram" viewBox="0 0 232 100" role="img" aria-labelledby="tree-one-title">
-  <title id="tree-one-title">Form with two fields: email, and address as a single leaf.</title>
-  <g class="tree-edge">
-    <path d="M60,50 H74 V30 H88" />
-    <path d="M60,50 H74 V70 H88" />
-  </g>
-  <g class="tree-node">
-    <rect x="6" y="39" width="54" height="22" rx="4" />
-    <rect x="88" y="19" width="54" height="22" rx="4" />
-    <rect x="88" y="59" width="54" height="22" rx="4" />
-  </g>
-  <g class="tree-label">
-    <text x="33" y="50">form</text>
-    <text x="115" y="30">email</text>
-    <text x="115" y="70">address</text>
-  </g>
-</svg>
-<p class="tree-caption"><strong>Leaf.</strong> Any path in the value shape can be treated as a single leaf field. Here, <code>address</code> is.</p>
+<p><Cta href="/form/guide/form-composition">Build reusable field components →</Cta></p>
+</Section>
+
+<Section>
+<SectionHeader>Why it exists</SectionHeader>
+<Prose>Reusable field components <Cta href="/form/comparison/react-hook-form#nested-group-field">become awkward</Cta> when a library treats the form as the only stateful object and fields as proxies into it. Nested objects, arrays, and shared validation then need their own special mechanisms.</Prose>
+<Prose>Kin Form treats a form as a tree where every node (leaf, group, or the form itself) is the same thing, with its own state, configuration, and subscribers. That is why one component pattern works at every level.</Prose>
+<Prose>Nothing forces one shape on a given value. Same <code>\{ email, address: \{ line1, line2 \} \}</code>, three valid trees:</Prose>
+<Grid cols={3} divided>
+
+<div className="flex flex-col gap-3">
+<TreeDiagram viewBox="0 0 232 100" titleId="tree-one-title" title="Form with two fields: email, and address as a single leaf.">
+  <TreeEdge d="M60,50 H74 V30 H88" />
+  <TreeEdge d="M60,50 H74 V70 H88" />
+  <TreeNode x={6} y={39} width={54} height={22} label="form" labelX={33} labelY={50} />
+  <TreeNode x={88} y={19} width={54} height={22} label="email" labelX={115} labelY={30} />
+  <TreeNode x={88} y={59} width={54} height={22} label="address" labelX={115} labelY={70} />
+</TreeDiagram>
+<TreeCaption><strong>Leaf.</strong> Any path in the value shape can be treated as a single leaf field. Here, <code>address</code> is.</TreeCaption>
 </div>
 
-<div class="tree-example">
-<svg class="tree-diagram" viewBox="0 0 232 100" role="img" aria-labelledby="tree-two-title">
-  <title id="tree-two-title">Form with three flat fields: email, address.line1, and address.line2, all direct children of the form.</title>
-  <g class="tree-edge">
-    <path d="M60,50 H74 V20 H88" />
-    <path d="M60,50 H74 V50 H88" />
-    <path d="M60,50 H74 V80 H88" />
-  </g>
-  <g class="tree-node">
-    <rect x="6" y="39" width="54" height="22" rx="4" />
-    <rect x="88" y="9" width="54" height="22" rx="4" />
-    <rect x="88" y="39" width="110" height="22" rx="4" />
-    <rect x="88" y="69" width="110" height="22" rx="4" />
-  </g>
-  <g class="tree-label">
-    <text x="33" y="50">form</text>
-    <text x="115" y="20">email</text>
-    <text x="143" y="50">address.line1</text>
-    <text x="143" y="80">address.line2</text>
-  </g>
-</svg>
-<p class="tree-caption"><strong>Flat.</strong> Every scalar is its own field, addressed by its full path.</p>
+<div className="flex flex-col gap-3">
+<TreeDiagram viewBox="0 0 232 100" titleId="tree-two-title" title="Form with three flat fields: email, address.line1, and address.line2, all direct children of the form.">
+  <TreeEdge d="M60,50 H74 V20 H88" />
+  <TreeEdge d="M60,50 H74 V50 H88" />
+  <TreeEdge d="M60,50 H74 V80 H88" />
+  <TreeNode x={6} y={39} width={54} height={22} label="form" labelX={33} labelY={50} />
+  <TreeNode x={88} y={9} width={54} height={22} label="email" labelX={115} labelY={20} />
+  <TreeNode x={88} y={39} width={110} height={22} label="address.line1" labelX={143} labelY={50} />
+  <TreeNode x={88} y={69} width={110} height={22} label="address.line2" labelX={143} labelY={80} />
+</TreeDiagram>
+<TreeCaption><strong>Flat.</strong> Every scalar is its own field, addressed by its full path.</TreeCaption>
 </div>
 
-<div class="tree-example">
-<svg class="tree-diagram" viewBox="0 0 232 100" role="img" aria-labelledby="tree-three-title">
-  <title id="tree-three-title">Form with email as a leaf and address as a group, with line1 and line2 registered underneath it.</title>
-  <g class="tree-edge">
-    <path d="M60,42 H74 V20 H88" />
-    <path d="M60,42 H74 V65 H88" />
-    <path d="M142,65 H156 V50 H170" />
-    <path d="M142,65 H156 V80 H170" />
-  </g>
-  <g class="tree-node">
-    <rect x="6" y="31" width="54" height="22" rx="4" />
-    <rect x="88" y="9" width="54" height="22" rx="4" />
-    <rect x="88" y="54" width="54" height="22" rx="4" />
-    <rect x="170" y="39" width="54" height="22" rx="4" />
-    <rect x="170" y="69" width="54" height="22" rx="4" />
-  </g>
-  <g class="tree-label">
-    <text x="33" y="42">form</text>
-    <text x="115" y="20">email</text>
-    <text x="115" y="65">address</text>
-    <text x="197" y="50">line1</text>
-    <text x="197" y="80">line2</text>
-  </g>
-</svg>
-<p class="tree-caption"><strong>Grouped.</strong> <code>address</code> becomes an intermediate node, with <code>line1</code>/<code>line2</code> registered underneath it.</p>
+<div className="flex flex-col gap-3">
+<TreeDiagram viewBox="0 0 232 100" titleId="tree-three-title" title="Form with email as a leaf and address as a group, with line1 and line2 registered underneath it.">
+  <TreeEdge d="M60,42 H74 V20 H88" />
+  <TreeEdge d="M60,42 H74 V65 H88" />
+  <TreeEdge d="M142,65 H156 V50 H170" />
+  <TreeEdge d="M142,65 H156 V80 H170" />
+  <TreeNode x={6} y={31} width={54} height={22} label="form" labelX={33} labelY={42} />
+  <TreeNode x={88} y={9} width={54} height={22} label="email" labelX={115} labelY={20} />
+  <TreeNode x={88} y={54} width={54} height={22} label="address" labelX={115} labelY={65} />
+  <TreeNode x={170} y={39} width={54} height={22} label="line1" labelX={197} labelY={50} />
+  <TreeNode x={170} y={69} width={54} height={22} label="line2" labelX={197} labelY={80} />
+</TreeDiagram>
+<TreeCaption><strong>Grouped.</strong> <code>address</code> becomes an intermediate node, with <code>line1</code>/<code>line2</code> registered underneath it.</TreeCaption>
 </div>
 
-</div>
-</section>
+</Grid>
+</Section>
 
-<section class="system">
-  <h2 class="section-header">What it does differently</h2>
-  <div class="system-card principle-grid">
-    <div class="principle"><h3 class="lede">One state machine, not two</h3><p>A nested group and a leaf field are the same class, not a special case bolted onto it.</p></div>
-    <div class="principle"><h3 class="lede">Type-safe paths</h3><p><code>field("items.0.code")</code> type-checks against your value type, so a typo'd path is a compile error.</p></div>
-    <div class="principle"><h3 class="lede">No special-case array API</h3><p>Push, insert, move, swap, and remove live on the same class every field already has, not a separate <code>useFieldArray</code> hook.</p></div>
-    <div class="principle"><h3 class="lede">Declarative cross-field rules</h3><p>List <code>dependents</code> on a field to re-validate siblings, instead of wiring a manual subscription.</p></div>
-    <div class="principle"><h3 class="lede">Selective re-rendering</h3><p>A change propagates only to the nodes it affects, so each subscriber re-renders only when the field, or selected state, it's watching actually changed.</p></div>
-    <div class="principle"><h3 class="lede">Composable fields</h3><p>Your reusable <code>TextField</code>, <code>AddressField</code>, and <code>SubmitButton</code> each take a <code>FieldApi</code>, so they work the same way whether bound to a leaf, a subtree, or the whole form.</p></div>
-  </div>
-</section>
+<Section>
+  <SectionHeader>What it does differently</SectionHeader>
+  <Card>
+  <Grid cols={2} divided>
+    <Principle title="One state machine, not two">A nested group and a leaf field are the same class, not a special case bolted onto it.</Principle>
+    <Principle title="Type-safe paths"><code>field("items.0.code")</code> type-checks against your value type, so a typo'd path is a compile error.</Principle>
+    <Principle title="No special-case array API">Push, insert, move, swap, and remove live on the same class every field already has, not a separate <code>useFieldArray</code> hook.</Principle>
+    <Principle title="Declarative cross-field rules">List <code>dependents</code> on a field to re-validate siblings, instead of wiring a manual subscription.</Principle>
+    <Principle title="Selective re-rendering">A change propagates only to the nodes it affects, so each subscriber re-renders only when the field, or selected state, it's watching actually changed.</Principle>
+    <Principle title="Composable fields">Your reusable <code>TextField</code>, <code>AddressField</code>, and <code>SubmitButton</code> each take a <code>FieldApi</code>, so they work the same way whether bound to a leaf, a subtree, or the whole form.</Principle>
+  </Grid>
+  </Card>
+</Section>
 
-<section class="fit">
-<h2 class="section-header">Is Kin Form a fit?</h2>
-<div class="fit-card">
+<Section>
+<SectionHeader>Is Kin Form a fit?</SectionHeader>
+<Card>
+<Grid cols={2}>
 <div>
-<h3 class="lede">Use it when forms become reusable UI.</h3>
-<ul>
-  <li>You maintain field components across forms or apps.</li>
-  <li>Your forms have nested groups, repeatable rows, or multiple steps.</li>
-  <li>You need stable array item identity and narrowly scoped re-renders.</li>
-  <li>Field state must survive UI unmounts and remounts, such as rows in a virtual list.</li>
-  <li>You want typed field paths without a separate array API.</li>
-  <li>You need sync or async validation, scoped per field or subtree.</li>
+<Lede as="h3">Use it when forms become reusable UI</Lede>
+<ul className="list-disc pl-5 [&>li+li]:mt-2">
+  <li>You maintain field components across forms or apps</li>
+  <li>Your forms have nested groups, dynamic arrays, or multiple steps</li>
+  <li>You need stable array item identity and narrowly scoped re-renders</li>
+  <li>You want typed field paths without a separate array API</li>
+  <li>You need sync or async validation, scoped per field or subtree</li>
+  <li>Field state must survive UI unmounts and remounts, such as rows in a virtual list</li>
 </ul>
 </div>
 <div>
-<h3 class="lede">Skip it when the simple thing is enough.</h3>
-<ul>
-  <li>The form is a small, one-off contact or login form.</li>
-  <li>Component-local state is already simpler.</li>
-  <li>Your team has a form-library standard that is working well and no pain worth migrating for.</li>
+<Lede as="h3">Skip it when the simple thing is enough</Lede>
+<ul className="list-disc pl-5 [&>li+li]:mt-2">
+  <li>The form is a small, one-off contact or login form</li>
+  <li>Component-local state is already simpler</li>
+  <li>Your team has a form-library standard that is working well and no pain worth migrating for</li>
 </ul>
 </div>
-</div>
-</section>
+</Grid>
+</Card>
+</Section>
 
-<section class="numbers">
-  <h2 class="section-header">How it compares</h2>
+<Section>
+  <SectionHeader>How it compares</SectionHeader>
   <FeatureMatrix full />
-  <div class="numbers-grid">
-    <div class="system-card">
+  <Grid cols={2} className="mt-10">
+    <Card>
       <BundleSizeChart title="Bundle size (React usage, gzip)" />
-    </div>
-    <div class="system-card">
+    </Card>
+    <Card>
       <PerformanceHighlight title="Flat field update burst (800×)" />
-    </div>
-  </div>
-  <p style="margin-top: 24px">Full comparison, including where Kin Form isn't the right fit: <a class="cta" href="/comparison/">see the details →</a></p>
-</section>
+    </Card>
+  </Grid>
+  <p className="mt-6">Full comparison, including where Kin Form isn't the right fit: <Cta href="/form/comparison/">see the details →</Cta></p>
+</Section>
 
-<section class="demo">
-  <h2 class="section-header">See it for yourself</h2>
+<Section>
+  <SectionHeader>See it for yourself</SectionHeader>
 
-<h3 class="demo-step">1. A login form</h3>
+<Lede step="01">A login form</Lede>
 
-::: code-group
+<CodeGroup>
 
-```tsx{12-13,28-29} [React]
+<CodeGroupItem label="React">
+
+```tsx {5,14,29}
 import { useForm, Watch } from "@kintools/form-react";
 import { required } from "@kintools/form-validators";
 
@@ -204,7 +184,6 @@ function LoginForm() {
 
   return (
     <form onSubmit={form.handleSubmit}>
-
       {/* Watch is great for one-off UI or prototyping. */}
       {/* Only re-render when the email field changes. */}
       <Watch api={form.field("email", { validators: required("Required") })}>
@@ -232,7 +211,11 @@ function LoginForm() {
 }
 ```
 
-```ts{14-15,31-32} [Lit]
+</CodeGroupItem>
+
+<CodeGroupItem label="Lit">
+
+```lit {8,20,31-32, 40}
 import { html, LitElement } from "lit";
 import { customElement } from "lit/decorators.js";
 import { FormApi, watch } from "@kintools/form-lit";
@@ -284,13 +267,17 @@ class LoginForm extends LitElement {
 }
 ```
 
-:::
+</CodeGroupItem>
 
-<h3 class="demo-step">2. Reusable TextField</h3>
+</CodeGroup>
+<br/>
+<Lede step="02">Reusable TextField</Lede>
 
-::: code-group
+<CodeGroup>
 
-```tsx{13} [React]
+<CodeGroupItem label="React">
+
+```tsx {5,14}
 import type { ReactNode } from "react";
 import { type FieldApi, useWatch } from "@kintools/form-react";
 
@@ -324,7 +311,11 @@ export function TextField<TParentValue>(
 }
 ```
 
-```ts{15} [Lit]
+</CodeGroupItem>
+
+<CodeGroupItem label="Lit">
+
+```lit {8,14}
 import { html, LitElement } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { type FieldApi, WatchController } from "@kintools/form-lit";
@@ -361,13 +352,17 @@ export class TextField extends LitElement {
 }
 ```
 
-:::
+</CodeGroupItem>
 
-<h3 class="demo-step">3. Reusable SubmitButton</h3>
+</CodeGroup>
+<br/>
+<Lede step="03">Reusable SubmitButton</Lede>
 
-::: code-group
+<CodeGroup>
 
-```tsx{12} [React]
+<CodeGroupItem label="React">
+
+```tsx {5,13}
 import type { ReactNode } from "react";
 import { type FormApi, useWatch } from "@kintools/form-react";
 
@@ -390,7 +385,11 @@ export function SubmitButton<TValue>(
 }
 ```
 
-```ts{14} [Lit]
+</CodeGroupItem>
+
+<CodeGroupItem label="Lit">
+
+```lit {8,11}
 import { html, LitElement } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { type FormApi, WatchController } from "@kintools/form-lit";
@@ -414,13 +413,17 @@ export class SubmitButton extends LitElement {
 }
 ```
 
-:::
+</CodeGroupItem>
 
-<h3 class="demo-step">4. Form with reusable components</h3>
+</CodeGroup>
+<br/>
+<Lede step="04">Form with reusable components</Lede>
 
-::: code-group
+<CodeGroup>
 
-```tsx{14-18} [React]
+<CodeGroupItem label="React">
+
+```tsx {14-17,19}
 import { useForm } from "@kintools/form-react";
 import { required } from "@kintools/form-validators";
 import { TextField } from "./TextField.tsx";
@@ -438,13 +441,18 @@ function LoginForm() {
         api={form.field("email", { validators: required("Required") })}
         label="Email"
       />
+
       <SubmitButton api={form}>Log in</SubmitButton>
     </form>
   );
 }
 ```
 
-```ts{13-16} [Lit]
+</CodeGroupItem>
+
+<CodeGroupItem label="Lit">
+
+```lit {18-23,25}
 import { html, LitElement } from "lit";
 import { customElement } from "lit/decorators.js";
 import { FormApi } from "@kintools/form-lit";
@@ -468,6 +476,7 @@ class LoginForm extends LitElement {
           })}
           label="Email"
         ></text-field>
+
         <submit-button .api=${this.#form}>Log in</submit-button>
       </form>
     `;
@@ -475,8 +484,10 @@ class LoginForm extends LitElement {
 }
 ```
 
-:::
+</CodeGroupItem>
 
-</section>
+</CodeGroup>
 
-</div>
+</Section>
+
+</Home>

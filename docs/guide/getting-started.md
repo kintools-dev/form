@@ -2,56 +2,81 @@
 
 ## Install
 
-::: code-group
+<CodeGroup>
 
-```sh [React]
+<CodeGroupItem label="React">
+
+```sh
 npm  add @kintools/form-react
 pnpm add @kintools/form-react
 yarn add @kintools/form-react
 deno add jsr:@kintools/form-react
 ```
 
-```sh [Lit]
+</CodeGroupItem>
+
+<CodeGroupItem label="Lit">
+
+```sh
 npm  add @kintools/form-lit
 pnpm add @kintools/form-lit
 yarn add @kintools/form-lit
 deno add jsr:@kintools/form-lit
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 `@kintools/form-react` and `@kintools/form-lit` re-export `@kintools/form-core`.
 
 To add common validators or the schema validation adapter:
 
-::: code-group
+<CodeGroup>
 
-```sh [npm]
+<CodeGroupItem label="npm">
+
+```sh
 npm add @kintools/form-validators
 ```
 
-```sh [pnpm]
+</CodeGroupItem>
+
+<CodeGroupItem label="pnpm">
+
+```sh
 pnpm add @kintools/form-validators
 ```
 
-```sh [yarn]
+</CodeGroupItem>
+
+<CodeGroupItem label="yarn">
+
+```sh
 yarn add @kintools/form-validators
 ```
 
-```sh [deno]
+</CodeGroupItem>
+
+<CodeGroupItem label="deno">
+
+```sh
 deno add jsr:@kintools/form-validators
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 ## What's next
 
-- [Concepts](/guide/concepts) — the tree model, shared state, and typed paths
-- [Basic](/guide/basic) — building `TextField` from `Watch`, the pattern the
-  rest of these guides lean on
-- [Per-node Validation](/guide/per-node-validation) — validators, debouncing,
-  and running validation explicitly
-- [Nested Objects](/guide/nested-objects) and
-  [Dynamic Arrays](/guide/dynamic-arrays)
-- [Validators](/validators/) — `required`, `email`, `minLength`, a
+- [Concepts](/form/guide/concepts) — the tree model, shared state, and typed
+  paths
+- [Basic](/form/guide/basic) — building `TextField` from `Watch`, the pattern
+  the rest of these guides lean on
+- [Per-node Validation](/form/guide/per-node-validation) — validators,
+  debouncing, and running validation explicitly
+- [Nested Objects](/form/guide/nested-objects) and
+  [Dynamic Arrays](/form/guide/dynamic-arrays)
+- [Validators](/form/validators/) — `required`, `email`, `minLength`, a
   `toSchemaValidator()` adapter for zod/valibot, and more

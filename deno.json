@@ -7,7 +7,6 @@
   },
   "workspace": [
     "core",
-    "docs",
     "examples/*",
     "lit",
     "react",

@@ -1,23 +1,23 @@
 # Server-Side Rendering (SSR)
 
-::: info
+<Container type="info">
 
 React only for now: other framework bindings are planned, and Lit's own SSR
 story (`@lit-labs/ssr`) is a separate concern this guide doesn't cover.
 
-:::
+</Container>
 
 `@kintools/form-react`'s bindings render on the server without any extra setup.
 `useWatch`/`Watch` are backed by `useSyncExternalStore` with a proper
 `getServerSnapshot`, so a form built the normal way, following the
-[Basic](/guide/basic) guide, just works.
+[Basic](/form/guide/basic) guide, just works.
 
 ## `field.id` in server-rendered markup
 
 `field.id` is a plain, module-level counter (`let nextId = 0`): stable across
 array reorders, which is what makes it a good React `key` (see
-[Dynamic Arrays](/guide/dynamic-arrays)), but not seeded the same way on the
-server and the client. Rendering it into an actual DOM attribute, like an
+[Dynamic Arrays](/form/guide/dynamic-arrays)), but not seeded the same way on
+the server and the client. Rendering it into an actual DOM attribute, like an
 `<input id={field.id}>` / `<label htmlFor={field.id}>` pair, mismatches during
 hydration.
 
@@ -77,8 +77,8 @@ function ProfileForm({ initialValue }: { initialValue: Profile }) {
 ```
 
 This is the same "delay mounting the form" pattern from
-[Async Initial Values](/guide/async-initial-values), just with the server doing
-the waiting instead of a client-side loading state.
+[Async Initial Values](/form/guide/async-initial-values), just with the server
+doing the waiting instead of a client-side loading state.
 
 ## Full example
 
@@ -89,7 +89,7 @@ these bindings under a real SSR framework, not just a client-only dev server.
 
 ## What's next
 
-- [Async Initial Values](/guide/async-initial-values): the placeholder vs.
+- [Async Initial Values](/form/guide/async-initial-values): the placeholder vs.
   delayed-mount tradeoff this guide's last section builds on
-- [Common Pitfalls](/guide/common-pitfalls): the short version of the `field.id`
-  gotcha above
+- [Common Pitfalls](/form/guide/common-pitfalls): the short version of the
+  `field.id` gotcha above

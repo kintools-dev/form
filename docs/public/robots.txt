@@ -1,5 +1,0 @@
-User-agent: *
-Allow: /
-
-# Add "Sitemap: <hostname>/sitemap.xml" here once the docs site has a
-# permanent hostname (see the SITE_URL placeholder in .vitepress/config.ts).

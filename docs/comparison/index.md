@@ -2,7 +2,14 @@
 
 ## Feature matrix
 
-<FeatureMatrix :full="true" />
+<FeatureMatrix full={true} />
+
+## API surface
+
+Not whether a feature exists, but which APIs/hooks/types you have to learn to
+use it:
+
+<ApiSurfaceMatrix />
 
 ## Bundle size (React usage)
 
@@ -27,4 +34,4 @@ where that count is clean and isolated.
 
 ## Detailed comparisons
 
-- [vs React Hook Form](/comparison/react-hook-form)
+- [vs React Hook Form](/form/comparison/react-hook-form)

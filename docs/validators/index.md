@@ -1,27 +1,39 @@
 # Validators
 
-Common validator factories for `@kin-form`, published as
+Common validator factories for Kin Form, published as
 `@kintools/form-validators`. Split out from `@kintools/form-core` on purpose:
 validator wording and edge cases churn far more than the engine does, so it's
 versioned separately.
 
 ## Install
 
-::: code-group
+<CodeGroup>
 
-```sh [npm]
+<CodeGroupItem label="npm">
+
+```sh
 npm add @kintools/form-validators
 ```
 
-```sh [pnpm]
+</CodeGroupItem>
+
+<CodeGroupItem label="pnpm">
+
+```sh
 pnpm add @kintools/form-validators
 ```
 
-```sh [deno]
+</CodeGroupItem>
+
+<CodeGroupItem label="deno">
+
+```sh
 deno add jsr:@kintools/form-validators
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 ## Available validators
 

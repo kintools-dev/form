@@ -1,18 +1,20 @@
 # Async Initial Values
 
 `initialValue` is only read once, at construction. It's also the
-[dirty-tracking baseline](/guide/dirty-tracking-and-reset), so nothing refreshes
-it automatically afterward. When the real initial value comes from an async
-source (an API call, a `useQuery`), there are two ways to get it in.
+[dirty-tracking baseline](/form/guide/dirty-tracking-and-reset), so nothing
+refreshes it automatically afterward. When the real initial value comes from an
+async source (an API call, a `useQuery`), there are two ways to get it in.
 
 ## Placeholder + `reset()`
 
 Construct the form immediately with a placeholder value, then move both the
 value and the dirty baseline to the real data via `reset()` once it arrives.
 
-::: code-group
+<CodeGroup>
 
-```tsx [React]
+<CodeGroupItem label="React">
+
+```tsx
 function ProfileForm() {
   const { data, isLoading } = useQuery({
     queryKey: ["profile"],
@@ -41,7 +43,11 @@ function ProfileForm() {
 }
 ```
 
-```ts [Lit]
+</CodeGroupItem>
+
+<CodeGroupItem label="Lit">
+
+```lit
 @customElement("profile-form")
 class ProfileForm extends LitElement {
   #form = new FormApi({
@@ -81,7 +87,9 @@ class ProfileForm extends LitElement {
 }
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 `reset(data)` both populates the fields and moves the dirty baseline to `data`,
 so the form isn't reported `dirty` just because its value moved from the empty
@@ -94,9 +102,11 @@ first, then a separate form component mounts once data has resolved, with the
 real value passed straight in as `initialValue`. No placeholder, no `reset()`
 call.
 
-::: code-group
+<CodeGroup>
 
-```tsx [React]
+<CodeGroupItem label="React">
+
+```tsx
 function ProfilePage() {
   const { data, isLoading } = useQuery({
     queryKey: ["profile"],
@@ -122,7 +132,11 @@ function ProfileForm({ initialValue }: { initialValue: Profile }) {
 }
 ```
 
-```ts [Lit]
+</CodeGroupItem>
+
+<CodeGroupItem label="Lit">
+
+```lit
 // One element, not two: a Lit property isn't readable until after the
 // constructor runs, so a resolved value can't be handed in as a `.prop` and
 // constructed from in the same pass the way a React prop can. Delaying the
@@ -162,9 +176,11 @@ class ProfileForm extends LitElement {
 }
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 ## What's next
 
-- [Dirty Tracking & Reset](/guide/dirty-tracking-and-reset) — how the baseline
-  works
+- [Dirty Tracking & Reset](/form/guide/dirty-tracking-and-reset) — how the
+  baseline works

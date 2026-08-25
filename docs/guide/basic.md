@@ -1,15 +1,17 @@
 # Basic
 
-[Concepts](/guide/concepts) covered the state machine in the abstract; this page
-builds an actual form with it, starting with the simplest way to bind an input,
-then promoting that into a reusable `TextField`. The rest of these guides assume
-a component like it exists.
+[Concepts](/form/guide/concepts) covered the state machine in the abstract; this
+page builds an actual form with it, starting with the simplest way to bind an
+input, then promoting that into a reusable `TextField`. The rest of these guides
+assume a component like it exists.
 
 ## A login form
 
-::: code-group
+<CodeGroup>
 
-```tsx [React]
+<CodeGroupItem label="React">
+
+```tsx
 import { useForm, Watch } from "@kintools/form-react";
 
 function LoginForm() {
@@ -55,7 +57,11 @@ function LoginForm() {
 }
 ```
 
-```ts [Lit]
+</CodeGroupItem>
+
+<CodeGroupItem label="Lit">
+
+```lit
 import { html, LitElement } from "lit";
 import { customElement } from "lit/decorators.js";
 import { FormApi, watch } from "@kintools/form-lit";
@@ -113,49 +119,53 @@ class LoginForm extends LitElement {
 }
 ```
 
-:::
+</CodeGroupItem>
 
-::: tip Highlight
+</CodeGroup>
+
+<Container type="tip" title="Highlight">
 
 Selective subscription and re-rendering is explicit.
 
 <FrameworkText>
-<template #react>
+<FrameworkSlot name="react">
 
-Each `Watch` only re-renders when the state it reads changes.
+Each `Watch` only re-renders when the state it reads changes. It's the **same
+mechanism** whether rendering an input or a submit button.
 
-</template>
-<template #lit>
+</FrameworkSlot>
+<FrameworkSlot name="lit">
 
 Each `watch` call only re-renders the part it's bound to when the state it reads
-changes.
+changes. It's the **same mechanism** whether rendering an input or a submit
+button.
 
-</template>
+</FrameworkSlot>
 </FrameworkText>
 
-:::
+</Container>
 
 `form.field(name, options)` resolves (creating on first call) the `FieldApi`
-registered on `form` — see [Concepts](/guide/concepts#getting-a-field) for what
-that resolution does.
+registered on `form` — see [Concepts](/form/guide/concepts#getting-a-field) for
+what that resolution does.
 
 <FrameworkText>
-<template #react>
+<FrameworkSlot name="react">
 
 Safe to call inline in JSX on every render: `options` gets applied to an
 already-registered field the same way every time, so re-calling it doesn't
 re-create anything. `Watch` then subscribes the calling component to whatever
 `api` it's given.
 
-</template>
-<template #lit>
+</FrameworkSlot>
+<FrameworkSlot name="lit">
 
 Safe to call inline in a template on every render: `options` gets applied to an
 already-registered field the same way every time, so re-calling it doesn't
 re-create anything. `watch` then subscribes just that part of the template to
 whatever `api` it's given.
 
-</template>
+</FrameworkSlot>
 </FrameworkText>
 
 ## Promoting to a reusable `TextField`
@@ -163,9 +173,11 @@ whatever `api` it's given.
 The `email`/`password` fields above are nearly identical: only the field name
 and `type` differ. That repetition is the signal to extract a component:
 
-::: code-group
+<CodeGroup>
 
-```tsx [React]
+<CodeGroupItem label="React">
+
+```tsx
 import type { ReactNode } from "react";
 import { type FieldApi, useWatch } from "@kintools/form-react";
 
@@ -200,7 +212,11 @@ export function TextField<TParentValue>(
 }
 ```
 
-```ts [Lit]
+</CodeGroupItem>
+
+<CodeGroupItem label="Lit">
+
+```lit
 import { html, LitElement } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { type FieldApi, WatchController } from "@kintools/form-lit";
@@ -244,10 +260,12 @@ export class TextField extends LitElement {
 }
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 <FrameworkText>
-<template #react>
+<FrameworkSlot name="react">
 
 Note the swap from `Watch` to `useWatch`. That's the general rule, not specific
 to this example: `Watch` is for a shape that appears once; once it's a named,
@@ -264,11 +282,11 @@ lives or how it was configured.
 lets a caller disable this one field on its own (e.g. a field that's read-only
 until some other condition is met), while `field.disabled` picks up a value
 cascaded down from an ancestor (e.g. the whole form disabled while submitting,
-see [Submission Handling](/guide/submission-handling)) without the caller doing
-anything at all.
+see [Submission Handling](/form/guide/submission-handling)) without the caller
+doing anything at all.
 
-</template>
-<template #lit>
+</FrameworkSlot>
+<FrameworkSlot name="lit">
 
 Note the swap from `watch` to `WatchController`. That's the general rule, not
 specific to this example: `watch` is for a shape that appears once, inline in a
@@ -285,34 +303,36 @@ the tree it lives or how it was configured.
 property lets a caller disable this one field on its own (e.g. a field that's
 read-only until some other condition is met), while `field.disabled` picks up a
 value cascaded down from an ancestor (e.g. the whole form disabled while
-submitting, see [Submission Handling](/guide/submission-handling)) without the
-caller doing anything at all.
+submitting, see [Submission Handling](/form/guide/submission-handling)) without
+the caller doing anything at all.
 
-</template>
+</FrameworkSlot>
 </FrameworkText>
 
 ## Promoting to a reusable `SubmitButton`
 
 <FrameworkText>
-<template #react>
+<FrameworkSlot name="react">
 
 The submit button's `Watch` follows the same shape as the fields above. Pull it
 into a component that calls `useWatch` directly, and every form in the app
 agrees on when submission is disabled:
 
-</template>
-<template #lit>
+</FrameworkSlot>
+<FrameworkSlot name="lit">
 
 The submit button's `watch` follows the same shape as the fields above. Pull it
 into a component that subscribes via `WatchController` directly, and every form
 in the app agrees on when submission is disabled:
 
-</template>
+</FrameworkSlot>
 </FrameworkText>
 
-::: code-group
+<CodeGroup>
 
-```tsx [React]
+<CodeGroupItem label="React">
+
+```tsx
 import type { ReactNode } from "react";
 import { type FormApi, useWatch } from "@kintools/form-react";
 
@@ -334,7 +354,11 @@ export function SubmitButton<TValue>(
 }
 ```
 
-```ts [Lit]
+</CodeGroupItem>
+
+<CodeGroupItem label="Lit">
+
+```lit
 import { html, LitElement } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { type FormApi, WatchController } from "@kintools/form-lit";
@@ -357,15 +381,19 @@ export class SubmitButton extends LitElement {
 }
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 ## The same form with reusable components
 
 With the new `TextField` and `SubmitButton`, `LoginForm` collapses to:
 
-::: code-group
+<CodeGroup>
 
-```tsx [React]
+<CodeGroupItem label="React">
+
+```tsx
 function LoginForm() {
   const form = useForm({
     initialValue: { email: "", password: "" },
@@ -388,7 +416,11 @@ function LoginForm() {
 }
 ```
 
-```ts [Lit]
+</CodeGroupItem>
+
+<CodeGroupItem label="Lit">
+
+```lit
 import { html, LitElement } from "lit";
 import { customElement } from "lit/decorators.js";
 import { FormApi } from "@kintools/form-lit";
@@ -423,10 +455,12 @@ class LoginForm extends LitElement {
 }
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 <FrameworkText>
-<template #react>
+<FrameworkSlot name="react">
 
 In the same way, a `SelectField`, `AddressField`, `ItemsField`, or a wrapper
 around any third-party input all follow this shape: an already-resolved `api`
@@ -434,8 +468,8 @@ in, `useWatch` to subscribe, whatever markup and value-parsing that input needs
 in between. Write each one once per app and every call site collapses to a
 single component call, typed against whatever value shape it's mounted on.
 
-</template>
-<template #lit>
+</FrameworkSlot>
+<FrameworkSlot name="lit">
 
 In the same way, a `SelectField`, `AddressField`, `ItemsField`, or a wrapper
 around any third-party input all follow this shape: an already-resolved `.api`
@@ -443,17 +477,17 @@ in, `WatchController` to subscribe, whatever markup and value-parsing that input
 needs in between. Write each one once per app and every call site collapses to a
 single custom element, typed against whatever value shape it's mounted on.
 
-</template>
+</FrameworkSlot>
 </FrameworkText>
 
 ## What's next
 
-- [Per-node Validation](/guide/per-node-validation) — validators, debouncing,
-  running validation explicitly
-- [Schema Validation](/guide/schema-validation) — validating a whole group/form
-  with a Standard Schema library (zod, valibot, ...) instead
-- [Form Composition](/guide/form-composition) — `AddressField`, `ItemsField`:
-  reusable components for a nested group/array that owns its own state, building
-  on `TextField`/`SubmitButton` from this page
-- [Reactivity](/guide/reactivity) — `useWatch`/`Watch` in depth, including
+- [Per-node Validation](/form/guide/per-node-validation) — validators,
+  debouncing, running validation explicitly
+- [Schema Validation](/form/guide/schema-validation) — validating a whole
+  group/form with a Standard Schema library (zod, valibot, ...) instead
+- [Form Composition](/form/guide/form-composition) — `AddressField`,
+  `ItemsField`: reusable components for a nested group/array that owns its own
+  state, building on `TextField`/`SubmitButton` from this page
+- [Reactivity](/form/guide/reactivity) — `useWatch`/`Watch` in depth, including
   `select` for controlling re-renders

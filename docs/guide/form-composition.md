@@ -1,33 +1,36 @@
 # Form Composition
 
 <FrameworkText>
-<template #react>
+<FrameworkSlot name="react">
 
 `Watch` is convenient for a field that appears once, but repeating a render prop
 doesn't scale past a couple of fields. For anything reused (a text input, an
 address block, a line-item list, a submit button), build a named, typed
 component around `useWatch` once and reuse it.
 
-</template>
-<template #lit>
+</FrameworkSlot>
+<FrameworkSlot name="lit">
 
 `watch` is convenient for a field that appears once, but repeating it doesn't
 scale past a couple of fields. For anything reused (a text input, an address
 block, a line-item list, a submit button), build a named custom element around
 `WatchController` once and reuse it.
 
-</template>
+</FrameworkSlot>
 </FrameworkText>
 
 ## Leaf fields: `TextField`, `NumberField`
 
-[Basic](/guide/basic) builds `TextField` from scratch. `NumberField` follows the
-same recipe, differing only in the input's markup and value parsing. Once these
-exist, a form body reads as configuration rather than repeated wiring:
+[Basic](/form/guide/basic) builds `TextField` from scratch. `NumberField`
+follows the same recipe, differing only in the input's markup and value parsing.
+Once these exist, a form body reads as configuration rather than repeated
+wiring:
 
-::: code-group
+<CodeGroup>
 
-```tsx [React]
+<CodeGroupItem label="React">
+
+```tsx
 <TextField
   api={form.field("email", { validators: [required(), email()] })}
   label="Email"
@@ -35,7 +38,11 @@ exist, a form body reads as configuration rather than repeated wiring:
 <NumberField api={form.field("age")} label="Age" />
 ```
 
-```ts [Lit]
+</CodeGroupItem>
+
+<CodeGroupItem label="Lit">
+
+```lit
 html`
   <text-field
     .api=${form.field("email", { validators: [required(), email()] })}
@@ -45,10 +52,12 @@ html`
 `;
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 <FrameworkText>
-<template #react>
+<FrameworkSlot name="react">
 
 Both take an already-resolved `api: FieldApi<TValue, TParentValue>` rather than
 `parent`+`name`: the caller resolves the field (and its `validators`,
@@ -57,8 +66,8 @@ Both take an already-resolved `api: FieldApi<TValue, TParentValue>` rather than
 `FieldApi<string, TParentValue>`/`FieldApi<number, TParentValue>`, not where in
 the tree it lives or how it was configured.
 
-</template>
-<template #lit>
+</FrameworkSlot>
+<FrameworkSlot name="lit">
 
 Both take an already-resolved `.api: FieldApi<TValue, unknown>` property rather
 than `parent`+`name`: the caller resolves the field (and its `validators`,
@@ -67,7 +76,7 @@ than `parent`+`name`: the caller resolves the field (and its `validators`,
 `FieldApi<string, unknown>`/`FieldApi<number, unknown>`, not where in the tree
 it lives or how it was configured.
 
-</template>
+</FrameworkSlot>
 </FrameworkText>
 
 ## Nested fields: `AddressField`
@@ -76,9 +85,11 @@ A component composes fields (leaf or nested) under its own slice of the value,
 as a resolved field. It doesn't need the dotted path leading to it, only that it
 owns an `Address`:
 
-::: code-group
+<CodeGroup>
 
-```tsx [React]
+<CodeGroupItem label="React">
+
+```tsx
 function AddressField<TParentValue>(
   { api }: { api: FieldApi<Address, TParentValue> }
 ) {
@@ -94,7 +105,11 @@ function AddressField<TParentValue>(
 <AddressField api={form.field("billing")} />
 ```
 
-```ts [Lit]
+</CodeGroupItem>
+
+<CodeGroupItem label="Lit">
+
+```lit
 import { html, LitElement } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { type FieldApi } from "@kintools/form-lit";
@@ -122,28 +137,32 @@ html`
 `;
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 ### Reacting to the field's own state
 
 <FrameworkText>
-<template #react>
+<FrameworkSlot name="react">
 
 `AddressField` above doesn't re-render when the passed-in `api` changes. To
 re-render when something on that `api` changes, use `useWatch`:
 
-</template>
-<template #lit>
+</FrameworkSlot>
+<FrameworkSlot name="lit">
 
 `AddressField` above doesn't update when something on the passed-in `.api`
 changes. To update when it does, use `WatchController`:
 
-</template>
+</FrameworkSlot>
 </FrameworkText>
 
-::: code-group
+<CodeGroup>
 
-```tsx [React]
+<CodeGroupItem label="React">
+
+```tsx
 function AddressField<TParentValue>(
   { api }: { api: FieldApi<Address, TParentValue> },
 ) {
@@ -162,7 +181,11 @@ function AddressField<TParentValue>(
 }
 ```
 
-```ts [Lit]
+</CodeGroupItem>
+
+<CodeGroupItem label="Lit">
+
+```lit
 import { html, LitElement } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { type FieldApi, WatchController } from "@kintools/form-lit";
@@ -194,12 +217,14 @@ class AddressField extends LitElement {
 }
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 ## Arrays: `ItemsField`
 
 <FrameworkText>
-<template #react>
+<FrameworkSlot name="react">
 
 An array component composes the same way, plus array mutation helpers and a
 stable React key. Use `field.id` (or `group.id`), not the array index, as the
@@ -207,8 +232,8 @@ stable React key. Use `field.id` (or `group.id`), not the array index, as the
 position) to the wrong row after a reorder, since the item that _renders_ at
 index 2 changes but the component instance React reuses for index 2 doesn't:
 
-</template>
-<template #lit>
+</FrameworkSlot>
+<FrameworkSlot name="lit">
 
 An array component composes the same way, plus array mutation helpers and
 `lit-html`'s
@@ -218,12 +243,14 @@ index-as-key misattributes uncontrolled DOM state (focus, cursor position) to
 the wrong row after a reorder, since the item that _renders_ at index 2 changes
 but the element instance Lit reuses for index 2 doesn't:
 
-</template>
+</FrameworkSlot>
 </FrameworkText>
 
-::: code-group
+<CodeGroup>
 
-```tsx [React]
+<CodeGroupItem label="React">
+
+```tsx
 function ItemsField<TParentValue>(
   { api }: { api: FieldApi<Item[], TParentValue> },
 ) {
@@ -261,7 +288,11 @@ function ItemField(
 }
 ```
 
-```ts [Lit]
+</CodeGroupItem>
+
+<CodeGroupItem label="Lit">
+
+```lit
 import { html, LitElement } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { repeat } from "lit/directives/repeat.js";
@@ -315,23 +346,25 @@ class ItemField extends LitElement {
 }
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 <FrameworkText>
-<template #react>
+<FrameworkSlot name="react">
 
 `ItemsField` itself needs `useWatch(api, (g) => g.value)` to re-render when the
 array changes; `api.field(i)` resolves the stable `item.id` without subscribing
 to each item.
 
-</template>
-<template #lit>
+</FrameworkSlot>
+<FrameworkSlot name="lit">
 
 `ItemsField` itself needs a `select` of `(g) => g.value` to update when the
 array changes; `api.field(i)` resolves the stable `item.id` without subscribing
 to each item.
 
-</template>
+</FrameworkSlot>
 </FrameworkText>
 
 `Item` here is a nested object, so each element is decomposed into its own
@@ -341,28 +374,30 @@ separate array-of-leaves API.
 
 ## `SubmitButton`
 
-[Basic](/guide/basic) builds a `SubmitButton` that disables while `submitting`.
-This one also disables while the form isn't `dirty` (nothing to submit until
-something's changed), but the shape is the same:
+[Basic](/form/guide/basic) builds a `SubmitButton` that disables while
+`submitting`. This one also disables while the form isn't `dirty` (nothing to
+submit until something's changed), but the shape is the same:
 
 <FrameworkText>
-<template #react>
+<FrameworkSlot name="react">
 
 `useWatch` directly, no render prop, so every form in the app agrees on when
 submission is disabled:
 
-</template>
-<template #lit>
+</FrameworkSlot>
+<FrameworkSlot name="lit">
 
 `WatchController` directly, no `watch` directive, so every form in the app
 agrees on when submission is disabled:
 
-</template>
+</FrameworkSlot>
 </FrameworkText>
 
-::: code-group
+<CodeGroup>
 
-```tsx [React]
+<CodeGroupItem label="React">
+
+```tsx
 function SubmitButton<TValue>(
   { api, children }: { api: FormApi<TValue>; children: React.ReactNode },
 ) {
@@ -379,7 +414,11 @@ function SubmitButton<TValue>(
 }
 ```
 
-```ts [Lit]
+</CodeGroupItem>
+
+<CodeGroupItem label="Lit">
+
+```lit
 import { html, LitElement } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { type FormApi, WatchController } from "@kintools/form-lit";
@@ -406,13 +445,17 @@ class SubmitButton extends LitElement {
 }
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 ## Putting it together
 
-::: code-group
+<CodeGroup>
 
-```tsx [React]
+<CodeGroupItem label="React">
+
+```tsx
 function CheckoutForm() {
   const form = useForm<Checkout>({
     initialValue: {
@@ -439,7 +482,11 @@ function CheckoutForm() {
 }
 ```
 
-```ts [Lit]
+</CodeGroupItem>
+
+<CodeGroupItem label="Lit">
+
+```lit
 import { html, LitElement } from "lit";
 import { customElement } from "lit/decorators.js";
 import { FormApi } from "@kintools/form-lit";
@@ -480,19 +527,21 @@ class CheckoutForm extends LitElement {
 }
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 <FrameworkText>
-<template #react>
+<FrameworkSlot name="react">
 
 Reach for `<Watch>` directly when prototyping or when a field appears once.
 Promote to a named component the moment the same shape shows up twice.
 
-</template>
-<template #lit>
+</FrameworkSlot>
+<FrameworkSlot name="lit">
 
 Reach for `watch` directly when prototyping or when a field appears once.
 Promote to a named custom element the moment the same shape shows up twice.
 
-</template>
+</FrameworkSlot>
 </FrameworkText>

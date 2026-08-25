@@ -1,8 +1,8 @@
 # Dynamic Arrays
 
-Every [`FieldApi`](/guide/nested-objects) exposes array mutation helpers, called
-with a path whose value is an array, that update the immutable value **and**
-re-key the field registry, so field identity survives a reorder:
+Every [`FieldApi`](/form/guide/nested-objects) exposes array mutation helpers,
+called with a path whose value is an array, that update the immutable value
+**and** re-key the field registry, so field identity survives a reorder:
 
 ```ts
 form.pushItem("items", newItem);
@@ -25,9 +25,11 @@ Every array method also accepts `""` for `name`, addressing **the node's own
 value**, for a reusable component that receives a
 `FieldApi<Item[], TParentValue>` and shouldn't need the dotted path to it:
 
-::: code-group
+<CodeGroup>
 
-```tsx [React]
+<CodeGroupItem label="React">
+
+```tsx
 function ArrayField<Item, TParentValue>(
   {
     api,
@@ -44,7 +46,11 @@ function ArrayField<Item, TParentValue>(
 <ArrayField api={parent.field("items")} newItem={() => makeItem()} />;
 ```
 
-```ts [Lit]
+</CodeGroupItem>
+
+<CodeGroupItem label="Lit">
+
+```lit
 import { html, LitElement } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { type FieldApi } from "@kintools/form-lit";
@@ -73,13 +79,15 @@ html`
 `;
 ```
 
-:::
+</CodeGroupItem>
+
+</CodeGroup>
 
 ## Why re-keying matters
 
 Without re-keying, a field bound to array index 2 would silently read/write
 whatever value now lives at index 2 after a reorder, not the item the user was
-actually editing. `id` (see [Concepts](/guide/concepts#shared-state)) stays
+actually editing. `id` (see [Concepts](/form/guide/concepts#shared-state)) stays
 stable across a reorder even as `name` (the index-based path) changes: it's the
 right list key (`key={field.id}` in React, or `lit-html`'s
 [`repeat`](https://lit.dev/docs/templates/lists/#the-repeat-directive) directive
