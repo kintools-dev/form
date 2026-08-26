@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.9 - 2026-08-26
+
+- Marked the npm package `sideEffects: false` so bundlers can safely tree-shake
+  unused exports.
+
 ## 0.1.8 - 2026-08-25
 
 - Restructured the README's `Watch` section: `Watch` now covers only one-off/

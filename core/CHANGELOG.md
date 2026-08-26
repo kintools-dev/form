@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.7 - 2026-08-26
+
+- Replaced leftover `kin-form` branding in doc comments and the root README's
+  doc links with Kin Form / kintools.
+- Marked the npm package `sideEffects: false` so bundlers can safely tree-shake
+  unused exports.
+
 ## 0.1.6 - 2026-08-20
 
 - Renamed from `@kin-form/core` to `@kintools/form-core`. Now also published to

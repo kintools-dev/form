@@ -1,6 +1,6 @@
 {
   "name": "@kintools/form-core",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "The framework-agnostic core of Kin Form",
   "license": "MIT",
   "exports": {

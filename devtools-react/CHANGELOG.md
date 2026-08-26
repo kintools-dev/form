@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.6 - 2026-08-26
+
+- Marked the npm package `sideEffects: false` so bundlers can safely tree-shake
+  unused exports.
+
 ## 0.1.5 - 2026-08-20
 
 - Renamed from `@kin-form/react-devtools` to `@kintools/form-devtools-react`
