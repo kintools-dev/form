@@ -1,9 +1,5 @@
 ---
 layout: home
-# Opts out of VPHomeContent's `.vp-doc` prose wrapper (link underlines,
-# paragraph spacing, table display, etc.) — this page's markdown supplies
-# all its own styling via style.css.
-markdownStyles: false
 ---
 
 <Home>
