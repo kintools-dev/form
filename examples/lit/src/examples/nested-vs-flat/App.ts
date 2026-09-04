@@ -32,8 +32,12 @@ function FlatPanel(): unknown {
 
   return Panel({
     title: "Flat",
-    code: `watch(form.field("address.line1"), ...)
-form.pushItem("tags", "")`,
+    code: `form
+├─ field("address.line1")
+├─ field("address.city")
+├─ field("address.zip")
+├─ field("tags.0")
+└─ pushItem("tags", "")`,
     children: html`
       <form @submit=${form.handleSubmit} novalidate class="space-y-4">
         ${watch(
@@ -83,9 +87,14 @@ function NestedPanel(): unknown {
 
   return Panel({
     title: "Nested",
-    code:
-      `watch(form.field("address"), (address) => watch(address.field("line1"), ...))
-watch(form.field("tags"), (tags) => tags.pushItem("", ""))`,
+    code: `form
+├─ field("address")
+│   ├─ field("line1")
+│   ├─ field("city")
+│   └─ field("zip")
+└─ field("tags")
+    ├─ field("0")
+    └─ pushItem("", "")`,
     children: html`
       <form @submit=${form.handleSubmit} novalidate class="space-y-4">
         ${watch(form.field("address"), (address) =>

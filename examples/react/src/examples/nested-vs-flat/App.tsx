@@ -40,8 +40,12 @@ function FlatPanel(): ReactNode {
   return (
     <Panel
       title="Flat"
-      code={`<Watch api={form.field("address.line1")}>
-form.pushItem("tags", "")`}
+      code={`form
+├─ field("address.line1")
+├─ field("address.city")
+├─ field("address.zip")
+├─ field("tags.0")
+└─ pushItem("tags", "")`}
     >
       <form
         onSubmit={form.handleSubmit}
@@ -106,8 +110,14 @@ function NestedPanel(): ReactNode {
   return (
     <Panel
       title="Nested"
-      code={`<Watch api={form.field("address")}>{(address) => <Watch api={address.field("line1")}>}
-<Watch api={form.field("tags")}>{(tags) => tags.pushItem("", "")}`}
+      code={`form
+├─ field("address")
+│   ├─ field("line1")
+│   ├─ field("city")
+│   └─ field("zip")
+└─ field("tags")
+    ├─ field("0")
+    └─ pushItem("", "")`}
     >
       <form
         onSubmit={form.handleSubmit}
