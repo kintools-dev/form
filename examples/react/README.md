@@ -1,6 +1,6 @@
 # Kin Form examples
 
-One Vite app, ten patterns — pick one from the sidebar. Each example's form code
+One Vite app, 12 patterns — pick one from the sidebar. Each example's form code
 lives in its own file under `src/examples/<slug>/`, self-contained (including
 any local components), so it can be copy-pasted out as a starting point on its
 own.
