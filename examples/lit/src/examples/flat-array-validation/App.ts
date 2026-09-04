@@ -54,13 +54,6 @@ export default function App(): unknown {
       <h1 class="text-xl font-semibold text-gray-900">
         Event registration
       </h1>
-      <p class="mt-1 text-sm text-gray-500">
-        Every field below is a flat dotted path straight off <code>form</code>
-        — no group, for the nested <code>contact</code> object or the
-        dynamic <code>guests</code> array. One Zod schema validates the
-        whole tree via <code>toSchemaValidator()</code>, and each field, even
-        inside the array, picks up its own message automatically.
-      </p>
 
       <form class="mt-6 space-y-6" @submit=${form.handleSubmit} novalidate>
         <fieldset class="space-y-4">

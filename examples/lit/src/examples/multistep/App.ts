@@ -256,10 +256,6 @@ class MultistepWizard extends LitElement {
     return html`
       <div class="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
         <h1 class="text-xl font-semibold text-gray-900">Create account</h1>
-        <p class="mt-1 text-sm text-gray-500">
-          Business accounts get an extra <em>Company</em> step; personal
-          accounts skip straight to <em>Profile</em>.
-        </p>
         ${this.#stepIndicator(wizard.stepIndex, accountType)}
 
         <form

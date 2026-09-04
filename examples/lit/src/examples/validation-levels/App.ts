@@ -52,11 +52,6 @@ export default function App(): unknown {
   return html`
     <div class="w-full max-w-sm rounded-lg bg-white p-8 shadow-md">
       <h1 class="text-xl font-semibold text-gray-900">Book a stay</h1>
-      <p class="mt-1 text-sm text-gray-500">
-        <em>Check-out</em> is validated against <em>Check-in</em> on their
-        shared <code>stay</code> group; "how to reach you" is validated on
-        the form as a whole.
-      </p>
 
       <form class="mt-6 space-y-4" @submit=${form.handleSubmit} novalidate>
         <validation-levels-text-field

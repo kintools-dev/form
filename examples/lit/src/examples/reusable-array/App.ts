@@ -39,11 +39,6 @@ export default function App(): unknown {
   return html`
     <div class="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
       <h1 class="text-xl font-semibold text-gray-900">Team profile</h1>
-      <p class="mt-1 text-sm text-gray-500">
-        <code>skills</code> (primitive items) and <code>teamMembers</code>
-        (object items) are both edited by the same <code>array-field</code>
-        element.
-      </p>
 
       <form class="mt-6 space-y-6" @submit=${form.handleSubmit} novalidate>
         <reusable-array-text-field

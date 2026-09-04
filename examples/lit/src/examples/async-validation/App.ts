@@ -43,9 +43,6 @@ export default function App(): unknown {
   return html`
     <div class="w-full max-w-sm rounded-lg bg-white p-8 shadow-md">
       <h1 class="text-xl font-semibold text-gray-900">Create account</h1>
-      <p class="mt-1 text-sm text-gray-500">
-        Checks availability against a simulated server as you type.
-      </p>
 
       <form class="mt-6 space-y-4" @submit=${form.handleSubmit} novalidate>
         ${UsernameField(form)}

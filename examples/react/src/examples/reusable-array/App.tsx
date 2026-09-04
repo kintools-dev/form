@@ -41,11 +41,6 @@ export default function App() {
   return (
     <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
       <h1 className="text-xl font-semibold text-gray-900">Team profile</h1>
-      <p className="mt-1 text-sm text-gray-500">
-        <code>skills</code> (primitive items) and <code>teamMembers</code>{" "}
-        (object items) are both edited by the same <code>ArrayField</code>{" "}
-        component.
-      </p>
 
       <form
         className="mt-6 space-y-6"

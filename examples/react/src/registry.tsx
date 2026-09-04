@@ -120,13 +120,11 @@ export const examples: ExampleEntry[] = [
     title: "Schema validation",
     description: (
       <>
-        A sign-up form mixing hand-written field validators for{" "}
-        <code>email</code>/<code>password</code> with a whole-form Zod{" "}
-        <code>refine()</code> check — via{" "}
-        <code>@kintools/form-validators</code>'s{" "}
-        <code>toSchemaValidator()</code>{" "}
-        adapter — for the password-confirmation invariant no single field can
-        express.
+        A sign-up form validated entirely by one Zod schema via{" "}
+        <code>toSchemaValidator()</code>, including a whole-form{" "}
+        <code>refine()</code>{" "}
+        check for the password-confirmation invariant no single field can
+        express on its own.
       </>
     ),
     Component: lazy(() => import("./examples/schema-validation/App.tsx")),

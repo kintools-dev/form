@@ -42,13 +42,6 @@ export default function App(): unknown {
   return html`
     <div class="w-full max-w-sm rounded-lg bg-white p-8 shadow-md">
       <h1 class="text-xl font-semibold text-gray-900">Create account</h1>
-      <p class="mt-1 text-sm text-gray-500">
-        Every field is validated by one Zod schema via
-        <code>toSchemaValidator()</code>, including
-        <code>confirmPassword</code>'s cross-field <code>refine()</code>
-        check. Per-node validators can still be layered on top for anything a
-        schema alone can't cover.
-      </p>
 
       <form class="mt-6 space-y-4" @submit=${form.handleSubmit} novalidate>
         <schema-validation-text-field

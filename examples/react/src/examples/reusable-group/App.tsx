@@ -28,11 +28,6 @@ export default function App() {
   return (
     <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
       <h1 className="text-xl font-semibold text-gray-900">Shipping details</h1>
-      <p className="mt-1 text-sm text-gray-500">
-        The same <code>AddressFields</code>{" "}
-        component is mounted twice below, once for billing and once for
-        shipping.
-      </p>
 
       <form
         className="mt-6 space-y-6"

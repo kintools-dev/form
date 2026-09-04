@@ -27,10 +27,6 @@ export default function App(): unknown {
   return html`
     <div class="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
       <h1 class="text-xl font-semibold text-gray-900">Shipping details</h1>
-      <p class="mt-1 text-sm text-gray-500">
-        The same <code>address-field</code> element is mounted twice below,
-        once for billing and once for shipping.
-      </p>
 
       <form class="mt-6 space-y-6" @submit=${form.handleSubmit} novalidate>
         <address-field

@@ -73,11 +73,6 @@ export default function App(): unknown {
   return html`
     <div class="w-full max-w-sm rounded-lg bg-white p-8 shadow-md">
       <h1 class="text-xl font-semibold text-gray-900">New attribute</h1>
-      <p class="mt-1 text-sm text-gray-500">
-        Switching <em>Type</em> re-validates <em>Default value</em> via
-        <code>dependents</code>, and toggles whether <em>Options</em>
-        shows at all.
-      </p>
 
       <form class="mt-6 space-y-4" @submit=${form.handleSubmit} novalidate>
         <conditional-fields-text-field

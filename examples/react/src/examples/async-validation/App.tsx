@@ -51,9 +51,6 @@ export default function App() {
   return (
     <div className="w-full max-w-sm rounded-lg bg-white p-8 shadow-md">
       <h1 className="text-xl font-semibold text-gray-900">Create account</h1>
-      <p className="mt-1 text-sm text-gray-500">
-        Checks availability against a simulated server as you type.
-      </p>
 
       <form
         className="mt-6 space-y-4"

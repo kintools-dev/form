@@ -76,11 +76,6 @@ export default function App() {
   return (
     <div className="w-full max-w-sm rounded-lg bg-white p-8 shadow-md">
       <h1 className="text-xl font-semibold text-gray-900">New attribute</h1>
-      <p className="mt-1 text-sm text-gray-500">
-        Switching <em>Type</em> re-validates <em>Default value</em> via{" "}
-        <code>dependents</code>, and toggles whether <em>Options</em>{" "}
-        shows at all.
-      </p>
 
       <form
         className="mt-6 space-y-4"
