@@ -36,18 +36,27 @@ self-contained and avoid `customElements.define()` collisions on navigation.
 
 ## Running
 
-You need to have Deno v2.0.0 or later installed to run this repo.
-
-Start a dev server:
+Inside the [kintools/form](https://github.com/kintools-dev/form) monorepo, you
+need Deno v2.0.0 or later. Start a dev server:
 
 ```bash
 $ deno task dev
 ```
 
-## Deploy
-
 Build production assets:
 
 ```bash
 $ deno task build
+```
+
+## Standalone / StackBlitz
+
+This folder also works on its own, against the published npm packages instead of
+the monorepo's live source. That's how
+[StackBlitz](https://stackblitz.com/github/kintools-dev/form/tree/main/examples/lit)
+runs it, and given just this folder, plain npm works too:
+
+```bash
+$ npm install
+$ npm run dev
 ```
