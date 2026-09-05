@@ -1,6 +1,6 @@
 {
   "title": "Kin Form",
-  "description": "Fast, lightweight, framework-agnostic form state library for TypeScript. Zero-dependencies core, 100% type-safe field paths, React bindings built in.",
+  "description": "Fast, lightweight, framework-agnostic form state library for TypeScript. Zero-dependencies core, 100% type-safe field paths, with React and Lit bindings built in.",
   "nav": [
     { "text": "Guide", "link": "/guide/" },
     { "text": "Validators", "link": "/validators/" },
