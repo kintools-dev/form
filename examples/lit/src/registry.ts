@@ -7,7 +7,7 @@ export type ExampleEntry = {
   load: () => Promise<{ default: () => unknown }>;
 };
 
-// Order matches examples/react's registry — roughly increasing concept
+// Order matches examples/react's registry: roughly increasing concept
 // complexity, not alphabetical.
 export const examples: ExampleEntry[] = [
   {
@@ -24,7 +24,7 @@ export const examples: ExampleEntry[] = [
     title: "Reusable fields",
     description: html`
       The same login form as <em>Basic</em>, but with a reusable
-      <code>TextField</code> function wrapping <code>watch</code> — the
+      <code>TextField</code> function wrapping <code>watch</code>. The
       label/input/error boilerplate lives once, not per field.
     `,
     load: () => import("./examples/reusable-fields/App.ts"),
@@ -33,8 +33,8 @@ export const examples: ExampleEntry[] = [
     slug: "reusable-group",
     title: "Reusable group",
     description: html`
-      A shipping/billing form where one reusable <code>AddressField</code> — a
-      <code>FieldApi</code>-bound nested field — is mounted twice.
+      A shipping/billing form where one reusable <code>AddressField</code> (a
+      <code>FieldApi</code>-bound nested field) is mounted twice.
       <em>Same as billing</em> assigns a whole nested field's value at once.
     `,
     load: () => import("./examples/reusable-group/App.ts"),
@@ -43,8 +43,8 @@ export const examples: ExampleEntry[] = [
     slug: "reusable-array",
     title: "Reusable array",
     description: html`
-      A profile form with two array fields — <code>skills</code> (strings)
-      and <code>teamMembers</code> (objects) — both edited by the same
+      A profile form with two array fields, <code>skills</code> (strings)
+      and <code>teamMembers</code> (objects), both edited by the same
       generic <code>ArrayField</code> function via the group's own self-key.
     `,
     load: () => import("./examples/reusable-array/App.ts"),
@@ -87,7 +87,7 @@ export const examples: ExampleEntry[] = [
     title: "Validation levels",
     description: html`
       A booking form showing that validators work on any
-      <code>FieldApi</code>, not just leaf fields — a nested-field-level
+      <code>FieldApi</code>, not just leaf fields: a nested-field-level
       date-range check and a form-level <em>at least one contact method</em>
       check.
     `,
@@ -120,7 +120,7 @@ export const examples: ExampleEntry[] = [
     description: html`
       A registration form with a nested <code>contact</code> object and a
       dynamic <code>guests</code> array, every field a flat dotted path off
-      <code>form</code> — no group. One whole-form Zod schema via
+      <code>form</code>, no group. One whole-form Zod schema via
       <code>toSchemaValidator()</code> reports messages straight onto each
       field, even inside the array, since a flat field's <code>name</code> is
       already <code>toSchemaValidator()</code>'s key.

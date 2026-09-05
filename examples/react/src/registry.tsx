@@ -7,8 +7,7 @@ export type ExampleEntry = {
   Component: LazyExoticComponent<() => ReactNode>;
 };
 
-// Order matches the original numbered example folders — roughly increasing
-// concept complexity, not alphabetical.
+// Order is roughly increasing concept complexity, not alphabetical.
 export const examples: ExampleEntry[] = [
   {
     slug: "basic",
@@ -27,8 +26,9 @@ export const examples: ExampleEntry[] = [
     description: (
       <>
         The same login form as <em>Basic</em>, but with a reusable{" "}
-        <code>TextField</code> component wrapping <code>useWatch</code>{" "}
-        — the label/input/error boilerplate lives once, not per field.
+        <code>TextField</code> component wrapping{" "}
+        <code>useWatch</code>. The label/input/error boilerplate lives once, not
+        per field.
       </>
     ),
     Component: lazy(() => import("./examples/reusable-fields/App.tsx")),
@@ -38,9 +38,9 @@ export const examples: ExampleEntry[] = [
     title: "Reusable group",
     description: (
       <>
-        A shipping/billing form where one reusable <code>AddressField</code> — a
+        A shipping/billing form where one reusable <code>AddressField</code> (a
         {" "}
-        <code>FieldApi</code>-bound nested field — is mounted twice.{" "}
+        <code>FieldApi</code>-bound nested field) is mounted twice.{" "}
         <em>Same as billing</em> assigns a whole nested field's value at once.
       </>
     ),
@@ -51,10 +51,9 @@ export const examples: ExampleEntry[] = [
     title: "Reusable array",
     description: (
       <>
-        A profile form with two array fields — <code>skills</code> (strings) and
+        A profile form with two array fields, <code>skills</code> (strings) and
         {" "}
-        <code>teamMembers</code> (objects) — both edited by the same generic
-        {" "}
+        <code>teamMembers</code> (objects), both edited by the same generic{" "}
         <code>ArrayField</code> component via the group's own self-key.
       </>
     ),
@@ -107,7 +106,7 @@ export const examples: ExampleEntry[] = [
     description: (
       <>
         A booking form showing that validators work on any{" "}
-        <code>FieldApi</code>, not just leaf fields — a nested-field-level
+        <code>FieldApi</code>, not just leaf fields: a nested-field-level
         date-range check and a form-level <em>at least one contact method</em>
         {" "}
         check.
@@ -148,9 +147,9 @@ export const examples: ExampleEntry[] = [
       <>
         A registration form with a nested <code>contact</code>{" "}
         object and a dynamic <code>guests</code>{" "}
-        array, every field a flat dotted path off <code>form</code> — no{" "}
-        group. One whole-form Zod schema via <code>toSchemaValidator()</code>
-        {" "}
+        array, every field a flat dotted path off{" "}
+        <code>form</code>, no group. One whole-form Zod schema via{" "}
+        <code>toSchemaValidator()</code>{" "}
         reports messages straight onto each field, even inside the array, since
         a flat field's <code>name</code> is already{" "}
         <code>toSchemaValidator()</code>'s key.
