@@ -6,7 +6,14 @@ layout: home
 
 <Hero title="Kin Form" lede="Build your field components once. Reuse them everywhere." description="A framework-agnostic form state library for TypeScript.">
   <Button href="/form/guide/getting-started">Get Started</Button>
-  <Button href="https://github.com/kintools-dev/form" variant="secondary" external>View on GitHub</Button>
+  <FrameworkText>
+    <FrameworkSlot name="react">
+      <Button href="https://stackblitz.com/github/kintools-dev/form/tree/main/examples/react" variant="secondary" external>Try it live</Button>
+    </FrameworkSlot>
+    <FrameworkSlot name="lit">
+      <Button href="https://stackblitz.com/github/kintools-dev/form/tree/main/examples/lit" variant="secondary" external>Try it live</Button>
+    </FrameworkSlot>
+  </FrameworkText>
 </Hero>
 
 <Section>
@@ -483,6 +490,17 @@ class LoginForm extends LitElement {
 </CodeGroupItem>
 
 </CodeGroup>
+
+<p>
+<FrameworkText>
+  <FrameworkSlot name="react">
+    <Cta href="https://stackblitz.com/github/kintools-dev/form/tree/main/examples/react" external>Try it live on StackBlitz →</Cta>
+  </FrameworkSlot>
+  <FrameworkSlot name="lit">
+    <Cta href="https://stackblitz.com/github/kintools-dev/form/tree/main/examples/lit" external>Try it live on StackBlitz →</Cta>
+  </FrameworkSlot>
+</FrameworkText>
+</p>
 
 </Section>
 
