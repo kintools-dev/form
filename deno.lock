@@ -19,6 +19,10 @@
     "jsr:@ts-morph/common@0.29": "0.29.0",
     "npm:@deno/vite-plugin@^2.0.2": "2.0.3_vite@8.2.2__@types+node@20.19.43_@types+node@20.19.43",
     "npm:@happy-dom/global-registrator@15": "15.11.7",
+    "npm:@kintools/form-devtools-react@~0.1.7": "0.1.7_react@19.2.8",
+    "npm:@kintools/form-lit@~0.1.5": "0.1.6_lit@3.3.3",
+    "npm:@kintools/form-react@~0.1.9": "0.1.10_react@19.2.8",
+    "npm:@kintools/form-validators@~0.1.7": "0.1.7",
     "npm:@standard-schema/spec@^1.1.0": "1.1.0",
     "npm:@tailwindcss/postcss@^4.3.2": "4.3.3",
     "npm:@tailwindcss/vite@^4.3.2": "4.3.3_vite@8.2.2__@types+node@20.19.43",
@@ -382,6 +386,30 @@
         "@jsr/std__bytes"
       ],
       "tarball": "https://npm.jsr.io/~/11/@jsr/std__streams/1.1.2.tgz"
+    },
+    "@kintools/form-devtools-react@0.1.7_react@19.2.8": {
+      "integrity": "sha512-ZZVqOku729QVPi36MMyeM1ltHbhS6OpZD/KVh9FuJexnu3YahHZeAft/8d0xyZ8+yYOYZKpBn+nvbg9Qi7mD7A==",
+      "dependencies": [
+        "react"
+      ]
+    },
+    "@kintools/form-lit@0.1.6_lit@3.3.3": {
+      "integrity": "sha512-LqpsrANzVNlEiDxOt6gkQG7SjzHgEBGPdKS4o7tWHZf0iANe/BkoPz0Nh5A/WhBIqaAKH7VAVwYy1HRL5GIDVw==",
+      "dependencies": [
+        "lit"
+      ]
+    },
+    "@kintools/form-react@0.1.10_react@19.2.8": {
+      "integrity": "sha512-hgBvLex5oN0XnWDmoJSzlkvsF73fQ1wAJQahpix8siAX6uAYfYD3qG3KDsQNvtI7bT7YLUDIMeO/e6Y9ADlxwA==",
+      "dependencies": [
+        "react"
+      ]
+    },
+    "@kintools/form-validators@0.1.7": {
+      "integrity": "sha512-WoE5fGEXFeF77PowBWYH5OX0YPg84wTH/4EDNVavmUgik0Y1YcZ81OvvrRe8IXLU4ZdsGGxIojwnWZAqCvsQxQ==",
+      "dependencies": [
+        "@standard-schema/spec"
+      ]
     },
     "@lit-labs/ssr-dom-shim@1.6.0": {
       "integrity": "sha512-VHb0ALPMTlgKjM6yIxxoQNnpKyUKLD04VzeQdsiXkMqkvYlAHxq9glGLmgbb889/1GsohSOAjvQYoiBppXFqrQ=="
@@ -1275,7 +1303,21 @@
           "npm:tslib@^2.8.1",
           "npm:vite@^8.0.3",
           "npm:zod@4"
-        ]
+        ],
+        "packageJson": {
+          "dependencies": [
+            "npm:@deno/vite-plugin@^2.0.2",
+            "npm:@kintools/form-lit@~0.1.5",
+            "npm:@kintools/form-validators@~0.1.7",
+            "npm:@tailwindcss/vite@^4.3.2",
+            "npm:@tanstack/lit-virtual@^3.13.36",
+            "npm:lit@^3.3.3",
+            "npm:tailwindcss@^4.3.2",
+            "npm:tslib@^2.8.1",
+            "npm:vite@^8.0.3",
+            "npm:zod@4"
+          ]
+        }
       },
       "examples/nextjs": {
         "dependencies": [
@@ -1303,7 +1345,25 @@
           "npm:tailwindcss@^4.3.2",
           "npm:vite@^8.0.3",
           "npm:zod@4"
-        ]
+        ],
+        "packageJson": {
+          "dependencies": [
+            "npm:@deno/vite-plugin@^2.0.2",
+            "npm:@kintools/form-devtools-react@~0.1.7",
+            "npm:@kintools/form-react@~0.1.9",
+            "npm:@kintools/form-validators@~0.1.7",
+            "npm:@tailwindcss/vite@^4.3.2",
+            "npm:@tanstack/react-virtual@^3.14.8",
+            "npm:@types/react-dom@^19.2.3",
+            "npm:@types/react@^19.2.14",
+            "npm:@vitejs/plugin-react@^6.0.1",
+            "npm:react-dom@^19.2.4",
+            "npm:react@^19.2.4",
+            "npm:tailwindcss@^4.3.2",
+            "npm:vite@^8.0.3",
+            "npm:zod@4"
+          ]
+        }
       },
       "lit": {
         "dependencies": [
