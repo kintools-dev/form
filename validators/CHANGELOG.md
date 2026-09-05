@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.7 - 2026-09-05
+
+- Trimmed the README to a tagline and a link to kintools.dev/form, dropping the
+  inline validator reference/examples that duplicated the docs site.
+
 ## 0.1.6 - 2026-08-26
 
 - Replaced leftover `kin-form` branding in the README.

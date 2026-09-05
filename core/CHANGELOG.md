@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.8 - 2026-09-05
+
+- Trimmed the README to a tagline and a link to kintools.dev/form, dropping the
+  inline design-principles/quick-start/API sections that duplicated the docs
+  site.
+
 ## 0.1.7 - 2026-08-26
 
 - Replaced leftover `kin-form` branding in doc comments and the root README's

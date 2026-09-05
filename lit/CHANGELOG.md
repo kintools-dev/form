@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.6 - 2026-09-05
+
+- Trimmed the README down to a tagline, a link to kintools.dev/form, and the
+  quick-start example (now with a second snippet showing the same form built
+  from reusable `<text-field>`/`<submit-button>` elements); dropped the sections
+  duplicated by the docs site guides (resolving a field, `watch`,
+  `WatchController`, `MultistepController`).
+
 ## 0.1.5 - 2026-08-26
 
 - Marked the npm package `sideEffects: false` so bundlers can safely tree-shake

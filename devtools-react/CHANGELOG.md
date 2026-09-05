@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.7 - 2026-09-05
+
+- Rephrased the README's overview, added a Documentation link to
+  kintools.dev/form/guide/devtools, and replaced "Docking the panel"/"Learn
+  more" with a pointer to the same guide page.
+
 ## 0.1.6 - 2026-08-26
 
 - Marked the npm package `sideEffects: false` so bundlers can safely tree-shake
