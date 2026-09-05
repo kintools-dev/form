@@ -3,10 +3,14 @@
 [![JSR @kintools/form-devtools-react](https://jsr.io/badges/@kintools/form-devtools-react)](https://jsr.io/@kintools/form-devtools-react)
 ![License: MIT](https://img.shields.io/badge/License-MIT-166534?style=flat)
 
-An inspector panel for visualizing a
-[`@kintools/form-react`](../react/README.md) form's live tree state during
-development: every registered field/group's `value`, `error`, `touched`, and
-`validating`, as they change.
+An inspector panel that visualizes a `@kintools/form-react` form's live tree
+state during development: every registered field/group's `value`, `error`,
+`touched`, and `validating`, as they change.
+
+## Documentation
+
+See
+[kintools.dev/form/guide/devtools](https://kintools.dev/form/guide/devtools).
 
 ## Install
 
@@ -70,20 +74,5 @@ function App() {
 }
 ```
 
-## Docking the panel
-
-The panel docks to a corner of the viewport (`"top-left"`, `"top-right"`,
-`"bottom-left"`, or `"bottom-right"`), defaulting to `"bottom-right"`. Set a
-different default with `initialPosition`, or let the user reposition it from the
-panel itself (the choice persists across reloads):
-
-```tsx
-<DevtoolsProvider initialPosition="top-right">
-  <App />
-</DevtoolsProvider>;
-```
-
-## Learn more
-
-- [Devtools guide](../docs/devtools/index.md)
-- [`@kintools/form-react`](../react/README.md) — the hooks this panel inspects
+See [kintools.dev/form/guide/devtools](https://kintools.dev/form/guide/devtools)
+for docking the panel and more.

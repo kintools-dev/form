@@ -18,6 +18,8 @@ A framework-agnostic form state library for TypeScript.
 
 ## The payoff
 
+Forms read like composition, not wiring.
+
 ```tsx
 <form onSubmit={form.handleSubmit}>
   <TextField api={form.field("email")} label="Email" />
@@ -35,21 +37,39 @@ part of the form that depends on it. See
 [Form Composition](https://kintools.dev/form/guide/form-composition) for the
 full pattern.
 
+## Why it exists
+
+Reusable field components
+[become awkward](https://kintools.dev/form/comparison/react-hook-form#nested-group-field)
+when a library treats the form as the only stateful object and fields as proxies
+into it. Nested objects, arrays, and shared validation then need their own
+special mechanisms.
+
+Kin Form treats a form as a tree where every node (leaf, group, or the form
+itself) is the same thing, with its own state, configuration, and subscribers.
+That is why one component pattern works at every level. Dotted paths like
+`field("address.line1")` type-check against that same tree, so a typo'd path is
+a compile error, not a runtime surprise.
+
+See [kintools.dev/form](https://kintools.dev/form) for how the same value shape
+can be structured as different valid trees.
+
 ## Feature matrix
 
-|                                           | **Kin Form** | React Hook Form | Formik | TanStack Form |
-| ----------------------------------------- | :----------: | :-------------: | :----: | :-----------: |
-| Zero dependencies                         |      ✅      |       ✅        |   ❌   |      ⚠️       |
-| Framework-agnostic core                   |      ✅      |       ❌        |   ❌   |      ✅       |
-| Type-safe nested field paths              |      ✅      |       ✅        |   ❌   |      ✅       |
-| Standard Schema support                   |      ⚠️      |       ⚠️        |   ❌   |      ✅       |
-| Nested groups/arrays as first-class nodes |      ✅      |       ⚠️        |   ⚠️   |      ✅       |
-| Selective re-rendering                    |      ✅      |       ✅        |   ⚠️   |      ✅       |
-| Built-in async-validation debounce        |      ✅      |       ❌        |   ❌   |      ✅       |
-| Declarative cross-field revalidation      |      ✅      |       ⚠️        |   ❌   |      ✅       |
+|                                                  | **Kin Form** | React Hook Form | Formik | TanStack Form |
+| ------------------------------------------------ | :----------: | :-------------: | :----: | :-----------: |
+| Zero dependencies                                |      ✅      |       ✅        |   ❌   |      ⚠️       |
+| Framework-agnostic core                          |      ✅      |       ❌        |   ❌   |      ✅       |
+| Type-safe nested field paths                     |      ✅      |       ⚠️        |   ❌   |      ✅       |
+| Standard Schema support                          |      ⚠️      |       ⚠️        |   ❌   |      ✅       |
+| Same primitive for field, group, array, and form |      ✅      |       ❌        |   ❌   |      ❌       |
+| Localized subscription                           |      ✅      |       ❌        |   ❌   |      ❌       |
+| Selective re-rendering                           |      ✅      |       ⚠️        |   ⚠️   |      ✅       |
+| Built-in async-validation debounce               |      ✅      |       ❌        |   ❌   |      ✅       |
+| Declarative cross-field revalidation             |      ✅      |       ⚠️        |   ❌   |      ✅       |
+| Field state survives list virtualization         |      ✅      |       ⚠️        |   ✅   |      ✅       |
 
-✅ full support · ⚠️ partial, conditional, or requires an extra package · ❌ not
-supported
+✅ full support · ⚠️ partial or conditional · ❌ not supported
 
 ## Bundle size
 
@@ -58,14 +78,16 @@ then gzipped. Reproduce with `deno task --cwd scripts bundle-size`. Not directly
 comparable to Bundlephobia, which uses a different minifier (terser).
 
 ```text
-@kintools/form-core                                   ██████░░░░░░░░░░░░░░░░░░    4.4 KB
-@kintools/form-react (bindings only)                  █░░░░░░░░░░░░░░░░░░░░░░░    0.8 KB
-@kintools/form-validators                             █░░░░░░░░░░░░░░░░░░░░░░░    0.7 KB
+@kintools/form-core                              ██████░░░░░░░░░░░░░░░░░░    4.4 KB
+@kintools/form-react (bindings only)             █░░░░░░░░░░░░░░░░░░░░░░░    0.8 KB
+@kintools/form-lit (bindings only)               ██░░░░░░░░░░░░░░░░░░░░░░    1.3 KB
+@kintools/form-validators                        █░░░░░░░░░░░░░░░░░░░░░░░    0.7 KB
 
-Kin Form (core + react)                          ███████░░░░░░░░░░░░░░░░░    5.0 KB
-React Hook Form                                  █████████████████░░░░░░░   13.0 KB
+Kin Form (core + react bindings)                 ███████░░░░░░░░░░░░░░░░░    5.1 KB
+Kin Form (core + lit bindings)                   ███████░░░░░░░░░░░░░░░░░    5.4 KB
+React Hook Form                                  ██████████████████░░░░░░   13.7 KB
 Formik                                           ██████████████████░░░░░░   13.9 KB
-Tanstack Form (core + react)                     ████████████████████████   18.5 KB
+TanStack Form                                    ████████████████████████   18.5 KB
 ```
 
 ## Performance
@@ -89,3 +111,8 @@ methodology notes, and code-by-code comparisons.
 | [`@kintools/form-lit`](./lit/)                       | `watch`, `WatchController`, `MultistepController` — Lit bindings                                                                |
 | [`@kintools/form-validators`](./validators/)         | `required`, `minLength`, `maxLength`, `min`, `max`, `url`, `email`, `pattern`, `maxFileSize`, `password`, `toSchemaValidator()` |
 | [`@kintools/form-devtools-react`](./devtools-react/) | `DevtoolsProvider`, `useFormDevtools` — inspector panel for a form's live tree state during development                         |
+
+## Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for project layout, running tests, and
+the PR process.
