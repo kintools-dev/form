@@ -487,12 +487,10 @@ class LoginForm extends LitElement {
 
 </CodeGroup>
 
-<p>
 <PlaygroundButton variant="text" label="Try it live on StackBlitz">
   <PlaygroundLink name="react" href="https://stackblitz.com/github/kintools-dev/form/tree/main/examples/react" />
   <PlaygroundLink name="lit" href="https://stackblitz.com/github/kintools-dev/form/tree/main/examples/lit" />
 </PlaygroundButton>
-</p>
 
 </Section>
 
