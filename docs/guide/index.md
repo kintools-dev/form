@@ -4,6 +4,14 @@ description: "Why Kin Form treats every node in a form (leaf, nested group, or t
 
 # Why Kin Form?
 
+Kin Form starts from one premise: **a form is a tree, and every node in that
+tree (leaf field, nested group, or the form itself) is the same kind of thing.**
+Most form libraries make the form object the sole owner of state: register a
+field and you get a proxy into that one store, not an object with its own
+value/error/validators. Nested objects, dynamic arrays, and cross-field rules
+end up routed through a second mechanism instead of being a plain field. Kin
+Form builds on the tree idea directly instead.
+
 ## Build field components once, then reuse them
 
 Kin Form is designed around reusable form UI, not one-off bindings. A
@@ -12,8 +20,8 @@ Kin Form is designed around reusable form UI, not one-off bindings. A
 callback plumbing. The same component can render a field wherever its value type
 fits, across forms and applications.
 
-Because a leaf, a nested group, an array item, and the form root share the same
-state model, the component pattern never changes as a form grows. See
+Because a leaf, a nested group, an array, and the form root share the same state
+model, the component pattern never changes as a form grows. See
 [Form Composition](/form/guide/form-composition) for the complete pattern.
 
 That reuse crosses form boundaries, not just within one form's own subtree.
@@ -31,33 +39,22 @@ function TextField<TParentValue>(
 `TParentValue` is an opaque type parameter `TextField` never inspects, not the
 whole form's value type, so the exact same `TextField` works unmodified across a
 login form, a checkout form, and a settings form with completely unrelated
-shapes — no `any`, no per-form variant. Contrast that with a field type
-parameterized by the whole form (`Control<TFieldValues>` in React Hook Form,
-`FieldApi<TParentData, TName, ...>` in TanStack Form): a shared component built
-against either has to re-parameterize itself over whatever form it's dropped
-into, generics leaking through every reusable component's signature, or drop to
-loosely-typed props and give up the safety.
-
-Kin Form starts from one premise: **a form is a tree, and every node in that
-tree (leaf field, nested group, or the form itself) is the same kind of thing.**
-Most form libraries make the form object the sole owner of state: register a
-field and you get a proxy into that one store, not an object with its own
-value/error/validators. Nested objects, dynamic arrays, and cross-field rules
-end up routed through a second mechanism instead of being a plain field. Kin
-Form builds on the tree idea directly instead.
+shapes, with no `any` and no per-form variant. A field type parameterized by the
+whole form (React Hook Form, TanStack Form) can't be reused this way without
+leaking generics through every component's signature or dropping to
+loosely-typed props;
+[see how the alternatives compare](#how-other-form-libraries-handle-this).
 
 ## One state machine, one shape
 
-Every node (leaf input, nested object/array, or the form itself) is the same
-class, `FieldApi`: `value`, `error`, `touched`, `validating`, `dirty`,
-validators (sync, async, and schema), plus a lazily-populated registry of its
-own child fields.
+Every node (leaf input, nested object/array, or the form itself) is a
+`FieldApi`: `value`, `error`, `touched`, `validating`, `dirty`, validators
+(sync, async, and schema), plus a lazily-populated registry of its own child
+fields. The root is a `FormApi`, a `FieldApi` subclass that adds submission and
+reset logic on top; every other node is a plain `FieldApi`.
 
 Whether an object/array-valued field is treated as one atomic leaf or decomposed
 into children is up to you, not the engine.
-
-`FormApi` is just the `FieldApi` at the root (`parent === null`, `name === ""`),
-with submission and reset logic added on top.
 
 That means the same mental model applies everywhere:
 
@@ -150,11 +147,15 @@ reorders. It's the right list key (`key={field.id}` in React, or `lit-html`'s
 ### Opt-in complexity
 
 `@kintools/form-core` has no UI framework dependency: it's just the state
-machine. `@kintools/form-react` adds hooks and render-prop components on top;
+machine.
+
+`@kintools/form-react` adds hooks and render-prop components on top;
+
 `@kintools/form-lit` adds a `watch` directive and `ReactiveController`s.
-`@kintools/form-validators` is a separate package on purpose: validator wording
-and edge cases churn far more than the engine does, so the two version
-independently. You pick up exactly the layers you use.
+
+`@kintools/form-validators` defines common per-node validators (`required`,
+`minLength`, `maxLength`, `password`, ...) as well as a Standard Schema adapter
+for zod, valibot, ...
 
 ## How other form libraries handle this
 
@@ -174,7 +175,7 @@ where they diverge from the premise above.
 - Inefficient by design: dirty/subscriber bookkeeping runs across every
   registered field on every update, not just the one that changed, regardless of
   how many components actually re-render.
-- Heavier: 13.0 KB gzip.
+- Heavier: 13.7 KB gzip.
 
 See [vs React Hook Form](/form/comparison/react-hook-form) for the full
 comparison.
