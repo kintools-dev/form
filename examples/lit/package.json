@@ -15,7 +15,6 @@
     "zod": "^4"
   },
   "devDependencies": {
-    "@deno/vite-plugin": "^2.0.2",
     "@tailwindcss/vite": "^4.3.2",
     "tailwindcss": "^4.3.2",
     "vite": "^8.0.3"

@@ -1,8 +1,13 @@
 import { defineConfig } from "vite";
-import deno from "@deno/vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
 
-// https://vite.dev/config/
-export default defineConfig({
-  plugins: [deno(), tailwindcss()],
-});
+// @deno/vite-plugin only resolves under `deno task dev`; standalone/StackBlitz
+// npm installs never have it (or its @jsr/* transitive deps) at all.
+export default defineConfig(async () => ({
+  plugins: [
+    "Deno" in globalThis
+      ? (await import(/* @vite-ignore */ "@deno/vite-plugin")).default()
+      : null,
+    tailwindcss(),
+  ],
+}));

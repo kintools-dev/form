@@ -1306,7 +1306,6 @@
         ],
         "packageJson": {
           "dependencies": [
-            "npm:@deno/vite-plugin@^2.0.2",
             "npm:@kintools/form-lit@~0.1.5",
             "npm:@kintools/form-validators@~0.1.7",
             "npm:@tailwindcss/vite@^4.3.2",
@@ -1348,7 +1347,6 @@
         ],
         "packageJson": {
           "dependencies": [
-            "npm:@deno/vite-plugin@^2.0.2",
             "npm:@kintools/form-devtools-react@~0.1.7",
             "npm:@kintools/form-react@~0.1.9",
             "npm:@kintools/form-validators@~0.1.7",
