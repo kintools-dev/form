@@ -69,7 +69,8 @@
           {
             "text": "vs React Hook Form",
             "link": "/comparison/react-hook-form"
-          }
+          },
+          { "text": "vs TanStack Form", "link": "/comparison/tanstack-form" }
         ]
       }
     ]

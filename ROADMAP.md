@@ -17,10 +17,10 @@ Guiding principle: everything shipped either teaches a concept or builds trust.
   docs site
 - Lit bindings shipped as `@kintools/form-lit`
 - Published to npm alongside JSR
+- Honest, dedicated comparison pages against React Hook Form and TanStack Form
 
 ## In progress: teach and prove
 
-- Honest, dedicated comparison pages against React Hook Form and TanStack Form
 - A regular cadence of engineering articles about the underlying problems (forms
   as trees, stable identity, controlled vs. uncontrolled, API design you don't
   have to memorize), not product marketing

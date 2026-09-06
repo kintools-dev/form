@@ -39,3 +39,4 @@ where that count is clean and isolated.
 ## Detailed comparisons
 
 - [vs React Hook Form](/form/comparison/react-hook-form)
+- [vs TanStack Form](/form/comparison/tanstack-form)
