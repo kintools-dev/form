@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.8 - 2026-09-06
+
+- Fixed the npm build so this package no longer bundles its own copy of
+  `@kintools/form-core`; it now depends on the published package instead.
+
 ## 0.1.7 - 2026-09-05
 
 - Rephrased the README's overview, added a Documentation link to
