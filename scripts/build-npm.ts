@@ -21,19 +21,33 @@ interface Mapping {
   peerDependency?: boolean;
 }
 
-// Bare specifiers (resolved via each package's own deno.json "imports") that
-// dnt can't infer a package.json dependency kind for on its own.
+const coreVersion = JSON.parse(
+  await Deno.readTextFile("../core/deno.json"),
+).version;
+
+const CORE: Record<string, Mapping> = {
+  "@kintools/form-core": {
+    name: "@kintools/form-core",
+    version: `^${coreVersion}`,
+  },
+};
+
+// External dependencies.
 const MAPPINGS: Record<string, Record<string, Mapping>> = {
   react: {
+    ...CORE,
     react: { name: "react", version: "^19.2.7", peerDependency: true },
   },
   "devtools-react": {
+    ...CORE,
     react: { name: "react", version: "^19.2.7", peerDependency: true },
   },
   lit: {
+    ...CORE,
     lit: { name: "lit", version: "^3.3.3", peerDependency: true },
   },
   validators: {
+    ...CORE,
     "@standard-schema/spec": {
       name: "@standard-schema/spec",
       version: "^1.1.0",
