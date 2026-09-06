@@ -60,7 +60,7 @@ only updates the part of the form that depends on it.</Prose>
 
 <Section>
 <SectionHeader>Why it exists</SectionHeader>
-<Prose>Reusable field components <Cta href="/form/comparison/react-hook-form#nested-group-field">become awkward</Cta> when a library treats the form as the only stateful object and fields as proxies into it. Nested objects, arrays, and shared validation then need their own special mechanisms.</Prose>
+<Prose>Reusable field components <Cta href="/form/comparison/react-hook-form#group-field">become awkward</Cta> when a library treats the form as the only stateful object and fields as proxies into it. Nested objects, arrays, and shared validation then need their own special mechanisms.</Prose>
 <Prose>Kin Form treats a form as a tree where every node (leaf, group, or the form itself) is the same thing, with its own state, configuration, and subscribers. That is why one component pattern works at every level.</Prose>
 <Prose>Nothing forces one shape on a given value. Same <code>\{ email, address: \{ line1, line2 \} \}</code>, three valid trees:</Prose>
 <Grid cols={3} divided>

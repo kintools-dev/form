@@ -65,7 +65,7 @@ function LoginForm() {
   const {
     register,
     handleSubmit,
-    // Form-wide, not scoped to email — re-renders on any field's state change.
+    // Form-wide, not scoped to email; re-renders on any field's state change.
     formState: { errors },
   } = useForm<LoginValues>({ defaultValues: { email: "" } });
 
@@ -88,10 +88,10 @@ function LoginForm() {
 
 **What's different:**
 
-|                      | Kin Form                                       | React Hook Form                            |
-| -------------------- | ---------------------------------------------- | ------------------------------------------ |
-| Binding model        | Controlled everywhere (`value`/`handleChange`) | Uncontrolled (`register` + ref) by default |
-| One-off native input | `<Watch>` render prop — more ceremony inline   | `{...register(name)}` — one line           |
+|                      | Kin Form                                    | React Hook Form                            |
+| -------------------- | ------------------------------------------- | ------------------------------------------ |
+| Binding model        | controlled (`value` / `handleChange`)       | uncontrolled (`register` + ref) by default |
+| One-off native input | `<Watch>` render prop, more inline ceremony | `{...register(name)}`, one line            |
 
 For a handful of native inputs each used once, `register` genuinely produces
 less code. Kin Form's bet is the opposite: build the field components once
@@ -185,15 +185,14 @@ function ProfileForm() {
 
 **What's different:**
 
-|                   | Kin Form                        | React Hook Form                         |
-| ----------------- | ------------------------------- | --------------------------------------- |
-| Non-native inputs | Same `Watch` as any other field | Needs `Controller` — a second primitive |
+|                   | Kin Form                        | React Hook Form                        |
+| ----------------- | ------------------------------- | -------------------------------------- |
+| Non-native inputs | same `Watch` as any other field | needs `Controller`, a second primitive |
 
 Nested groups and arrays are `FieldApi` nodes too, not a separate hook or a
-special case — see [Array field](#array-field) and
-[Nested group field](#nested-group-field) under
-[Form composition](#form-composition) below for the full comparison, shown as
-reusable components rather than inlined in one form.
+special case; see [Array field](#array-field) and [Group field](#group-field)
+under [Form composition](#form-composition) below for the full comparison, shown
+as reusable components rather than inlined in one form.
 
 ## Per-node validation: when it runs, and debouncing
 
@@ -238,7 +237,7 @@ import debounce from "lodash/debounce";
 
 function SignupForm() {
   const { control } = useForm<{ username: string }>({
-    mode: "onChange", // form-wide — every field revalidates on every change
+    mode: "onChange", // form-wide; every field revalidates on every change
   });
 
   // Hand-rolled.
@@ -271,11 +270,11 @@ function SignupForm() {
 
 **What's different:**
 
-|                      | Kin Form                                                                         | React Hook Form                                     |
-| -------------------- | -------------------------------------------------------------------------------- | --------------------------------------------------- |
-| When validation runs | `validators` run synchronously on every value change; `asyncValidator` debounced | Form-wide `mode`/`reValidateMode` setting           |
-| Debouncing           | `validationDebounceMs` — applies to `asyncValidator` only                        | Hand-rolled inside `validate` (no built-in option)  |
-| Rule composition     | Array of `validators`, checked in order, first truthy wins                       | Multiple rules for one field via `register` options |
+|                      | Kin Form                                                      | React Hook Form                            |
+| -------------------- | ------------------------------------------------------------- | ------------------------------------------ |
+| When validation runs | sync `validators` on every change; `asyncValidator` debounced | form-wide `mode` / `reValidateMode`        |
+| Debouncing           | `validationDebounceMs` (async only)                           | hand-rolled inside `validate`, no built-in |
+| Rule composition     | `validators` array, first truthy wins                         | multiple rules via `register` options      |
 
 ## Schema validation
 
@@ -351,7 +350,7 @@ function SignupForm() {
     <Controller
       control={control}
       name="email"
-      // A `rules.validate` passed here would silently never run — the
+      // A `rules.validate` passed here would silently never run; the
       // resolver has taken over.
       render={({ field, fieldState }) => (
         <>
@@ -372,11 +371,17 @@ function SignupForm() {
 
 **What's different:**
 
-|                               | Kin Form                                                                                                                             | React Hook Form                                                                                                    |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
-| Schema scope                  | Any node — field, group, or the whole form — can have its own `schemaValidator`                                                      | One `resolver`, for the whole form                                                                                 |
-| Per-field rules once wired up | `schemaValidator` runs _alongside_ per-field `validators`, not instead of them                                                       | `resolver` replaces `register`'s own rules for the fields it covers — `required`/`pattern`/`validate` stop running |
-| Where schema issues land      | A field's own `schemaError`, kept separate from `error` — the field decides how to combine them (`field.error ?? field.schemaError`) | Same `errors` as per-field rules — schema output replaces them, so there's nothing to combine                      |
+|                          | Kin Form                                           | React Hook Form                                           |
+| ------------------------ | -------------------------------------------------- | --------------------------------------------------------- |
+| Schema scope             | any node (field, group, or form)                   | one `resolver`, whole form only                           |
+| Schema + per-field rules | runs alongside `validators`                        | `resolver` replaces `register`'s rules for covered fields |
+| Where schema issues land | a field's own `schemaError`, separate from `error` | same `errors`; schema output replaces the per-field ones  |
+
+Once a `resolver` is set, `register`'s own `required` / `pattern` / `validate`
+on the fields it covers stop running (a `rules.validate` passed there silently
+never fires). Kin Form's `schemaValidator` instead runs alongside per-field
+`validators`, and its output lands in `schemaError`, kept apart from `error` so
+a field can carry both and decide how to combine them.
 
 ## Cross-field validation
 
@@ -488,11 +493,11 @@ function SignupForm() {
 
 **What's different:**
 
-|                     | Kin Form                                            | React Hook Form                                                                                               |
-| ------------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| Where it's declared | Declarative on the source field (`dependents` list) | Manual `trigger()` call on the source field                                                                   |
-| Wiring              | Nothing extra — `dependents` handles the refire     | `getValues()` in `validate` to read the other value, `trigger()` from the source field's `onChange` to refire |
-| Multiple dependents | One `dependents` array covers all of them           | One `trigger()` call per dependent field, by hand                                                             |
+|                     | Kin Form                                      | React Hook Form                                            |
+| ------------------- | --------------------------------------------- | ---------------------------------------------------------- |
+| Where it's declared | declarative, `dependents` on the source field | manual `trigger()` on the source field                     |
+| Wiring              | nothing extra                                 | `getValues()` to read, `trigger()` in `onChange` to refire |
+| Multiple dependents | one `dependents` array covers all             | one `trigger()` call per dependent, by hand                |
 
 ## Dirty tracking & reset
 
@@ -540,7 +545,7 @@ function ProfileForm() {
 
 <CodeGroupItem label="React Hook Form">
 
-```tsx {6,23,25}
+```tsx {6,20-25}
 function ProfileForm() {
   const {
     control,
@@ -583,12 +588,12 @@ function ProfileForm() {
 
 **What's different:**
 
-|                  | Kin Form                                                                                                                                | React Hook Form                                                                                                                            |
-| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| Whole-form dirty | `form.dirty`                                                                                                                            | `formState.isDirty`                                                                                                                        |
-| Per-field dirty  | `field.dirty` inside a `Watch`/`useWatch` scoped to that field — the subscription unit is the field itself, not which property you read | `formState.dirtyFields` — reading `.firstName` still subscribes to the whole object, so any field becoming dirty re-renders this component |
-| Reset            | `form.reset(value?)` — moves the baseline too                                                                                           | `reset(values?, keepStateOptions)`                                                                                                         |
-| Reset one field  | `form.resetField(name, value?)` — same idea                                                                                             | `resetField(name, options?)`                                                                                                               |
+|                  | Kin Form                                 | React Hook Form                                                                    |
+| ---------------- | ---------------------------------------- | ---------------------------------------------------------------------------------- |
+| Whole-form dirty | `form.dirty`                             | `formState.isDirty`                                                                |
+| Per-field dirty  | `field.dirty` in a scoped `Watch`        | `formState.dirtyFields`; reading `.firstName` still subscribes to the whole object |
+| Reset            | `form.reset(value?)`, moves the baseline | `reset(values?, keepStateOptions)`                                                 |
+| Reset one field  | `form.resetField(name, value?)`          | `resetField(name, options?)`                                                       |
 
 ## Submission handling
 
@@ -633,7 +638,7 @@ const { handleSubmit } = useForm<Signup>({
     try {
       await signUp(values);
     } catch {
-      // Must be wrapped manually — no dedicated "submission failed" callback.
+      // Must be wrapped manually; no dedicated "submission failed" callback.
       toast.error("Sign up failed");
     }
   },
@@ -651,12 +656,12 @@ const { handleSubmit } = useForm<Signup>({
 
 **What's different:**
 
-|                          | Kin Form                                                                                                                                                   | React Hook Form                                       |
-| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
-| Validation failed        | `onSubmitInvalid`                                                                                                                                          | `onInvalid` callback (2nd arg to `handleSubmit`)      |
-| `onSubmit` itself throws | `onSubmitError`, invoked automatically                                                                                                                     | Rethrown after updating state — no dedicated callback |
-| Binding to `<form>`      | `onSubmit={form.handleSubmit}`                                                                                                                             | `onSubmit={handleSubmit(onValid, onInvalid)}`         |
-| Preventing page reload   | Automatic when given an event — `handleSubmit`'s `event` param is optional, so the same call also works from a React Native `onPress` with nothing to pass | Automatic — `handleSubmit` calls it internally        |
+|                          | Kin Form                                                | React Hook Form                               |
+| ------------------------ | ------------------------------------------------------- | --------------------------------------------- |
+| Validation failed        | `onSubmitInvalid`                                       | `onInvalid`, the 2nd arg to `handleSubmit`    |
+| `onSubmit` itself throws | `onSubmitError`, automatic                              | rethrown after state update; no callback      |
+| Binding to `<form>`      | `onSubmit={form.handleSubmit}`                          | `onSubmit={handleSubmit(onValid, onInvalid)}` |
+| Preventing page reload   | automatic; event arg optional (works from RN `onPress`) | automatic, inside `handleSubmit`              |
 
 ## Async initial values
 
@@ -721,11 +726,11 @@ function ProfilePage() {
 
 **What's different:**
 
-|                        | Kin Form                                                                                  | React Hook Form                                                   |
-| ---------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| Async defaults         | `initialValue` is synchronous only, read once at construction                             | `defaultValues` accepts an async function, resolved automatically |
-| Loading state          | Whatever your data-fetching hook already gives you (e.g. `useQuery`'s `isLoading`)        | `formState.isLoading`, built in                                   |
-| Populating once loaded | `ProfileForm` doesn't mount until data arrives — `initialValue` is already the real value | Automatic — same component, `defaultValues` resolves in place     |
+|                        | Kin Form                           | React Hook Form                              |
+| ---------------------- | ---------------------------------- | -------------------------------------------- |
+| Async defaults         | `initialValue` is synchronous only | `defaultValues` accepts an async function    |
+| Loading state          | from your data-fetching hook       | `formState.isLoading`, built in              |
+| Populating once loaded | mount the form after data arrives  | automatic, `defaultValues` resolves in place |
 
 ## Reactivity & selective re-rendering
 
@@ -779,7 +784,7 @@ function Field<T extends FieldValues>(
   const value = useWatch({ control, name });
   const { errors, touchedFields } = useFormState({ control, name });
 
-  // Casts needed — T is generic, so `name` can't be narrowed to a literal key.
+  // Casts needed: T is generic, so `name` can't be narrowed to a literal key.
   const touched = (touchedFields as Record<string, boolean>)[name];
   const error = touched &&
     (errors as Record<string, { message?: string }>)[name]?.message;
@@ -803,11 +808,11 @@ function Field<T extends FieldValues>(
 
 **What's different:**
 
-|                      | Kin Form                                                       | React Hook Form                                                                   |
-| -------------------- | -------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| Default subscription | `useWatch(api)` — isolated per field/form                      | `useWatch({ control, name })` — isolated per value                                |
-| Deriving a value     | `select: (f) => ...`, deduped via `equal` (shallow by default) | `compute: (value) => ...`, deep-equal deduped — transforms the watched value only |
-| Value vs field state | One `useWatch(api, select)` covers both                        | `useWatch` + `useFormState` — two separate hooks, combined by hand                |
+|                      | Kin Form                                | React Hook Form                                     |
+| -------------------- | --------------------------------------- | --------------------------------------------------- |
+| Default subscription | `useWatch(api)`, per field/form         | `useWatch({ control, name })`, per value            |
+| Deriving a value     | `select: (f) => ...`, shallow-deduped   | `compute: (value) => ...`, deep-deduped, value only |
+| Value vs field state | one `useWatch(api, select)` covers both | `useWatch` + `useFormState`, combined by hand       |
 
 ## Form composition
 
@@ -817,7 +822,7 @@ where the two diverge:
 
 - **Kin Form**: `FieldApi<TValue, TParentValue = never>` decouples a field's own
   value type from its parent form's shape, so a component only ever needs to
-  know `TValue` — `TParentValue` stays an opaque pass-through it never inspects.
+  know `TValue`. `TParentValue` stays an opaque pass-through it never inspects.
 - **React Hook Form**: `Control<TFieldValues>` parameterizes the field by the
   _whole_ form instead, so a shared component built against it either
   re-parameterizes itself over whatever form it's dropped into (generics leaking
@@ -883,7 +888,7 @@ import type {
 
 function TextField<T extends FieldValues>(
   { label, ...controllerProps }:
-    // FieldPathByValue<T, string> — every path whose value is a string.
+    // FieldPathByValue<T, string>: every path whose value is a string.
     & UseControllerProps<T, FieldPathByValue<T, string>>
     & { label: string },
 ) {
@@ -921,14 +926,14 @@ every form), but the type-safety story differs:
 
 **What's different:**
 
-|                         | Kin Form                                                                                          | React Hook Form                                                                                                               |
-| ----------------------- | ------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| Reusable field prop bag | An already-resolved `api: FieldApi<...>`, passed in directly                                      | `UseControllerProps` — `control`+`name`+rules                                                                                 |
-| Type-safety on `name`   | Checked once, where `form.field(name, options)` is called — not re-derived inside every component | `FieldPath<T>` catches a typo'd `name` as a compile error, per call site                                                      |
-| Type-safety on value    | `FieldApi<string, TParent>` — only a `string`-valued field type-checks, nothing extra needed      | Needs `FieldPathByValue<T, string>` in place of `FieldPath<T>` — plain `FieldPath<T>` alone accepts a field of any value type |
-| Cross-form reuse        | Same component, unmodified, across unrelated forms — `TParentValue` is never inspected            | Needs re-parameterizing per form's `TFieldValues`, or `Control<any>`                                                          |
+|                         | Kin Form                                 | React Hook Form                                                                  |
+| ----------------------- | ---------------------------------------- | -------------------------------------------------------------------------------- |
+| Reusable field prop bag | resolved `api: FieldApi<...>` prop       | `UseControllerProps`: `control` + `name` + rules                                 |
+| Type-safety on `name`   | checked once, at `form.field(name, ...)` | `FieldPath<T>`, per call site                                                    |
+| Type-safety on value    | `FieldApi<string, TParent>` is enough    | needs `FieldPathByValue<T, string>`; plain `FieldPath<T>` accepts any value type |
+| Cross-form reuse        | same component, unmodified               | re-parameterize per `TFieldValues`, or `Control<any>`                            |
 
-### Nested group field
+### Group field
 
 A reusable component for a nested object (an address, reused for both shipping
 and billing) instead of an array:
@@ -1005,16 +1010,16 @@ function AddressField<T extends FieldValues>(
 
 **What's different:**
 
-|                              | Kin Form                                                                                    | React Hook Form                                                                                                    |
-| ---------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| Reusable nested-group prop   | An already-resolved `api: FieldApi<Address, TParentValue>` — same shape as any other field  | `control` + `name` — a path prefix, not a resolved field                                                           |
-| Type-safety at the call site | Automatic — `FieldApi<Address, TParentValue>` only accepts a field whose value is `Address` | `FieldPathByValue<T, Address>` gets there, but it's a library-specific escape hatch most RHF users never reach for |
-| Building child paths         | `api.field("line1")` — relative, same call as any top-level field                           | Template-string concatenation (`` `${name}.line1` ``)                                                              |
-| Type-safety on children      | Checked through `DeepKey<Address>` regardless of how deep `api` is nested                   | Still needs a cast: TS can't prove a concatenated string is a member of `FieldPathByValue<T, string>`              |
+|                              | Kin Form                                                   | React Hook Form                                             |
+| ---------------------------- | ---------------------------------------------------------- | ----------------------------------------------------------- |
+| Reusable nested-group prop   | resolved `api: FieldApi<Address, TParent>`, like any field | `control` + `name`, a path prefix                           |
+| Type-safety at the call site | automatic from `FieldApi<Address, TParent>`                | `FieldPathByValue<T, Address>`, a rarely-used escape hatch  |
+| Building child paths         | `api.field("line1")`, relative                             | template-string concat (`` `${name}.line1` ``)              |
+| Type-safety on children      | via `DeepKey<Address>`, no cast                            | needs a cast; TS can't prove the concatenated path is valid |
 
 ### Array field
 
-An array (unlike the [group above](#nested-group-field)) also needs stable item
+An array (unlike the [group above](#group-field)) also needs stable item
 identity across a reorder, plus its own mutation helpers:
 
 <SideBySide>
@@ -1117,7 +1122,7 @@ function ItemsField<
   const { fields, append, move, remove } = useFieldArray(props);
   const { errors } = useFormState(props);
 
-  // Cast needed — TName is generic, so it can't be narrowed to a literal key.
+  // Cast needed: TName is generic, so it can't be narrowed to a literal key.
   const rootError = errors[props.name]?.root as
     | { message?: string }
     | undefined;
@@ -1192,13 +1197,13 @@ function Form() {
 
 **What's different:**
 
-|                          | Kin Form                                                     | React Hook Form                                        |
-| ------------------------ | ------------------------------------------------------------ | ------------------------------------------------------ |
-| What holds the array     | `FieldApi` — the array _is_ a node                           | `useFieldArray` for logic, `useFormState` for state    |
-| Array-level validation   | The field's own `validators`                                 | `useFieldArray`'s own `rules` — a separate API         |
-| Item identity on reorder | Field identity follows the item via re-keying                | `fields[i].id` from the hook                           |
-| Reusable component       | Yes — pass a resolved `FieldApi` down                        | Yes — pass `control`+`name` down (or `useFormContext`) |
-| Typesafety               | Fully type-safe — `DeepKey<T>` needs no cast, generic or not | Casts needed — `TFieldValues`/`TName` are generic      |
+|                          | Kin Form                          | React Hook Form                                     |
+| ------------------------ | --------------------------------- | --------------------------------------------------- |
+| What holds the array     | `FieldApi`; the array _is_ a node | `useFieldArray` for logic, `useFormState` for state |
+| Array-level validation   | the field's own `validators`      | `useFieldArray`'s own `rules`, a separate API       |
+| Item identity on reorder | follows the item via re-keying    | `fields[i].id` from the hook                        |
+| Reusable component       | pass a resolved `FieldApi` down   | pass `control` + `name` down (or `useFormContext`)  |
+| Type-safety              | `DeepKey<T>` needs no cast        | casts needed; `TFieldValues` / `TName` are generic  |
 
 ## Multistep forms
 
@@ -1212,7 +1217,7 @@ Form's docs demonstrate the hand-rolled version.
 
 <CodeGroupItem label="Kin Form">
 
-```tsx {16-20,28-29,35-37}
+```tsx {16-20,30-31,35}
 import { useForm, useMultistep } from "@kintools/form-react";
 
 type Signup = {
@@ -1328,8 +1333,8 @@ function SignupWizard() {
 
 **What's different:**
 
-|                          | Kin Form                                                  | React Hook Form                                |
-| ------------------------ | --------------------------------------------------------- | ---------------------------------------------- |
-| Step-validation ceremony | `useMultistep`'s `next()` — touch + wait + gate, built in | Hand-rolled per wizard (`trigger([...names])`) |
-| Step ↔ field mapping     | Each step _is_ a `FieldApi` (`stepNames` entries)         | A field-name list you maintain per step        |
-| Branching/redirecting    | `onBeforeNext` can redirect to an arbitrary step name     | Custom `step` state logic                      |
+|                          | Kin Form                                 | React Hook Form                                |
+| ------------------------ | ---------------------------------------- | ---------------------------------------------- |
+| Step-validation ceremony | `next()`: touch, wait, gate, built in    | hand-rolled per wizard (`trigger([...names])`) |
+| Step to field mapping    | each step _is_ a `FieldApi`              | a field-name list you maintain per step        |
+| Branching / redirecting  | `onBeforeNext` returns a step to jump to | custom `step` state logic                      |
