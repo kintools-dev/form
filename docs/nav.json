@@ -53,6 +53,12 @@
           { "text": "Server-Side Rendering (SSR)", "link": "/guide/ssr" },
           { "text": "Common Pitfalls", "link": "/guide/common-pitfalls" }
         ]
+      },
+      {
+        "text": "Integrations",
+        "items": [
+          { "text": "shadcn/ui", "link": "/guide/shadcn-ui" }
+        ]
       }
     ],
     "/validators/": [

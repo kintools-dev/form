@@ -16,7 +16,7 @@ git config core.hooksPath .git-hooks   # enables the pre-commit fmt/lint/test ho
   panel
 - `validators/` (`@kintools/form-validators`), common validator factories
 - `docs/`, documentation content (Markdown + images), rendered by kintools.dev
-- `examples/react/`, a runnable example app
+- `examples/`, runnable example apps (`react/`, `lit/`, `nextjs/`, `shadcn-ui/`)
 
 See [CLAUDE.md](./CLAUDE.md) for the full architecture writeup.
 
