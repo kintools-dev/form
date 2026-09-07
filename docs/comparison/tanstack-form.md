@@ -115,13 +115,15 @@ function LoginForm() {
 | Submit wiring     | `onSubmit={form.handleSubmit}`                    | handler does `preventDefault` + `handleSubmit()`  |
 | Reading the error | `field.error`, a `string \| null`                 | `field.state.meta.errors`, an array               |
 
-Both bind controlled, and the shapes are close. The main structural difference
-is that `form.Field` is a single primitive bound to the form, whereas Kin Form
-splits "resolve a field" (`form.field(name, opts)`) from "watch it" (`<Watch>` /
-`useWatch`). For a one-off field, `form.Field` inline is a touch less ceremony.
-Kin Form's split is what lets an already-resolved `FieldApi` be handed to a
-reusable component (see [Form composition](#form-composition) below), where
-every call site collapses to one line too.
+Both bind controlled, and the field primitives are about the same size:
+`<Watch api={form.field("email", ...)}>` versus `<form.Field name="email" ...>`.
+TanStack Form fuses resolving a field and watching it into one `form`-bound
+primitive; Kin Form keeps them separate (`form.field` to resolve, `<Watch>` /
+`useWatch` to watch). That split is what keeps the core lean and composition
+simple: a resolved `FieldApi` is just a value, so it drops straight into a
+reusable component with a one-line call site (see
+[Form composition](#form-composition)), with no `form`-bound component type to
+thread through.
 
 This is the only section using a bare `<input>`. Everywhere else both sides bind
 to a controlled `<TextInput>` (or `<CountrySelect>`), since that is the case
@@ -219,14 +221,33 @@ function ProfileForm() {
 | ----------------- | --------------------------------- | -------------------------------------- |
 | Non-native inputs | Same `<Watch>` as any other field | Same `<form.Field>` as any other field |
 
-Both treat a custom-component field exactly like a native one, with no extra
-primitive. This is the `Controller` tax React Hook Form pays and neither of
-these does. Nested groups and arrays are covered under
-[Form composition](#form-composition); there the two diverge, because a TanStack
-Form `FieldGroupApi` is a separate type from `FieldApi`, whereas a Kin Form
-group is just a `FieldApi` whose value is an object.
+Both treat a custom-component field exactly like a native one: no extra
+primitive. Groups and arrays are where they diverge (see
+[Form composition](#form-composition)): a TanStack Form `FieldGroupApi` is a
+separate type, a Kin Form group is just a `FieldApi` whose value is an object.
 
-## Per-node validation: when it runs, and debouncing
+## Reusable field component
+
+Real forms bind through reusable field components. This is where the two
+libraries diverge most: in Kin Form, the call site collapses to one typed
+element; in TanStack Form, a typed reusable field needs the full
+`createFormHook` apparatus and still does not collapse the call site. So the
+sections below use a `<TextField>` on the Kin Form side and inline
+`<form.Field>` on the TanStack Form side, the idiomatic shape for each.
+
+<Container type="info">
+
+To build one reusable, type-safe text field and reuse it across forms, the
+concepts you learn are:
+
+- Kin Form: `FieldApi`, `useWatch`
+- Tanstack Form: `createFormHookContexts`, `createFormHook`, `fieldContext`,
+  `useAppForm`, `form.AppField`, `useFieldContext`, and for groups
+  `withFieldGroup` / `FieldGroupApi` and the `fields` mapping
+
+The [API surface matrix](/form/comparison/#api-surface) lists the full set.
+
+</Container>
 
 <SideBySide>
 
@@ -234,8 +255,115 @@ group is just a `FieldApi` whose value is an object.
 
 <CodeGroupItem label="Kin Form">
 
-```tsx {13}
-import { useForm, Watch } from "@kintools/form-react";
+```tsx {4,16-17}
+import { type FieldApi, useWatch } from "@kintools/form-react";
+
+function TextField<TParentValue>(
+  { api, label }: { api: FieldApi<string, TParentValue>; label: string },
+) {
+  const field = useWatch(api);
+
+  return (
+    <label>
+      {label}
+      <TextInput
+        value={field.value}
+        onBlur={field.handleBlur}
+        onChange={field.handleChange}
+      />
+      {field.invalid && field.touched &&
+        <span>{field.error ?? field.schemaError}</span>}
+    </label>
+  );
+}
+
+<TextField
+  api={form.field("email", { validators: required() })}
+  label="Email"
+/>;
+```
+
+</CodeGroupItem>
+
+<CodeGroupItem label="TanStack Form">
+
+```tsx {4,8,18-20,36}
+import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
+
+// One-time setup, shared across the app.
+const { fieldContext, formContext, useFieldContext } = createFormHookContexts();
+
+function TextField({ label }: { label: string }) {
+  // Pulls the field off context; only valid inside `form.AppField`.
+  const field = useFieldContext<string>();
+
+  return (
+    <label>
+      {label}
+      <TextInput
+        value={field.state.value}
+        onBlur={field.handleBlur}
+        onChange={field.handleChange}
+      />
+      {field.state.meta.isTouched && field.state.meta.errors[0] && (
+        <span>{field.state.meta.errors[0]}</span>
+      )}
+    </label>
+  );
+}
+
+// `createFormHook` also returns `withForm`, `withFieldGroup`, ...; the group
+// section below uses `withFieldGroup`.
+const { useAppForm, withFieldGroup } = createFormHook({
+  fieldContext,
+  formContext,
+  fieldComponents: { TextField },
+  formComponents: {},
+});
+
+// At the call site:
+const form = useAppForm({ defaultValues: { email: "" } });
+<form.AppField name="email">
+  {(field) => <field.TextField label="Email" />}
+</form.AppField>;
+```
+
+</CodeGroupItem>
+
+</CodeGroup>
+
+</SideBySide>
+
+**What's different:**
+
+|                             | Kin Form                                            | TanStack Form                                                             |
+| --------------------------- | --------------------------------------------------- | ------------------------------------------------------------------------- |
+| What the component receives | resolved `api: FieldApi<string, TParentValue>` prop | field off React context (`useFieldContext`), only inside `form.AppField`  |
+| One-time setup              | none                                                | `createFormHookContexts()` + `createFormHook({...})` → `useAppForm`       |
+| Value-type safety           | `FieldApi<string, TParentValue>` checks it          | `useFieldContext<string>()`: you assert it, or lose it with `AnyFieldApi` |
+| Call site                   | `<TextField api={form.field(...)} />`               | `<form.AppField name>{(field) => <field.TextField/>}</form.AppField>`     |
+| Cross-form reuse            | plain import, passed a prop                         | registered in one `createFormHook`, used via its `useAppForm` forms       |
+
+Kin Form: resolve the field, pass the `FieldApi` down. No setup, and it is the
+same `FieldApi` every other field uses.
+
+TanStack Form: first build the wiring (`createFormHookContexts`,
+`createFormHook`, a component registry), then read the field from context inside
+the component. Several APIs to learn before the first typed field renders, and
+the call site still needs the `form.AppField` wrapper. The lighter route,
+passing the field object down directly, skips the wiring but types it as
+`AnyFieldApi` (23 `any` parameters), so the value type is gone.
+
+## Per-node validation
+
+<SideBySide>
+
+<CodeGroup>
+
+<CodeGroupItem label="Kin Form">
+
+```tsx {11-13}
+import { useForm } from "@kintools/form-react";
 
 function SignupForm() {
   const form = useForm<{ username: string }>({
@@ -243,17 +371,14 @@ function SignupForm() {
   });
 
   return (
-    <Watch
+    <TextField
       api={form.field("username", {
         asyncValidator: async (field) =>
           (await checkUsernameTaken(field.value)) ? "Username taken" : null,
         validationDebounceMs: 300,
       })}
-    >
-      {(field) => (
-        <TextInput value={field.value} onChange={field.handleChange} />
-      )}
-    </Watch>
+      label="Username"
+    />
   );
 }
 ```
@@ -310,17 +435,17 @@ known bad.
 | Debounce         | `validationDebounceMs`                    | `asyncDebounceMs`, plus per-hook overrides         |
 | Config shape     | one array + one async slot + one number   | a `validators` object keyed by event               |
 
-Functional coverage is the same. The difference is shape: Kin Form's one
-`validators` array plus a separate async slot and one debounce number (which
-also covers its `schemaValidator`), versus TanStack Form's `validators` object
-where each timing (change, blur, submit; sync and async) is its own key, with
-per-hook debounce overrides. TanStack Form's model makes "validate only on blur"
-a one-key change; Kin Form runs sync `validators` on every change and leaves
-blur-only display to the render (`field.touched`).
+Same coverage, different shape. Kin Form: one `validators` array, one async
+slot, one debounce number. TanStack Form: a `validators` object keyed by timing
+(change, blur, submit; sync and async), so "validate on blur only" is a one-key
+change. Kin Form always runs sync `validators` on change and leaves blur-only
+display to the render (`field.touched`).
 
 ## Schema validation
 
-This is a place TanStack Form is genuinely nicer.
+This is a bundling tradeoff, not a clear win for either side: TanStack Form
+builds Standard Schema support into core, Kin Form keeps it in a separately
+versioned package for a lean core.
 
 <SideBySide>
 
@@ -328,9 +453,9 @@ This is a place TanStack Form is genuinely nicer.
 
 <CodeGroupItem label="Kin Form">
 
-```tsx {14}
-import { useForm, Watch } from "@kintools/form-react";
-import { required, toSchemaValidator } from "@kintools/form-validators";
+```tsx {14,18-19}
+import { useForm } from "@kintools/form-react";
+import { toSchemaValidator } from "@kintools/form-validators";
 import { z } from "zod";
 
 const signupSchema = z.object({
@@ -343,21 +468,17 @@ function SignupForm() {
   const form = useForm<Signup>({
     initialValue: { email: "", password: "" },
     schemaValidator: toSchemaValidator(signupSchema),
+    onSubmit: (form) => signUp(form.value),
   });
 
+  // A field's own `validators` still run alongside the schema when present;
+  // their errors land in `error`, the schema's in `schemaError`.
   return (
-    <Watch api={form.field("email", { validators: required("Required") })}>
-      {(field) => {
-        // Both channels are live at once, not one overriding the other.
-        const error = field.error ?? field.schemaError;
-        return (
-          <>
-            <TextInput value={field.value} onChange={field.handleChange} />
-            {error && <span>{error}</span>}
-          </>
-        );
-      }}
-    </Watch>
+    <form onSubmit={form.handleSubmit}>
+      <TextField api={form.field("email")} label="Email" />
+      <TextField api={form.field("password")} label="Password" />
+      <button type="submit">Sign up</button>
+    </form>
   );
 }
 ```
@@ -381,23 +502,46 @@ function SignupForm() {
     defaultValues: { email: "", password: "" } as Signup,
     // A Standard Schema is a validator as-is. No adapter package.
     validators: { onChange: signupSchema },
+    onSubmit: ({ value }) => signUp(value),
   });
 
   return (
-    <form.Field name="email">
-      {(field) => (
-        <>
-          <TextInput
-            value={field.state.value}
-            onChange={field.handleChange}
-          />
-          {/* A schema validator yields issue objects, not strings. */}
-          {field.state.meta.errors[0] && (
-            <span>{field.state.meta.errors[0].message}</span>
-          )}
-        </>
-      )}
-    </form.Field>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        form.handleSubmit();
+      }}
+    >
+      <form.Field name="email">
+        {(field) => (
+          <>
+            <TextInput
+              value={field.state.value}
+              onChange={field.handleChange}
+            />
+            {/* A schema validator yields issue objects, not strings. */}
+            {field.state.meta.errors[0] && (
+              <span>{field.state.meta.errors[0].message}</span>
+            )}
+          </>
+        )}
+      </form.Field>
+      <form.Field name="password">
+        {(field) => (
+          <>
+            <TextInput
+              type="password"
+              value={field.state.value}
+              onChange={field.handleChange}
+            />
+            {field.state.meta.errors[0] && (
+              <span>{field.state.meta.errors[0].message}</span>
+            )}
+          </>
+        )}
+      </form.Field>
+      <button type="submit">Sign up</button>
+    </form>
   );
 }
 ```
@@ -408,13 +552,6 @@ function SignupForm() {
 
 </SideBySide>
 
-TanStack Form has native [Standard Schema](https://standardschema.dev) support:
-a schema is a validator, passed straight to `validators.onChange` at the field
-or form level, with no `@hookform/resolvers`-style package and no
-`toSchemaValidator()`. Any Standard Schema library works (zod, valibot, arktype,
-effect). Kin Form needs the `toSchemaValidator()` adapter from
-`@kintools/form-validators` for the same thing.
-
 **What's different:**
 
 |                             | Kin Form                                               | TanStack Form                                                    |
@@ -424,12 +561,11 @@ effect). Kin Form needs the `toSchemaValidator()` adapter from
 | Schema + hand-written rules | coexist; `schemaError` kept apart from `error`         | merge into one `errors`; a field's rules replace the form schema |
 | Standard Schema libraries   | any (zod, valibot, arktype, ...)                       | any (zod, valibot, arktype, effect, ...)                         |
 
-Kin Form's counter is scope and separation, not ergonomics: a schema can sit on
-any node (not just the whole form), and its output lands in a field's own
-`schemaError`, kept apart from the `error` its own `validators` produce, so a
-field can carry both at once and decide how to combine them. On TanStack Form, a
-field-level `validators` entry overrides the form-level schema for that field
-rather than running alongside it.
+Kin Form's edge is scope and separation, not ergonomics: a schema can sit on any
+node, and its output lands in a field's own `schemaError`, separate from the
+`error` its `validators` produce, so a field can carry both. On TanStack Form a
+field-level `validators` entry replaces the form schema for that field instead
+of running alongside it.
 
 ## Cross-field validation
 
@@ -442,7 +578,7 @@ declare the link from opposite ends of the relationship.
 
 <CodeGroupItem label="Kin Form">
 
-```tsx {8,18-20}
+```tsx {9,14-15}
 function SignupForm() {
   const form = useForm<Signup>({
     initialValue: { email: "", password: "", confirmPassword: "" },
@@ -450,33 +586,17 @@ function SignupForm() {
 
   return (
     <>
-      <Watch api={form.field("password", { dependents: ["confirmPassword"] })}>
-        {(field) => (
-          <TextInput
-            type="password"
-            value={field.value}
-            onChange={field.handleChange}
-          />
-        )}
-      </Watch>
-
-      <Watch
+      <TextField
+        api={form.field("password", { dependents: ["confirmPassword"] })}
+        label="Password"
+      />
+      <TextField
         api={form.field("confirmPassword", {
           validators: (field) =>
             field.value !== form.value.password ? "Passwords must match" : null,
         })}
-      >
-        {(field) => (
-          <>
-            <TextInput
-              type="password"
-              value={field.value}
-              onChange={field.handleChange}
-            />
-            {field.error && <span>{field.error}</span>}
-          </>
-        )}
-      </Watch>
+        label="Confirm password"
+      />
     </>
   );
 }
@@ -551,6 +671,16 @@ Same spirit, opposite ends. Kin Form puts the wiring on the field being watched,
 so adding a dependent is an edit to the source field's `dependents`. TanStack
 Form puts it on the field doing the watching, so the field that owns the rule
 also declares what re-triggers it. Both avoid a manual refire call.
+
+The tradeoff is fan-out versus locality: one source feeding many dependents is a
+single array in Kin Form (one `onChangeListenTo` per dependent in TanStack
+Form), while co-locating each dependent's rule with its triggers means removing
+the dependent takes its wiring with it, where a Kin Form source can be left with
+a stale `dependents` entry.
+
+Kin Form's side also needs no per-dependent subscription: the source's own
+value-change callback, which fires anyway, does the revalidation, so nothing
+registers or tears down as fields mount and unmount.
 
 ## Dirty tracking & reset
 
@@ -653,11 +783,9 @@ function ProfileForm() {
 | Reset one field          | `form.resetField(name, value?)`          | `form.resetField(name)`                          |
 
 The models differ. Kin Form's `dirty` is a live `deepEqual` against the
-baseline, so typing a character and deleting it again leaves the field clean.
-TanStack Form's `meta.isDirty` is a "has ever been edited" flag that stays set
-after a revert by design; for Kin Form's semantics you read
-`!meta.isDefaultValue` instead. TanStack Form exposes both flags so you pick;
-Kin Form gives you the one behavior.
+baseline, so typing a character then deleting it leaves the field clean.
+TanStack Form's `meta.isDirty` means "edited at some point" and stays set after
+a revert; `!meta.isDefaultValue` is the check that matches Kin Form's `dirty`.
 
 ## Submission handling
 
@@ -732,13 +860,10 @@ const form = useForm({
 | Binding to `<form>`      | `onSubmit={form.handleSubmit}` | handler does `preventDefault` + `handleSubmit()`         |
 | Submit-in-progress state | `form.submitting`              | `form.state.isSubmitting` / `.canSubmit`                 |
 
-`onSubmitInvalid` is parity, and unlike React Hook Form's positional second
-argument, both give it a name. The gap is the same one React Hook Form has: no
-callback for "the submit function threw," so a failed request inside `onSubmit`
-is yours to catch. TanStack Form additionally flips `canSubmit` to `false` after
-an uncaught submit error, so a bare re-click will not retry until an input
-changes. Kin Form's `onSubmitError` fires automatically and leaves the form
-submittable.
+`onSubmitInvalid` is parity. The gap: TanStack Form has no callback for "the
+submit function threw," so a failed request inside `onSubmit` is yours to catch,
+and an uncaught throw flips `canSubmit` to `false` until an input changes. Kin
+Form's `onSubmitError` fires automatically and leaves the form submittable.
 
 ## Async initial values
 
@@ -832,17 +957,21 @@ call `form.reset(data)` in an effect when it lands); either works.
 
 ## Reactivity & selective re-rendering
 
-**Kin Form**: `FieldApi` carries all of its state (`value`, `error`, `touched`,
-`dirty`, ...) on one object, so `useWatch`, via `select`, subscribes to any of
-it (or several pieces together) in one call, isolated to that node.
+Both support selective re-rendering; the subscription model is what differs.
+
+**Kin Form**: each `FieldApi` node has its own subscribers, so a notification
+reaches only the subscribers of the nodes that changed (and any ancestor group
+being watched). State (`value`, `error`, `touched`, `dirty`, ...) lives on one
+object, so a single `useWatch` `select` can subscribe to any slice of it.
 
 **TanStack Form**: `FieldApi`, `FieldGroupApi`, and `FormApi` all read from one
-shared `@tanstack/store`. Every mutation notifies every subscriber, and each
-subscriber runs its own selector to decide whether to re-render. Selectors do
-prevent re-renders effectively, the same way React Hook Form's do; the
-difference is the notify-everyone-then-filter model versus Kin Form's targeted
-notify (this is the "Localized subscription" row in the
-[feature matrix](/form/comparison/#feature-matrix)).
+shared `@tanstack/store`, so any change notifies **every** subscriber, each of
+which runs its selector to decide whether to re-render. The selectors keep the
+re-renders precise; the cost is only the notify-all fan-out, negligible for
+typical form sizes.
+
+The [feature matrix](/form/comparison/#feature-matrix) tracks this difference as
+the "Localized subscription" row.
 
 <SideBySide>
 
@@ -905,152 +1034,18 @@ function Field({ field }: { field: AnyFieldApi }) {
 
 </SideBySide>
 
-**What's different:**
-
-|                        | Kin Form                                       | TanStack Form                                                   |
-| ---------------------- | ---------------------------------------------- | --------------------------------------------------------------- |
-| Notify model           | targeted: only that node's subscribers         | one shared store; every mutation notifies all, selectors filter |
-| Value vs field state   | one `useWatch(api, select)` covers both        | `useStore(field.store, selector)`, same store                   |
-| In-render subscription | `<Watch api select>`, a render-prop `useWatch` | `<form.Subscribe selector>`, does not re-render the parent      |
-| Deriving a value       | `select: (f) => ...`, deduped (shallow)        | `selector: (s) => ...`, deduped by the store                    |
-
-The end results are similar: both let a component subscribe to exactly the slice
-it cares about. Kin Form routes a notification only to the nodes that changed.
-TanStack Form runs every selector on every change and relies on the selector's
-return value staying equal to skip the re-render.
-
 ## Form composition
 
-Both let you build a reusable field component (leaf, group, or array) instead of
-repeating markup at every call site. The type-parameter shape and the number of
-named primitives are where they diverge.
-
-- **Kin Form**: `FieldApi<TValue, TParentValue = never>` decouples a field's own
-  value type from its parent form's shape, so a component only ever needs to
-  know `TValue`. `TParentValue` stays an opaque pass-through it never inspects.
-- **TanStack Form**: reusable, typed components go through `createFormHook`
-  (`createFormHookContexts` + `createFormHook` giving `useAppForm`, `withForm`,
-  `withFieldGroup`), plus `form.AppField` / `form.AppForm`, plus `formOptions`
-  for shared config, plus `FieldGroupApi` for reusable groups. The lighter route
-  (pass the field object down directly) types it as `AnyFieldApi`, which is
-  `FieldApi` with 23 `any` type parameters, so the value type is gone.
-
-<Container type="info">
-
-To build one reusable, type-safe text field and reuse it across forms, the
-concepts you learn are: `FieldApi` (Kin Form) versus `createFormHookContexts`,
-`createFormHook`, `fieldContext`, `useAppForm`, `form.AppField`,
-`useFieldContext`, and for groups `withFieldGroup` / `FieldGroupApi` and the
-`fields` mapping (TanStack Form). The
-[API surface matrix](/form/comparison/#api-surface) lists the full set.
-
-</Container>
-
-### Leaf field
-
-<SideBySide>
-
-<CodeGroup>
-
-<CodeGroupItem label="Kin Form">
-
-```tsx {4}
-import { type FieldApi, useWatch } from "@kintools/form-react";
-
-function TextField<TParent>(
-  { api, label }: { api: FieldApi<string, TParent>; label: string },
-) {
-  const field = useWatch(api);
-
-  return (
-    <label>
-      {label}
-      <TextInput
-        value={field.value}
-        onBlur={field.handleBlur}
-        onChange={field.handleChange}
-      />
-      {field.invalid && field.touched && <span>{field.error}</span>}
-    </label>
-  );
-}
-
-<TextField
-  api={form.field("email", { validators: required() })}
-  label="Email"
-/>;
-```
-
-</CodeGroupItem>
-
-<CodeGroupItem label="TanStack Form">
-
-```tsx {4,8,34}
-import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
-
-// One-time setup, shared across the app.
-const { fieldContext, formContext, useFieldContext } = createFormHookContexts();
-
-function TextField({ label }: { label: string }) {
-  // Pulls the field off context; only valid inside `form.AppField`.
-  const field = useFieldContext<string>();
-
-  return (
-    <label>
-      {label}
-      <TextInput
-        value={field.state.value}
-        onBlur={field.handleBlur}
-        onChange={field.handleChange}
-      />
-      {field.state.meta.isTouched && field.state.meta.errors[0] && (
-        <span>{field.state.meta.errors[0]}</span>
-      )}
-    </label>
-  );
-}
-
-const { useAppForm } = createFormHook({
-  fieldContext,
-  formContext,
-  fieldComponents: { TextField },
-  formComponents: {},
-});
-
-// At the call site:
-const form = useAppForm({ defaultValues: { email: "" } });
-<form.AppField name="email">
-  {(field) => <field.TextField label="Email" />}
-</form.AppField>;
-```
-
-</CodeGroupItem>
-
-</CodeGroup>
-
-</SideBySide>
-
-**What's different:**
-
-|                             | Kin Form                                       | TanStack Form                                                             |
-| --------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------- |
-| What the component receives | resolved `api: FieldApi<string, TParent>` prop | field off React context (`useFieldContext`), only inside `form.AppField`  |
-| One-time setup              | none                                           | `createFormHookContexts()` + `createFormHook({...})` → `useAppForm`       |
-| Value-type safety           | `FieldApi<string, TParent>` checks it          | `useFieldContext<string>()`: you assert it, or lose it with `AnyFieldApi` |
-| Call site                   | `<TextField api={form.field(...)} />`          | `<form.AppField name>{(field) => <field.TextField/>}</form.AppField>`     |
-| Cross-form reuse            | same component, unmodified                     | registered once, reused via any `useAppForm` from the hook                |
-
-TanStack Form's typed-reusable-component story is `createFormHook`: a one-time
-wiring step that produces `useAppForm`, plus components registered in
-`fieldComponents` that read the field off context inside `form.AppField`. It
-works well once set up, and pre-binding keeps call sites terse
-(`<field.TextField label=... />`). Kin Form's is a plain prop: resolve the
-field, pass the `FieldApi` down, no context and no registration.
+[`TextField`](#reusable-field-component) above is the leaf case. Groups and
+arrays add more: a group needs child-path addressing, an array also needs stable
+item identity across a reorder. In Kin Form each stays one typed `FieldApi`
+prop; in TanStack Form each is a distinct primitive (`withFieldGroup` /
+`FieldGroupApi`, `form.Field` with `mode="array"`).
 
 ### Group field
 
-A reusable component for a nested object (an address, reused for shipping and
-billing):
+A reusable component for a nested object (e.g. an address, reused for shipping
+and billing):
 
 <SideBySide>
 
@@ -1083,10 +1078,10 @@ function AddressField<TParentValue>(
 <CodeGroupItem label="TanStack Form">
 
 ```tsx {5,21-22}
-// `withFieldGroup` is returned by `createFormHook()`, alongside the `useAppForm`
-// from the leaf field above.
 type Address = { line1: string; city: string };
 
+// `withFieldGroup` is the one destructured from the `createFormHook` call in
+// the Reusable field component section above, next to `useAppForm`.
 const AddressGroup = withFieldGroup({
   defaultValues: { line1: "", city: "" } as Address,
   render: function Render({ group }) {
@@ -1115,22 +1110,25 @@ const AddressGroup = withFieldGroup({
 
 **What's different:**
 
-|                            | Kin Form                                       | TanStack Form                                                                   |
-| -------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------- |
-| Reusable-group primitive   | same `FieldApi<Address, TParent>` as any field | `withFieldGroup({ defaultValues, render })`, a distinct HOC                     |
-| Binding it to a location   | `form.field("shipping")`, a resolved field     | `fields="shipping"` prop (path string or key-to-path map)                       |
-| Building child paths       | `api.field("line1")`, relative                 | `group.AppField name="line1"`, via the `fields` mapping                         |
-| The group's own value type | `FieldApi<Address, TParent>`: right there      | `defaultValues` stands in for the shape (type only)                             |
-| Distinct concepts to learn | one (`FieldApi`)                               | `withFieldGroup`, `FieldGroupApi`, `group.AppField`, `fields`, `createFieldMap` |
+|                            | Kin Form                                            | TanStack Form                                                                   |
+| -------------------------- | --------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Reusable-group primitive   | same `FieldApi<Address, TParentValue>` as any field | `withFieldGroup({ defaultValues, render })`, a distinct HOC                     |
+| Binding it to a location   | `form.field("shipping")`, a resolved field          | `fields="shipping"` prop (path string or key-to-path map)                       |
+| Building child paths       | `api.field("line1")`, relative                      | `group.AppField name="line1"`, via the `fields` mapping                         |
+| The group's own value type | `FieldApi<Address, TParentValue>`: right there      | `defaultValues` stands in for the shape (type only)                             |
+| Group-level validation     | `validators` on the group's `FieldApi`              | none on `withFieldGroup`; a whole-group rule must live on the form              |
+| Distinct concepts to learn | one (`FieldApi`)                                    | `withFieldGroup`, `FieldGroupApi`, `group.AppField`, `fields`, `createFieldMap` |
 
-Kin Form reuses one concept: a group is a `FieldApi` whose value happens to be
-an object, and `api.field("line1")` addresses into it exactly like a top-level
-field. TanStack Form's reusable-group path is `withFieldGroup`, a higher-order
-component with its own `group` object (`FieldGroupApi`, which is neither
-`FormApi` nor `FieldApi`), bound to a spot in the form through a `fields` prop
-that is a path string or an explicit key-to-path map. It is genuinely capable
-(the `fields` map even lets a group's internal shape differ from the form's),
-but it is another primitive with its own model.
+Kin Form uses one concept: a group is a `FieldApi` whose value is an object, and
+`api.field("line1")` reads into it like any other field.
+
+TanStack Form uses `withFieldGroup`, a separate wrapper with its own `group`
+object (a `FieldGroupApi`, which is neither `FormApi` nor `FieldApi`). You bind
+it to a place in the form with a `fields` prop: a path string, or a map from
+group key to form path. It is capable, and the map even lets the group's shape
+differ from the form's, but it is one more model to learn, and it takes no
+`validators`, so a whole-group rule has to live on the form instead of in the
+component.
 
 ### Array field
 
@@ -1148,8 +1146,8 @@ imperfect options in TanStack Form.
 ```tsx {4,11,13}
 import { type FieldApi, useWatch } from "@kintools/form-react";
 
-function ItemsField<TParent>(
-  { api }: { api: FieldApi<string[], TParent> },
+function ItemsField<TParentValue>(
+  { api }: { api: FieldApi<string[], TParentValue> },
 ) {
   const value = useWatch(api, (g) => g.value);
 
@@ -1189,7 +1187,8 @@ function ItemsField<TParent>(
 ```tsx {18-22,25,31,62-65}
 import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
 
-// One-time setup, shared across the app (same wiring as the leaf-field section).
+// One-time setup, shared across the app (same wiring as the
+// Reusable field component section).
 const { fieldContext, formContext } = createFormHookContexts();
 const { useAppForm, withFieldGroup } = createFormHook({
   fieldContext,
@@ -1274,21 +1273,19 @@ const ItemsField = withFieldGroup({
 Making the array component reusable is where TanStack Form has no clean answer.
 Three routes, each conceding something:
 
-- **`withFieldGroup` + a `fields` prop** (shown above) is generic and fully
-  typed, but adds the `createFormHook` setup, a third API object (`group`), and
-  every caller-controlled option (the validator here) re-declared as a render
-  prop.
-- **Passing the whole `form` to `form.Field`** is typed and setup-free, but
-  pinned to one form's exact shape: `ReactFormExtendedApi` is invariant over its
-  12 type args, so the type needs a factory to name and one extra field breaks
-  it.
+- **`withFieldGroup` + a `fields` prop** (above): generic and fully typed, but
+  adds the `createFormHook` setup, a third API object (`group`), and every
+  caller option re-declared as a render prop.
+- **Pass the whole `form` to `form.Field`**: typed and setup-free, but pinned to
+  one form's exact shape (`ReactFormExtendedApi` is invariant over its 12 type
+  args), so one extra field breaks it.
 - **A `{ form, name }` pair with `<Field>` / `useField`** (React Hook Form's
-  `Controller` style) stays generic and setup-free, but drops to `AnyFormApi` /
-  casts and an `any` value.
+  `Controller` style): generic and setup-free, but drops to `AnyFormApi` / casts
+  and an `any` value.
 
-Kin Form's resolved `FieldApi<string[], TParent>` prop is all three at once,
-generic, typed, no setup, because `TParent` is an opaque pass-through and
-validators go on `form.field(name, { validators })` at the call site.
+Kin Form's resolved `FieldApi<string[], TParentValue>` prop is all three at
+once: generic, typed, no setup, because `TParentValue` is an opaque pass-through
+and validators go on `form.field(name, { validators })` at the call site.
 
 ## Multistep forms
 
@@ -1416,10 +1413,9 @@ function SignupWizard() {
 | Branching / redirecting  | `onBeforeNext` returns a step to jump to    | custom `step` state logic                    |
 | Unvalidated navigation   | `back()`, `jump(index or name)`             | custom `setStep` calls                       |
 
-Same as React Hook Form, neither has a wizard component, but Kin Form ships
-`useMultistep` and TanStack Form does not. TanStack Form's
+Neither ships a wizard component, but Kin Form has `useMultistep` and TanStack
+Form does not. TanStack Form's
 [Form Groups](https://tanstack.com/form/latest/docs/framework/react/guides/form-groups)
-narrow the gap a little (a group per step, advancing on its `onGroupSubmit` when
-the group validates), but there is no equivalent to `useMultistep`'s `next()`
-doing touch, wait, and gate in one call, or `onBeforeNext` returning a step to
-redirect to.
+narrow the gap (a group per step, advancing on `onGroupSubmit`), but there is no
+equivalent to `next()` doing touch, wait, and gate in one call, or
+`onBeforeNext` redirecting to another step.

@@ -94,12 +94,10 @@ function LoginForm() {
 | One-off native input | `<Watch>` render prop, more inline ceremony | `{...register(name)}`, one line            |
 
 For a handful of native inputs each used once, `register` genuinely produces
-less code. Kin Form's bet is the opposite: build the field components once
-(`TextField`, `AddressField`, `SubmitButton`; see
-[Form composition](#form-composition) below), and every call site collapses to
-one line too, typed against that form's value shape. That pays off fast across
-many forms or a shared field library; for a single one-off form, `<Watch>`
-inline is the right call.
+less code. Kin Form's bet is the opposite: build the field components once (see
+[Form composition](#form-composition)), and every call site collapses to one
+line too, typed against the form's shape. That pays off across many forms or a
+shared field library; for a single one-off form, `<Watch>` inline is fine.
 
 This is the only section using a bare `<input>`/`register`, since wrapping one
 in `Controller` just to force it controlled wouldn't prove anything. Everywhere
@@ -194,7 +192,11 @@ special case; see [Array field](#array-field) and [Group field](#group-field)
 under [Form composition](#form-composition) below for the full comparison, shown
 as reusable components rather than inlined in one form.
 
-## Per-node validation: when it runs, and debouncing
+## Reusable field component
+
+Real forms bind through reusable field components, not a render prop re-inlined
+at every call site. Every section below uses one `TextField` per library, built
+once here.
 
 <SideBySide>
 
@@ -202,8 +204,110 @@ as reusable components rather than inlined in one form.
 
 <CodeGroupItem label="Kin Form">
 
-```tsx {13}
-import { useForm, Watch } from "@kintools/form-react";
+```tsx {4,16-17,23}
+import { type FieldApi, useWatch } from "@kintools/form-react";
+
+function TextField<TParentValue>(
+  { api, label }: { api: FieldApi<string, TParentValue>; label: string },
+) {
+  const field = useWatch(api);
+
+  return (
+    <label>
+      {label}
+      <TextInput
+        value={field.value}
+        onBlur={field.handleBlur}
+        onChange={field.handleChange}
+      />
+      {field.invalid && field.touched &&
+        <span>{field.error ?? field.schemaError}</span>}
+    </label>
+  );
+}
+
+<TextField
+  api={form.field("email", { validators: required() })}
+  label="Email"
+/>;
+```
+
+</CodeGroupItem>
+
+<CodeGroupItem label="React Hook Form">
+
+```tsx {11,24,30-32}
+import { useController } from "react-hook-form";
+import type {
+  FieldPathByValue,
+  FieldValues,
+  UseControllerProps,
+} from "react-hook-form";
+
+function TextField<T extends FieldValues>(
+  { label, ...controllerProps }:
+    // FieldPathByValue<T, string>: every path whose value is a string.
+    & UseControllerProps<T, FieldPathByValue<T, string>>
+    & { label: string },
+) {
+  const { field, fieldState } = useController(controllerProps);
+
+  return (
+    <label>
+      {label}
+      <TextInput
+        value={field.value}
+        onBlur={field.onBlur}
+        onChange={field.onChange}
+      />
+      {fieldState.invalid && <span>{fieldState.error?.message}</span>}
+    </label>
+  );
+}
+
+<TextField
+  control={control}
+  name="email"
+  rules={{ required: "Required" }}
+  label="Email"
+/>;
+```
+
+</CodeGroupItem>
+
+</CodeGroup>
+
+</SideBySide>
+
+**What's different:**
+
+|                   | Kin Form                            | React Hook Form                                          |
+| ----------------- | ----------------------------------- | -------------------------------------------------------- |
+| Prop bag          | `api: FieldApi<...>` prop           | `control` + `name` + rules (`UseControllerProps`)        |
+| Type parameter    | `TParentValue`, inert               | `T extends FieldValues`, the whole form type             |
+| Field-path typing | resolved once at `form.field(name)` | `FieldPath<T>` / `FieldPathByValue<T, V>`, per call site |
+
+Both `TextField`s are generic and reused unchanged across forms. The difference
+is that Kin Form's `TParentValue` carries no information (the component's real
+contract is `FieldApi<TValue>`), while React Hook Form's `T` is the whole form
+type: `name` is checked against it, nested paths need casts (see
+[Group field](#group-field)), and `Control<any>` is the only way out of the
+generic.
+
+The Kin Form `TextField` also reads `field.error ?? field.schemaError`, so a
+per-field rule and a [schema](#schema-validation) issue surface through the same
+component; React Hook Form has one `error` per field, so nothing to combine.
+
+## Per-node validation
+
+<SideBySide>
+
+<CodeGroup>
+
+<CodeGroupItem label="Kin Form">
+
+```tsx {11-13}
+import { useForm } from "@kintools/form-react";
 
 function SignupForm() {
   const form = useForm<{ username: string }>({
@@ -211,17 +315,14 @@ function SignupForm() {
   });
 
   return (
-    <Watch
+    <TextField
       api={form.field("username", {
         asyncValidator: async (field) =>
           (await checkUsernameTaken(field.value)) ? "Username taken" : null,
         validationDebounceMs: 300,
       })}
-    >
-      {(field) => (
-        <TextInput value={field.value} onChange={field.handleChange} />
-      )}
-    </Watch>
+      label="Username"
+    />
   );
 }
 ```
@@ -230,33 +331,33 @@ function SignupForm() {
 
 <CodeGroupItem label="React Hook Form">
 
-```tsx {10-17}
-import { Controller, useForm } from "react-hook-form";
+```tsx {7,10-19}
+import { useForm } from "react-hook-form";
 import { useMemo } from "react";
 import debounce from "lodash/debounce";
 
 function SignupForm() {
   const { control } = useForm<{ username: string }>({
-    mode: "onChange", // form-wide; every field revalidates on every change
+    mode: "onChange", // Form-wide; every field revalidates on every change.
   });
 
-  // Hand-rolled.
+  // Hand-rolled; no built-in debounce.
   const debouncedCheck = useMemo(
     () =>
-      debounce(async (value: string) => {
-        return await checkUsernameTaken(value) ? "Username taken" : true;
-      }, 300),
+      debounce(
+        async (value: string) =>
+          (await checkUsernameTaken(value)) ? "Username taken" : true,
+        300,
+      ),
     [],
   );
 
   return (
-    <Controller
+    <TextField
       control={control}
       name="username"
       rules={{ validate: debouncedCheck }}
-      render={({ field }) => (
-        <TextInput value={field.value} onChange={field.onChange} />
-      )}
+      label="Username"
     />
   );
 }
@@ -291,9 +392,9 @@ Both adapters can be used with any Standard Schema library: zod, valibot, ...
 
 <CodeGroupItem label="Kin Form">
 
-```tsx {20-21}
-import { useForm, Watch } from "@kintools/form-react";
-import { required, toSchemaValidator } from "@kintools/form-validators";
+```tsx {14}
+import { useForm } from "@kintools/form-react";
+import { toSchemaValidator } from "@kintools/form-validators";
 import { z } from "zod";
 
 const signupSchema = z.object({
@@ -306,21 +407,17 @@ function SignupForm() {
   const form = useForm<Signup>({
     initialValue: { email: "", password: "" },
     schemaValidator: toSchemaValidator(signupSchema),
+    onSubmit: (form) => signUp(form.value),
   });
 
+  // `TextField` shows `field.error ?? field.schemaError`; here only the
+  // schema is set, so `schemaError`.
   return (
-    <Watch api={form.field("email", { validators: required("Required") })}>
-      {(field) => {
-        // Both channels are live at once, not one overriding the other.
-        const error = field.error ?? field.schemaError;
-        return (
-          <>
-            <TextInput value={field.value} onChange={field.handleChange} />
-            {error && <span>{error}</span>}
-          </>
-        );
-      }}
-    </Watch>
+    <form onSubmit={form.handleSubmit}>
+      <TextField api={form.field("email")} label="Email" />
+      <TextField api={form.field("password")} label="Password" />
+      <button type="submit">Sign up</button>
+    </form>
   );
 }
 ```
@@ -329,8 +426,8 @@ function SignupForm() {
 
 <CodeGroupItem label="React Hook Form">
 
-```tsx {21-22}
-import { Controller, useForm } from "react-hook-form";
+```tsx {14}
+import { useForm } from "react-hook-form";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { z } from "zod";
 
@@ -341,24 +438,19 @@ const signupSchema = z.object({
 type Signup = z.infer<typeof signupSchema>;
 
 function SignupForm() {
-  const { control } = useForm<Signup>({
+  const { control, handleSubmit } = useForm<Signup>({
     defaultValues: { email: "", password: "" },
     resolver: standardSchemaResolver(signupSchema),
   });
 
+  // A `rules.validate` on these fields would silently never run; the
+  // resolver has taken over.
   return (
-    <Controller
-      control={control}
-      name="email"
-      // A `rules.validate` passed here would silently never run; the
-      // resolver has taken over.
-      render={({ field, fieldState }) => (
-        <>
-          <TextInput value={field.value} onChange={field.onChange} />
-          {fieldState.error && <span>{fieldState.error.message}</span>}
-        </>
-      )}
-    />
+    <form onSubmit={handleSubmit(signUp)}>
+      <TextField control={control} name="email" label="Email" />
+      <TextField control={control} name="password" label="Password" />
+      <button type="submit">Sign up</button>
+    </form>
   );
 }
 ```
@@ -371,17 +463,11 @@ function SignupForm() {
 
 **What's different:**
 
-|                          | Kin Form                                           | React Hook Form                                           |
-| ------------------------ | -------------------------------------------------- | --------------------------------------------------------- |
-| Schema scope             | any node (field, group, or form)                   | one `resolver`, whole form only                           |
-| Schema + per-field rules | runs alongside `validators`                        | `resolver` replaces `register`'s rules for covered fields |
-| Where schema issues land | a field's own `schemaError`, separate from `error` | same `errors`; schema output replaces the per-field ones  |
-
-Once a `resolver` is set, `register`'s own `required` / `pattern` / `validate`
-on the fields it covers stop running (a `rules.validate` passed there silently
-never fires). Kin Form's `schemaValidator` instead runs alongside per-field
-`validators`, and its output lands in `schemaError`, kept apart from `error` so
-a field can carry both and decide how to combine them.
+|                          | Kin Form                                           | React Hook Form                                          |
+| ------------------------ | -------------------------------------------------- | -------------------------------------------------------- |
+| Schema scope             | any node (field, group, or form)                   | one `resolver`, whole form only                          |
+| Schema + per-field rules | run independently, both kept                       | `resolver` overrides `register`'s rules                  |
+| Where schema issues land | a field's own `schemaError`, separate from `error` | same `errors`; schema output replaces the per-field ones |
 
 ## Cross-field validation
 
@@ -394,7 +480,7 @@ amounts of wiring.
 
 <CodeGroupItem label="Kin Form">
 
-```tsx {8,20-22}
+```tsx {9,14-15}
 function SignupForm() {
   const form = useForm<Signup>({
     initialValue: { email: "", password: "", confirmPassword: "" },
@@ -402,33 +488,17 @@ function SignupForm() {
 
   return (
     <>
-      <Watch api={form.field("password", { dependents: ["confirmPassword"] })}>
-        {(field) => (
-          <TextInput
-            type="password"
-            value={field.value}
-            onChange={field.handleChange}
-          />
-        )}
-      </Watch>
-
-      <Watch
+      <TextField
+        api={form.field("password", { dependents: ["confirmPassword"] })}
+        label="Password"
+      />
+      <TextField
         api={form.field("confirmPassword", {
           validators: (field) =>
             field.value !== form.value.password ? "Passwords must match" : null,
         })}
-      >
-        {(field) => (
-          <>
-            <TextInput
-              type="password"
-              value={field.value}
-              onChange={field.handleChange}
-            />
-            {field.error && <span>{field.error}</span>}
-          </>
-        )}
-      </Watch>
+        label="Confirm password"
+      />
     </>
   );
 }
@@ -438,7 +508,7 @@ function SignupForm() {
 
 <CodeGroupItem label="React Hook Form">
 
-```tsx {17-18,28-29}
+```tsx {19-21,30-31}
 function SignupForm() {
   const { control, trigger, getValues } = useForm<Signup>({
     defaultValues: { email: "", password: "", confirmPassword: "" },
@@ -446,6 +516,10 @@ function SignupForm() {
 
   return (
     <>
+      {
+        /* The source field can't hide behind `TextField`: it needs a manual
+          refire in its own `onChange`. */
+      }
       <Controller
         control={control}
         name="password"
@@ -455,30 +529,19 @@ function SignupForm() {
             value={field.value}
             onChange={(value) => {
               field.onChange(value);
-              // Manual trigger.
               trigger("confirmPassword");
             }}
           />
         )}
       />
-
-      <Controller
+      <TextField
         control={control}
         name="confirmPassword"
         rules={{
           validate: (value) =>
             value === getValues("password") || "Passwords must match",
         }}
-        render={({ field, fieldState }) => (
-          <>
-            <TextInput
-              type="password"
-              value={field.value}
-              onChange={field.onChange}
-            />
-            {fieldState.error && <span>{fieldState.error.message}</span>}
-          </>
-        )}
+        label="Confirm password"
       />
     </>
   );
@@ -591,7 +654,7 @@ function ProfileForm() {
 |                  | Kin Form                                 | React Hook Form                                                                    |
 | ---------------- | ---------------------------------------- | ---------------------------------------------------------------------------------- |
 | Whole-form dirty | `form.dirty`                             | `formState.isDirty`                                                                |
-| Per-field dirty  | `field.dirty` in a scoped `Watch`        | `formState.dirtyFields`; reading `.firstName` still subscribes to the whole object |
+| Per-field dirty  | `field.dirty`                            | `formState.dirtyFields`; reading `.firstName` still subscribes to the whole object |
 | Reset            | `form.reset(value?)`, moves the baseline | `reset(values?, keepStateOptions)`                                                 |
 | Reset one field  | `form.resetField(name, value?)`          | `resetField(name, options?)`                                                       |
 
@@ -665,7 +728,12 @@ const { handleSubmit } = useForm<Signup>({
 
 ## Async initial values
 
-This is a place React Hook Form is genuinely nicer.
+React Hook Form accepts an async function for `defaultValues` and exposes its
+pending state as `formState.isLoading`. Kin Form takes only a synchronous
+`initialValue`, by design: fetching data is the app's job, and apps do it in
+different ways (a query hook, a router loader, a server component, a plain
+`fetch`). The form only needs the value once it exists, so the usual pattern is
+to keep it unmounted until then.
 
 <SideBySide>
 
@@ -724,14 +792,6 @@ function ProfilePage() {
 
 </SideBySide>
 
-**What's different:**
-
-|                        | Kin Form                           | React Hook Form                              |
-| ---------------------- | ---------------------------------- | -------------------------------------------- |
-| Async defaults         | `initialValue` is synchronous only | `defaultValues` accepts an async function    |
-| Loading state          | from your data-fetching hook       | `formState.isLoading`, built in              |
-| Populating once loaded | mount the form after data arrives  | automatic, `defaultValues` resolves in place |
-
 ## Reactivity & selective re-rendering
 
 **Kin Form**: `FieldApi` carries its own state (`value`, `error`, `touched`,
@@ -748,11 +808,12 @@ error or touched status means also subscribing to `useFormState`.
 
 <CodeGroupItem label="Kin Form">
 
-```tsx {5-8}
+```tsx {6-9}
 import { type FieldApi, useWatch } from "@kintools/form-react";
 
 function Field<TParentValue>({ api }: { api: FieldApi<string, TParentValue> }) {
   // One hook covers all field state (including value).
+  // An optional selector can be provided for selective re-rendering.
   const [value, error] = useWatch(
     api,
     (f) => [f.value, f.touched ? f.error : null] as const,
@@ -816,21 +877,11 @@ function Field<T extends FieldValues>(
 
 ## Form composition
 
-Both let you build a reusable field component (leaf or group/array alike)
-instead of repeating markup at every call site. The type parameter shape is
-where the two diverge:
-
-- **Kin Form**: `FieldApi<TValue, TParentValue = never>` decouples a field's own
-  value type from its parent form's shape, so a component only ever needs to
-  know `TValue`. `TParentValue` stays an opaque pass-through it never inspects.
-- **React Hook Form**: `Control<TFieldValues>` parameterizes the field by the
-  _whole_ form instead, so a shared component built against it either
-  re-parameterizes itself over whatever form it's dropped into (generics leaking
-  through every reusable component's signature) or drops to loosely-typed props.
-
-The examples below reuse `TextField`/`AddressField` within one form; the same
-signatures generalize across completely unrelated forms too, with zero per-form
-coupling.
+[`TextField`](#reusable-field-component) above is the leaf case. Groups and
+arrays add more: a group needs child-path addressing, an array also needs stable
+item identity across a reorder. In Kin Form, each stays one typed prop. In React
+Hook Form, each needs `Control<TFieldValues>` threaded through, plus a
+path-prefix convention and casts.
 
 React Hook Form also has an official addon for this gap,
 [`@hookform/lenses`](https://github.com/react-hook-form/lenses). A
@@ -839,104 +890,10 @@ but it's another abstraction layer wrapping the same `register`/`useController`/
 `useFieldArray` underneath, not a change to them. The comparison below is
 against core React Hook Form, without this addon.
 
-### Leaf field
-
-<SideBySide>
-
-<CodeGroup>
-
-<CodeGroupItem label="Kin Form">
-
-```tsx {4}
-import { type FieldApi, useWatch } from "@kintools/form-react";
-
-function TextField<TParent>(
-  { api, label }: { api: FieldApi<string, TParent>; label: string },
-) {
-  const field = useWatch(api);
-
-  return (
-    <label>
-      {label}
-      <TextInput
-        value={field.value}
-        onBlur={field.handleBlur}
-        onChange={field.handleChange}
-      />
-      {field.invalid && field.touched && <span>{field.error}</span>}
-    </label>
-  );
-}
-
-<TextField
-  api={form.field("email", { validators: required() })}
-  label="Email"
-/>;
-```
-
-</CodeGroupItem>
-
-<CodeGroupItem label="React Hook Form">
-
-```tsx {11}
-import { useController } from "react-hook-form";
-import type {
-  FieldPathByValue,
-  FieldValues,
-  UseControllerProps,
-} from "react-hook-form";
-
-function TextField<T extends FieldValues>(
-  { label, ...controllerProps }:
-    // FieldPathByValue<T, string>: every path whose value is a string.
-    & UseControllerProps<T, FieldPathByValue<T, string>>
-    & { label: string },
-) {
-  const { field, fieldState } = useController(controllerProps);
-
-  return (
-    <label>
-      {label}
-      <TextInput
-        value={field.value}
-        onBlur={field.onBlur}
-        onChange={field.onChange}
-      />
-      {fieldState.invalid && <span>{fieldState.error?.message}</span>}
-    </label>
-  );
-}
-
-<TextField
-  control={control}
-  name="email"
-  rules={{ required: "Required" }}
-  label="Email"
-/>;
-```
-
-</CodeGroupItem>
-
-</CodeGroup>
-
-</SideBySide>
-
-The shapes end up close in spirit (both return one component reusable across
-every form), but the type-safety story differs:
-
-**What's different:**
-
-|                         | Kin Form                                 | React Hook Form                                                                  |
-| ----------------------- | ---------------------------------------- | -------------------------------------------------------------------------------- |
-| Reusable field prop bag | resolved `api: FieldApi<...>` prop       | `UseControllerProps`: `control` + `name` + rules                                 |
-| Type-safety on `name`   | checked once, at `form.field(name, ...)` | `FieldPath<T>`, per call site                                                    |
-| Type-safety on value    | `FieldApi<string, TParent>` is enough    | needs `FieldPathByValue<T, string>`; plain `FieldPath<T>` accepts any value type |
-| Cross-form reuse        | same component, unmodified               | re-parameterize per `TFieldValues`, or `Control<any>`                            |
-
 ### Group field
 
-A reusable component for a nested object (an address, reused for both shipping
-and billing) instead of an array:
+A reusable component for a nested object (e.g. an address, reused for both
+shipping and billing):
 
 <SideBySide>
 
@@ -1010,12 +967,12 @@ function AddressField<T extends FieldValues>(
 
 **What's different:**
 
-|                              | Kin Form                                                   | React Hook Form                                             |
-| ---------------------------- | ---------------------------------------------------------- | ----------------------------------------------------------- |
-| Reusable nested-group prop   | resolved `api: FieldApi<Address, TParent>`, like any field | `control` + `name`, a path prefix                           |
-| Type-safety at the call site | automatic from `FieldApi<Address, TParent>`                | `FieldPathByValue<T, Address>`, a rarely-used escape hatch  |
-| Building child paths         | `api.field("line1")`, relative                             | template-string concat (`` `${name}.line1` ``)              |
-| Type-safety on children      | via `DeepKey<Address>`, no cast                            | needs a cast; TS can't prove the concatenated path is valid |
+|                              | Kin Form                                                        | React Hook Form                                             |
+| ---------------------------- | --------------------------------------------------------------- | ----------------------------------------------------------- |
+| Reusable nested-group prop   | resolved `api: FieldApi<Address, TParentValue>`, like any field | `control` + `name`, a path prefix                           |
+| Type-safety at the call site | automatic from `FieldApi<Address, TParentValue>`                | `FieldPathByValue<T, Address>`, a rarely-used escape hatch  |
+| Building child paths         | `api.field("line1")`, relative                                  | template-string concat (`` `${name}.line1` ``)              |
+| Type-safety on children      | via `DeepKey<Address>`, no cast                                 | needs a cast; TS can't prove the concatenated path is valid |
 
 ### Array field
 
@@ -1028,63 +985,51 @@ identity across a reorder, plus its own mutation helpers:
 
 <CodeGroupItem label="Kin Form">
 
-```tsx {4,15,33}
-import { FieldApi, useForm, useWatch } from "@kintools/form-react";
+```tsx {4,11,13}
+import { type FieldApi, useForm, useWatch } from "@kintools/form-react";
 
 function ItemsField<TParentValue>(
   { api }: { api: FieldApi<string[], TParentValue> },
 ) {
-  // Selective re-rendering.
-  const [error, value] = useWatch(api, (f) => [f.error, f.value] as const);
+  const value = useWatch(api, (f) => f.value);
 
   return (
     <>
       {value.map((_, i) => {
         const field = api.field(`${i}`);
         return (
-          <ItemField
-            key={field.id}
-            api={field}
-            onMoveUp={i > 0 ? () => api.moveItem("", i, i - 1) : undefined}
-            onMoveDown={i < value.length - 1
-              ? () => api.moveItem("", i, i + 1)
-              : undefined}
-            onRemove={() => api.removeItem("", i)}
-          />
+          <div key={field.id}>
+            <TextInput
+              value={field.value}
+              onBlur={field.handleBlur}
+              onChange={field.handleChange}
+            />
+            <button
+              disabled={i === 0}
+              onClick={() => api.moveItem("", i, i - 1)}
+            >
+              Move up
+            </button>
+            <button
+              disabled={i === value.length - 1}
+              onClick={() => api.moveItem("", i, i + 1)}
+            >
+              Move down
+            </button>
+            <button onClick={() => api.removeItem("", i)}>Remove</button>
+          </div>
         );
       })}
-      {error && <span>{error}</span>}
+      {api.error && <span>{api.error}</span>}
       <button onClick={() => api.pushItem("", "")}>Add</button>
     </>
   );
 }
 
-function ItemField(
-  { api, onMoveUp, onMoveDown, onRemove }: {
-    api: FieldApi<string, string[]>;
-    onMoveUp?: () => void;
-    onMoveDown?: () => void;
-    onRemove: () => void;
-  },
-) {
-  useWatch(api);
-
-  return (
-    <div>
-      <TextInput
-        value={api.value}
-        onBlur={api.handleBlur}
-        onChange={api.handleChange}
-      />
-      <button disabled={!onMoveUp} onClick={onMoveUp}>Move up</button>
-      <button disabled={!onMoveDown} onClick={onMoveDown}>Move down</button>
-      <button onClick={onRemove}>Remove</button>
-    </div>
-  );
-}
-
 function Form() {
-  const form = useForm<{ items: string[] }>({ initialValue: { items: [] } });
+  const form = useForm<{ items: string[] }>({
+    initialValue: { items: [] },
+  });
 
   <ItemsField
     api={form.field("items", {
@@ -1098,9 +1043,9 @@ function Form() {
 
 <CodeGroupItem label="React Hook Form">
 
-```tsx {21-22,25-27,33,36-39,53}
+```tsx {20-21,32,35-38}
 import {
-  useController,
+  Controller,
   useFieldArray,
   useForm,
   useFormState,
@@ -1110,7 +1055,6 @@ import type {
   FieldPathByValue,
   FieldValues,
   Path,
-  UseControllerProps,
   UseFieldArrayProps,
 } from "react-hook-form";
 
@@ -1130,47 +1074,37 @@ function ItemsField<
   return (
     <>
       {fields.map((f, i) => (
-        <ItemField
-          key={f.id}
-          control={props.control}
-          // Cast needed, for the same reason as AddressField's children.
-          name={`${props.name}.${i}.value` as FieldPathByValue<
-            TFieldValues,
-            string
-          >}
-          onMoveUp={i > 0 ? () => move(i, i - 1) : undefined}
-          onMoveDown={i < fields.length - 1 ? () => move(i, i + 1) : undefined}
-          onRemove={() => remove(i)}
-        />
+        <div key={f.id}>
+          <Controller
+            control={props.control}
+            // Cast needed, for the same reason as AddressField's children.
+            name={`${props.name}.${i}.value` as FieldPathByValue<
+              TFieldValues,
+              string
+            >}
+            render={({ field }) => (
+              <TextInput
+                value={field.value}
+                onBlur={field.onBlur}
+                onChange={field.onChange}
+              />
+            )}
+          />
+          <button disabled={i === 0} onClick={() => move(i, i - 1)}>
+            Move up
+          </button>
+          <button
+            disabled={i === fields.length - 1}
+            onClick={() => move(i, i + 1)}
+          >
+            Move down
+          </button>
+          <button onClick={() => remove(i)}>Remove</button>
+        </div>
       ))}
       {rootError?.message && <span>{rootError.message}</span>}
       <button onClick={() => append({ value: "" } as never)}>Add</button>
     </>
-  );
-}
-
-function ItemField<TFieldValues extends FieldValues>(
-  { control, name, onMoveUp, onMoveDown, onRemove }:
-    & UseControllerProps<TFieldValues, FieldPathByValue<TFieldValues, string>>
-    & {
-      onMoveUp?: () => void;
-      onMoveDown?: () => void;
-      onRemove: () => void;
-    },
-) {
-  const { field } = useController({ control, name });
-
-  return (
-    <div>
-      <TextInput
-        value={field.value}
-        onBlur={field.onBlur}
-        onChange={field.onChange}
-      />
-      <button disabled={!onMoveUp} onClick={onMoveUp}>Move up</button>
-      <button disabled={!onMoveDown} onClick={onMoveDown}>Move down</button>
-      <button onClick={onRemove}>Remove</button>
-    </div>
   );
 }
 
@@ -1202,8 +1136,21 @@ function Form() {
 | What holds the array     | `FieldApi`; the array _is_ a node | `useFieldArray` for logic, `useFormState` for state |
 | Array-level validation   | the field's own `validators`      | `useFieldArray`'s own `rules`, a separate API       |
 | Item identity on reorder | follows the item via re-keying    | `fields[i].id` from the hook                        |
+| Per-item input binding   | `api.field(i).value`, read inline | a `<Controller>` boundary per input                 |
 | Reusable component       | pass a resolved `FieldApi` down   | pass `control` + `name` down (or `useFormContext`)  |
 | Type-safety              | `DeepKey<T>` needs no cast        | casts needed; `TFieldValues` / `TName` are generic  |
+
+Both item UIs are inlined here.
+
+**Kin Form**: a bare `<TextInput>` works because the row just reads
+`field.value` and calls stable methods, no subscription of its own; the parent's
+`useWatch` re-renders the list. If a row needs its own reactivity, swap in the
+reusable [`<TextField>`](#reusable-field-component) (it subscribes to `api`
+internally). A dedicated component is only needed to render something custom.
+
+**React Hook Form**: each input needs its own `<Controller>` render prop (or
+`register`, uncontrolled), there's no inline read of a field's value. Only the
+hook form, `useController`, forces a separate component.
 
 ## Multistep forms
 
