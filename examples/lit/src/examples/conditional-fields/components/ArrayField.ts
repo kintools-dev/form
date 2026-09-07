@@ -4,8 +4,8 @@ import { __decorate } from "tslib";
 import { type FieldApi, WatchController } from "@kintools/form-lit";
 
 export class ArrayField<
-  TParentValue = unknown,
   TItem = unknown,
+  TParentValue = unknown,
 > extends LitElement {
   // See `SubmitButton.ts`'s own doc comment for why these are `declare`d
   // rather than real class fields.

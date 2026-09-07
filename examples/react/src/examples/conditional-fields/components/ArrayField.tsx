@@ -11,8 +11,8 @@ export type ArrayFieldProps<TItem, TParentValue> = {
   ) => ReactNode;
 };
 
-export function ArrayField<TParentValue, TItem>(
-  { api, label, newItem, children }: ArrayFieldProps<TParentValue, TItem>,
+export function ArrayField<TItem, TParentValue>(
+  { api, label, newItem, children }: ArrayFieldProps<TItem, TParentValue>,
 ): ReactNode {
   const value = useWatch(api, (f) => f.value);
 

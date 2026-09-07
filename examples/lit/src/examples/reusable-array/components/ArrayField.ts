@@ -14,8 +14,8 @@ import { type FieldApi, WatchController } from "@kintools/form-lit";
 // names from, e.g. `${index}` for a primitive item or `${index}.code` for
 // an object one).
 export class ArrayField<
-  TParentValue = unknown,
   TItem = unknown,
+  TParentValue = unknown,
 > extends LitElement {
   // See `SubmitButton.ts`'s own doc comment for why these are `declare`d
   // rather than real class fields.

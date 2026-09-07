@@ -1,14 +1,15 @@
 import type { ReactNode } from "react";
 import { type FieldApi, useWatch } from "@kintools/form-react";
 
-export type ArrayFieldProps<TParentValue, TItem> = {
+export type ArrayFieldProps<TItem, TParentValue> = {
   api: FieldApi<TItem[], TParentValue>;
   label: ReactNode;
   newItem: () => TItem;
-  // Derives a stable React list key from an item, e.g. an id embedded on it
-  // at creation (see `reusable-array`'s `teamMembers`). Falls back to the
-  // array index when omitted, e.g. for primitive items with nothing to key
-  // off (`skills`) — see the caveat on that fallback below.
+  /**
+   * Derives a stable React list key from an item.
+   *
+   * Falls back to the array index when omitted.
+   */
   itemKey?: (item: TItem) => string | number | bigint;
   children: (
     api: FieldApi<TItem[], TParentValue>,
@@ -16,22 +17,19 @@ export type ArrayFieldProps<TParentValue, TItem> = {
   ) => ReactNode;
 };
 
-// Generic array editor: works for any item type (primitive or object) at any
-// path, because `group`'s own value already *is* the array — array methods
-// are called on it with `""` (see `DeepKeyOrRoot`'s doc comment in
-// `core/types.ts`) — so this only ever needs a `FieldApi<TItem[]>`, resolved
-// and passed in by the caller, and never has to know where it's mounted.
-// `children` renders one item's fields, given `group` (to resolve each
-// item's own fields off of) and that item's `index` (to build its field
-// names from, e.g. `${index}` for a primitive item or `${index}.code` for an
-// object one).
-export function ArrayField<TParentValue, TItem>({
+/**
+ * A generic array editor for any item type at any path.
+ *
+ * `children` renders one item's fields, given the array api and the item's
+ * `index`.
+ */
+export function ArrayField<TItem, TParentValue>({
   api,
   label,
   newItem,
   itemKey,
   children,
-}: ArrayFieldProps<TParentValue, TItem>): ReactNode {
+}: ArrayFieldProps<TItem, TParentValue>): ReactNode {
   const value = useWatch(api, (f) => f.value);
 
   return (
@@ -49,13 +47,6 @@ export function ArrayField<TParentValue, TItem>({
 
       <div className="mt-2 space-y-2">
         {value.map((item, index) => (
-          // Falling back to `index` when no `itemKey` is given does have the
-          // usual React list caveat: if an earlier row is removed while a
-          // later row holds focus, the browser keeps focus on the same DOM
-          // node, which now silently renders a different item underneath it.
-          // Field *state* stays correct either way (`moveItem`/`swapItems`
-          // re-key every field to its new index before updating `value`),
-          // but that's about the field, not the DOM node holding it.
           <div
             key={itemKey?.(item) ?? index}
             className="flex items-start gap-2"
