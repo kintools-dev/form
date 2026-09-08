@@ -6,6 +6,7 @@ import {
   type Validator,
 } from "@kintools/form-lit";
 import { email, minLength, required } from "@kintools/form-validators";
+import "./components/ResetButton.ts";
 import "./components/SubmitButton.ts";
 import "./components/TextField.ts";
 
@@ -137,6 +138,14 @@ class MultistepWizard extends LitElement {
     } else {
       this.#wizard.back();
     }
+  };
+
+  // Discards edits made on the current step, reverting its fields to whatever
+  // they held when the step was entered (the loaded draft, or empty). The
+  // Review step has no fields of its own, so there's nothing to reset there.
+  readonly #handleResetStep = (): void => {
+    const { stepName } = this.#wizard;
+    if (stepName !== null) this.#form.resetField(stepName);
   };
 
   override createRenderRoot(): this {
@@ -340,14 +349,24 @@ class MultistepWizard extends LitElement {
             : ""}
 
           <div class="mt-6 flex items-center justify-between gap-3">
-            <button
-              type="button"
-              @click=${this.#handleBack}
-              ?disabled=${wizard.isFirstStep}
-              class="rounded-md px-3 py-2 text-sm font-semibold text-gray-600 disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              Back
-            </button>
+            <div class="flex items-center">
+              <button
+                type="button"
+                @click=${this.#handleBack}
+                ?disabled=${wizard.isFirstStep}
+                class="rounded-md px-3 py-2 text-sm font-semibold text-gray-600 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Back
+              </button>
+              ${wizard.stepField
+                ? html`
+                  <multistep-reset-button
+                    .api=${wizard.stepField}
+                    .onReset=${this.#handleResetStep}
+                  ></multistep-reset-button>
+                `
+                : ""}
+            </div>
 
             ${wizard.isLastStep
               ? html`

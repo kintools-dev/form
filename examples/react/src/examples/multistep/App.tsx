@@ -10,6 +10,7 @@ import {
 } from "@kintools/form-react";
 import { useFormDevtools } from "@kintools/form-devtools-react";
 import { email, minLength, required } from "@kintools/form-validators";
+import { ResetButton } from "./components/ResetButton.tsx";
 import { SubmitButton } from "./components/SubmitButton.tsx";
 import { TextField } from "./components/TextField.tsx";
 
@@ -146,6 +147,14 @@ export default function App() {
     }
   };
 
+  // Discards edits made on the current step, reverting its fields to whatever
+  // they held when the step was entered (the loaded draft, or empty). The
+  // Review step has no fields of its own, so there's nothing to reset there.
+  const handleResetStep = () => {
+    const { stepName } = wizard;
+    if (stepName !== null) form.resetField(stepName);
+  };
+
   return (
     <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
       <h1 className="text-xl font-semibold text-gray-900">Create account</h1>
@@ -254,14 +263,21 @@ export default function App() {
         )}
 
         <div className="mt-6 flex items-center justify-between gap-3">
-          <button
-            type="button"
-            onClick={handleBack}
-            disabled={wizard.isFirstStep}
-            className="rounded-md px-3 py-2 text-sm font-semibold text-gray-600 disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            Back
-          </button>
+          <div className="flex items-center">
+            <button
+              type="button"
+              onClick={handleBack}
+              disabled={wizard.isFirstStep}
+              className="rounded-md px-3 py-2 text-sm font-semibold text-gray-600 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Back
+            </button>
+            {wizard.stepField && (
+              <ResetButton api={wizard.stepField} onReset={handleResetStep}>
+                Reset
+              </ResetButton>
+            )}
+          </div>
 
           {wizard.isLastStep
             ? (
