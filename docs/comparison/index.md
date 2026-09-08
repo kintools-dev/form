@@ -16,6 +16,9 @@ use it. Only what a typical app imports by name (a reusable field component, an
 
 <ApiSurfaceMatrix />
 
+Kin Form models every node (leaf, group, array, root) with one field type, so
+there's one small set of APIs to learn instead of one per level.
+
 ## Bundle size (React usage)
 
 <BundleSizeChart />
