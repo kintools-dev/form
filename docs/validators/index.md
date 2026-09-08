@@ -128,7 +128,7 @@ const form = useForm({
 
 Each issue's `path` becomes a key in that map (e.g. `"address.line1"`), so a
 child field with that exact `name` can read its own slice of it via
-`field.schemaError`, without any per-field wiring. Use it for whole-tree schema
+`field.error`, without any per-field wiring. Use it for whole-tree schema
 validation; individual fields should keep using regular field validators
 (`required`, `pattern`, a hand-written one, ...) rather than a schema of their
 own. Mixing the two invites them to disagree.

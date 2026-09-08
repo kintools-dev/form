@@ -218,7 +218,7 @@ export function TextField<TParentValue>(
       />
       {field.touched && field.invalid && (
         // Per-node validation and schema validation can co-exist.
-        <span>{field.error ?? field.schemaError}</span>
+        <span>{field.error}</span>
       )}
     </label>
   );

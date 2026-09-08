@@ -1,5 +1,5 @@
 ---
-description: "How toSchemaValidator() adapts a Standard Schema library (zod, valibot, arktype) into a schemaValidator that validates a whole group or form in one pass, populating schemaErrorMap and each field's own schemaError alongside per-node validators."
+description: "How toSchemaValidator() adapts a Standard Schema library (zod, valibot, arktype) into a schemaValidator that validates a whole group or form in one pass, populating schemaErrorMap and surfacing through each field's own error alongside per-node validators."
 ---
 
 # Schema Validation
@@ -31,10 +31,10 @@ const form = new FormApi({
 
 Running the schema populates `schemaErrorMap`, a flat dot-joined path -> message
 map (e.g. `{ "email": "Invalid email", "items.0.code": "Required" }`) built from
-every issue's `path`. A field reads its own slice via `field.schemaError`, with
-no per-field wiring needed, even through
-[intermediate fields](/form/guide/nested-objects), since the lookup walks up
-`parent` until it finds a map with an answer:
+every issue's `path`. A field reads its own slice via `field.error` (which falls
+back to it when the field has no own validator message), with no per-field
+wiring needed, even through [intermediate fields](/form/guide/nested-objects),
+since the lookup walks up `parent` until it finds a map with an answer:
 
 <CodeGroup>
 
@@ -42,9 +42,7 @@ no per-field wiring needed, even through
 
 ```tsx
 {
-  field.invalid && field.touched && (
-    <span>{field.error ?? field.schemaError}</span>
-  );
+  field.invalid && field.touched && <span>{field.error}</span>;
 }
 ```
 
@@ -54,7 +52,7 @@ no per-field wiring needed, even through
 
 ```lit
 field.invalid && field.touched
-  ? html`<span>${field.error ?? field.schemaError}</span>`
+  ? html`<span>${field.error}</span>`
   : "";
 ```
 
@@ -63,14 +61,17 @@ field.invalid && field.touched
 </CodeGroup>
 
 An issue with no `path` (e.g. a schema-level `.refine()`) maps to the group's
-own `""` key — read via `form.schemaErrorMap?.[""]`, or `form.schemaError`,
-which checks `""` first before falling back to a parent's slice.
+own `""` key — read via `form.schemaErrorMap?.[""]`, or `form.error`, which
+checks `""` first before falling back to a parent's slice.
 
 ## `schemaErrorMap` vs. `error`
 
-`schemaErrorMap` is kept separate from `error` (a field's own message from
-`validators`). Nothing is overwritten — a field can carry both a hand-written
-validator's `error` and a schema's `schemaError` at once.
+`schemaErrorMap` is the raw path -> message map from the schema. A schema issue
+is kept separate from the field's own validator message under the hood: nothing
+is overwritten, so a field can carry both a hand-written validator message and a
+schema issue at once. `field.error` is the one property to read either way: the
+field's own message when it has one, its resolved slice of the schema result
+otherwise.
 
 ## Works the same nested or flat
 
@@ -92,7 +93,7 @@ const form = useForm({
 // Flat — reads form's own schemaErrorMap directly.
 <TextField api={form.field("contact.name")} label="Name" />;
 
-// Nested — same schemaError, found by walking up through `contact`.
+// Nested — same resolved error, found by walking up through `contact`.
 const contact = form.field("contact");
 <TextField api={contact.field("name")} label="Name" />;
 ```
@@ -110,7 +111,7 @@ const form = new FormApi({
 // Flat — reads form's own schemaErrorMap directly.
 html`<text-field .api=${form.field("contact.name")} label="Name"></text-field>`;
 
-// Nested — same schemaError, found by walking up through `contact`.
+// Nested — same resolved error, found by walking up through `contact`.
 const contact = form.field("contact");
 html`<text-field .api=${contact.field("name")} label="Name"></text-field>`;
 ```

@@ -36,7 +36,7 @@ export function SelectField<TParentValue>(
   const id = useId();
   const errorId = `${id}-error`;
   const invalid = field.touched && field.invalid;
-  const message = invalid ? field.error ?? field.schemaError : undefined;
+  const message = invalid ? field.error : undefined;
 
   return (
     <Field data-invalid={invalid || undefined}>

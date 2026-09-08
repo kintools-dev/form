@@ -735,13 +735,16 @@ Deno.test("FieldApi", async (t) => {
     },
   );
 
-  await t.step("should have null schemaError with no parent", () => {
-    const field = new FieldApi(null, "", { initialValue: "test" });
-    assertEquals(field.schemaError, null);
-  });
+  await t.step(
+    "should have null error with no schemaValidator and no parent",
+    () => {
+      const field = new FieldApi(null, "", { initialValue: "test" });
+      assertEquals(field.error, null);
+    },
+  );
 
   await t.step(
-    "should have null schemaError when the parent's schemaErrorMap is empty",
+    "should have null error when the parent's schemaErrorMap is empty",
     async () => {
       const group = new FieldApi<{ a: string }>(null, "", {
         initialValue: { a: "" },
@@ -749,12 +752,12 @@ Deno.test("FieldApi", async (t) => {
       const field = group.field("a");
       await group.waitForValidation();
 
-      assertEquals(field.schemaError, null);
+      assertEquals(field.error, null);
     },
   );
 
   await t.step(
-    "should reflect a hit in the parent's schemaErrorMap under this field's exact name",
+    "should reflect a hit in the parent's schemaErrorMap under this field's exact name, via `error`",
     async () => {
       const group = new FieldApi<{ a: string; b: string }>(null, "", {
         initialValue: { a: "", b: "" },
@@ -764,9 +767,9 @@ Deno.test("FieldApi", async (t) => {
       const fieldB = group.field("b");
       await group.waitForValidation();
 
-      assertEquals(fieldA.schemaError, "Required");
+      assertEquals(fieldA.error, "Required");
       // A different key in the same map doesn't leak onto this field.
-      assertEquals(fieldB.schemaError, null);
+      assertEquals(fieldB.error, null);
     },
   );
 
@@ -785,7 +788,7 @@ Deno.test("FieldApi", async (t) => {
       assertEquals(form.schemaErrorMap, { "address.line1": "Required" });
       // ...and `line1`'s *direct* parent (`address`) never ran a schema of
       // its own, so the walk climbs past it and finds `form`'s entry.
-      assertEquals(line1.schemaError, "Required");
+      assertEquals(line1.error, "Required");
     },
   );
 
@@ -803,14 +806,14 @@ Deno.test("FieldApi", async (t) => {
       const line1 = address.field("line1");
       await form.waitForValidation();
 
-      // ...so `line1.schemaError` reflects that, not `form`'s entry for
+      // ...so `line1.error` reflects that, not `form`'s entry for
       // "address.line1": `address` owns the verdict for everything under it.
-      assertEquals(line1.schemaError, null);
+      assertEquals(line1.error, null);
     },
   );
 
   await t.step(
-    "should report invalid via schemaError even with no own validators, and clear once unset",
+    "should report invalid via a distributed schema error even with no own validators, and clear once unset",
     async () => {
       const group = new FieldApi<{ a: string }>(null, "", {
         initialValue: { a: "" },
@@ -819,12 +822,27 @@ Deno.test("FieldApi", async (t) => {
       const field = group.field("a");
       await group.waitForValidation();
 
-      assertEquals(field.error, null);
-      assertEquals(field.schemaError, "Required");
+      assertEquals(field.error, "Required");
       assertEquals(field.invalid, true);
 
       group.schemaValidator = undefined;
       assertEquals(field.invalid, false);
+    },
+  );
+
+  await t.step(
+    "should prefer an own validator error over a schema-distributed one in `error`",
+    async () => {
+      const group = new FieldApi<{ a: string }>(null, "", {
+        initialValue: { a: "" },
+        schemaValidator: () => ({ a: "Schema says required" }),
+      });
+      const field = group.field("a", {
+        validators: [(f) => (f.value ? null : "Own says required")],
+      });
+      await group.waitForValidation();
+
+      assertEquals(field.error, "Own says required");
     },
   );
 
@@ -1857,7 +1875,7 @@ Deno.test("FieldApi", async (t) => {
   );
 
   await t.step(
-    "should let a field have both its own schemaErrorMap and its own schemaError, independently",
+    "should let a field have both its own schemaErrorMap and a distributed error via `error`, independently",
     async () => {
       const form = new FieldApi<{ group: { a: string } }>(null, "", {
         initialValue: { group: { a: "" } },
@@ -1870,12 +1888,12 @@ Deno.test("FieldApi", async (t) => {
 
       // `group`'s own schemaErrorMap, from its own schemaValidator.
       assertEquals(group.schemaErrorMap, { a: "Nested required" });
-      // `group`'s own schemaError falls back to a lookup into *its* parent
+      // `group`'s own `error` falls back to a lookup into *its* parent
       // (`form`)'s schemaErrorMap under its own name ("group"), independent
       // of the above, since group's own schemaValidator never produced a
       // "" entry (it only ever flagged "a"), so there's nothing of group's
       // own to prefer here.
-      assertEquals(group.schemaError, "Required");
+      assertEquals(group.error, "Required");
     },
   );
 
@@ -1884,14 +1902,14 @@ Deno.test("FieldApi", async (t) => {
     async () => {
       // At the root, there's no `parent` to assign a slice at all; this is
       // the only way a whole-form `.refine()`-style check (no `path`) can
-      // ever surface through `schemaError`.
+      // ever surface through `error`.
       const form = new FieldApi<{ a: string }>(null, "", {
         initialValue: { a: "" },
         schemaValidator: () => ({ "": "Passwords must match" }),
       });
       await form.waitForValidation();
 
-      assertEquals(form.schemaError, "Passwords must match");
+      assertEquals(form.error, "Passwords must match");
     },
   );
 
@@ -1909,7 +1927,7 @@ Deno.test("FieldApi", async (t) => {
 
       // group's own schemaValidator is a more specific source for group's
       // own value than form's, which only mentions "group" in passing.
-      assertEquals(group.schemaError, "Nested whole-group issue");
+      assertEquals(group.error, "Nested whole-group issue");
     },
   );
 });

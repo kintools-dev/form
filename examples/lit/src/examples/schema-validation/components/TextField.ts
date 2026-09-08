@@ -10,9 +10,9 @@ const inputClasses = (invalid: boolean) =>
       : "border-gray-300 focus:border-blue-500 focus:ring-blue-200"
   }`;
 
-// `field.error` (this field's own `validators`) and `field.schemaError`
-// (this field's slice of the form's whole-tree `toSchemaValidator()`) are
-// two separate channels - see `App.ts` - so this checks both.
+// `field.error` is this field's own `validators` message if it has one,
+// otherwise its slice of the form's whole-tree `toSchemaValidator()` (see
+// `App.ts`), so one read covers both channels.
 export class TextField extends LitElement {
   // See `SubmitButton.ts`'s own doc comment for why these are `declare`d
   // rather than real class fields, with defaults set in the constructor
@@ -46,7 +46,7 @@ export class TextField extends LitElement {
   override render(): unknown {
     const field = this.#watch.value;
     const showError = field.invalid && field.touched;
-    const message = field.error ?? field.schemaError;
+    const message = field.error;
     const inputId = `${field.name}-${this.#id}`;
 
     return html`

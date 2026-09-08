@@ -19,16 +19,16 @@ export type TextFieldProps<TParentValue> =
     "id" | "value" | "onChange" | "onBlur"
   >;
 
-// `field.error` (this field's own `validators`) and `field.schemaError` (this
-// field's slice of the form's whole-tree `toSchemaValidator()`) are two separate
-// channels — see `App.tsx` — so every field here checks both.
+// `field.error` is this field's own `validators` message if it has one,
+// otherwise its slice of the form's whole-tree `toSchemaValidator()` (see
+// `App.tsx`), so one read covers both channels.
 export function TextField<const TParentValue>(
   props: TextFieldProps<TParentValue>,
 ): ReactNode {
   const { api, label, required, className, ...inputProps } = props;
   const field = useWatch(api);
   const showError = field.invalid && field.touched;
-  const message = field.error ?? field.schemaError;
+  const message = field.error;
   const value = field.value;
   // `useId`, not `field.id`: `field.id` is a plain module-level counter
   // (stable across reorders, which is what makes it suitable as a React

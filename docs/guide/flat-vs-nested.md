@@ -417,7 +417,7 @@ readonly #addItem = () => {
 
 A [schema validator](/form/guide/schema-validation) checks the whole tree in one
 pass and already produces a flat, dot-joined path -> message map
-(`schemaErrorMap`); `field.schemaError` reads a field's own slice by walking up
+(`schemaErrorMap`); `field.error` reads a field's own slice by walking up
 through any intermediate fields to find it. So unlike hand-written per-field
 `validators`, a `schemaValidator` doesn't push you toward one shape over the
 other: nest where it's worth its own `validators`/aggregate `touched`/`invalid`,
@@ -454,6 +454,6 @@ FormApi<Checkout>
   [Dynamic Arrays](/form/guide/dynamic-arrays) — everything the child registry
   adds
 - [Schema Validation](/form/guide/schema-validation) — `schemaErrorMap`, and how
-  `schemaError` resolves through nested fields
+  a field's `error` resolves it through nested fields
 - [Form Composition](/form/guide/form-composition) — reusable field components
   for either shape

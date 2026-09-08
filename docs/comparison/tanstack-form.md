@@ -272,7 +272,7 @@ function TextField<TParentValue>(
         onChange={field.handleChange}
       />
       {field.invalid && field.touched &&
-        <span>{field.error ?? field.schemaError}</span>}
+        <span>{field.error}</span>}
     </label>
   );
 }
@@ -472,7 +472,8 @@ function SignupForm() {
   });
 
   // A field's own `validators` still run alongside the schema when present;
-  // their errors land in `error`, the schema's in `schemaError`.
+  // `field.error` prefers a field's own message, falling back to its slice
+  // of the schema result.
   return (
     <form onSubmit={form.handleSubmit}>
       <TextField api={form.field("email")} label="Email" />
@@ -558,14 +559,15 @@ function SignupForm() {
 | --------------------------- | ------------------------------------------------------ | ---------------------------------------------------------------- |
 | Adapter package             | `toSchemaValidator()` from `@kintools/form-validators` | none; a Standard Schema is a validator itself                    |
 | Where a schema attaches     | any node, via its own `schemaValidator`                | field or form `validators.onChange`                              |
-| Schema + hand-written rules | coexist; `schemaError` kept apart from `error`         | merge into one `errors`; a field's rules replace the form schema |
+| Schema + hand-written rules | coexist; `error` prefers the field's own message       | merge into one `errors`; a field's rules replace the form schema |
 | Standard Schema libraries   | any (zod, valibot, arktype, ...)                       | any (zod, valibot, arktype, effect, ...)                         |
 
 Kin Form's edge is scope and separation, not ergonomics: a schema can sit on any
-node, and its output lands in a field's own `schemaError`, separate from the
-`error` its `validators` produce, so a field can carry both. On TanStack Form a
-field-level `validators` entry replaces the form schema for that field instead
-of running alongside it.
+node, and its output is tracked apart from a field's own `validators`-produced
+message under the hood, so a field can carry both without one overwriting the
+other; `field.error` surfaces whichever exists, preferring the field's own. On
+TanStack Form a field-level `validators` entry replaces the form schema for that
+field instead of running alongside it.
 
 ## Cross-field validation
 

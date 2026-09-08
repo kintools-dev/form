@@ -208,9 +208,7 @@ export function TextField<TParentValue>(
         onBlur={field.handleBlur}
         onChange={(e) => field.handleChange(e.target.value)}
       />
-      {field.touched && field.invalid && (
-        <span>{field.error ?? field.schemaError}</span>
-      )}
+      {field.touched && field.invalid && <span>{field.error}</span>}
     </label>
   );
 }
@@ -257,7 +255,7 @@ export class TextField extends LitElement {
         >
       </label>
       ${field.touched && field.invalid
-        ? html`<span>${field.error ?? field.schemaError}</span>`
+        ? html`<span>${field.error}</span>`
         : ""}
     `;
   }

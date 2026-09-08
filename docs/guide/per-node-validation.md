@@ -6,7 +6,7 @@ description: "How per-node validators and the single asyncValidator option work:
 
 ## Two kinds of validation
 
-Kin Form has two independent validation mechanisms, and most forms use both:
+Kin Form has two independent validation mechanisms. Most forms only need one:
 
 - **Per-node validation** (this page): `validators`/`asyncValidator`, attached
   to any individual field, group, or form. Each node owns its own rule(s) and
@@ -17,15 +17,11 @@ Kin Form has two independent validation mechanisms, and most forms use both:
   results back onto individual fields by path, without each field needing its
   own rule.
 
-They're additive, not exclusive: a field's `error` (from its own
-`validators`/`asyncValidator`) and its `schemaError` (its slice of a parent's
-whole-tree schema result) are tracked separately, and neither overwrites the
-other. `invalid` is `true` if either is set or any child is invalid. Reach for
-per-node validation for rules that live naturally on one field (`required`,
-`min`, an async uniqueness check); reach for schema validation when you already
-have (or want) one schema describing the whole form, or for a check spanning
-several fields at once (a cross-field `.refine()`) without hand-wiring
-[dependents](/form/guide/linked-fields).
+Use whichever is more convenient for a given field. If both are set on the same
+field, the per-node message wins in `error`. If you need to show a per-node
+error and a schema error separately,
+[open an issue](https://github.com/kintools-dev/form/issues) describing the
+case.
 
 ## Validators
 

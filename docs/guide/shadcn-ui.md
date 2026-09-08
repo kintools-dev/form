@@ -54,7 +54,7 @@ export function TextField<TParentValue>(
   const id = useId();
   const errorId = `${id}-error`;
   const invalid = field.touched && field.invalid;
-  const message = invalid ? field.error ?? field.schemaError : undefined;
+  const message = invalid ? field.error : undefined;
 
   return (
     <Field data-invalid={invalid || undefined}>
@@ -75,8 +75,8 @@ export function TextField<TParentValue>(
 }
 ```
 
-`message` reads `field.error` before `field.schemaError`, so a per-node
-validator wins over a [schema](/form/guide/schema-validation) result. `useId()`
+`message` reads `field.error`, which prefers a per-node validator's message over
+a [schema](/form/guide/schema-validation) result for the same field. `useId()`
 (not `field.id`) keeps the DOM id
 [SSR-safe](/form/guide/ssr#field-id-in-server-rendered-markup). `Textarea` is
 the same wrapper with the element swapped.
@@ -108,7 +108,7 @@ export function CheckboxField<TValue extends CheckedValue, TParentValue>(
   const id = useId();
   const errorId = `${id}-error`;
   const invalid = field.touched && field.invalid;
-  const message = invalid ? field.error ?? field.schemaError : undefined;
+  const message = invalid ? field.error : undefined;
 
   return (
     <Field orientation="horizontal" data-invalid={invalid || undefined}>
@@ -165,7 +165,7 @@ export function SelectField<TParentValue>(
   const id = useId();
   const errorId = `${id}-error`;
   const invalid = field.touched && field.invalid;
-  const message = invalid ? field.error ?? field.schemaError : undefined;
+  const message = invalid ? field.error : undefined;
 
   return (
     <Field data-invalid={invalid || undefined}>
@@ -239,7 +239,7 @@ export function FieldWrapper<TValue, TParentValue>(
   const id = useId();
   const errorId = `${id}-error`;
   const invalid = field.touched && field.invalid;
-  const message = invalid ? field.error ?? field.schemaError : undefined;
+  const message = invalid ? field.error : undefined;
 
   const control = children(field, {
     id,

@@ -303,7 +303,7 @@ export function TextField<TParentValue>(
       />
       {field.touched && field.invalid && (
         // Per-node validation and schema validation can co-exist.
-        <span>{field.error ?? field.schemaError}</span>
+        <span>{field.error}</span>
       )}
     </label>
   );
@@ -344,7 +344,7 @@ export class TextField extends LitElement {
       </label>
       ${field.touched && field.invalid
         // Per-node validation and schema validation can co-exist.
-        ? html`<span>${field.error ?? field.schemaError}</span>`
+        ? html`<span>${field.error}</span>`
         : ""}
     `;
   }

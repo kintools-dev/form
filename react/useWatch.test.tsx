@@ -257,7 +257,7 @@ Deno.test("useWatch", async (t) => {
   );
 
   await t.step(
-    "a select on a leaf field re-renders when its own schemaError changes",
+    "a select on a leaf field re-renders when its distributed schema error changes",
     async () => {
       try {
         const group = new FieldApi<{ a: string; b: string }>(null, "", {
@@ -268,7 +268,7 @@ Deno.test("useWatch", async (t) => {
 
         renderHook(() => {
           renders++;
-          return useWatch(fieldA, (f) => f.schemaError);
+          return useWatch(fieldA, (f) => f.error);
         });
 
         assertEquals(renders, 1);

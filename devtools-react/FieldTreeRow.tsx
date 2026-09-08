@@ -197,12 +197,8 @@ export function FieldTreeRow({ node, depth }: FieldTreeRowProps): ReactNode {
         {node.dirty && <Badge label="dirty" kind="dirty" />}
         {node.validating && <Badge label="validating" kind="validating" />}
         {node.invalid && <Badge label="invalid" kind="invalid" />}
-        {node.error || node.schemaError
-          ? (
-            <span style={errorStyle}>
-              {String(node.error ?? node.schemaError)}
-            </span>
-          )
+        {node.error
+          ? <span style={errorStyle}>{String(node.error)}</span>
           : null}
         <button
           type="button"
@@ -248,10 +244,6 @@ function NodeDetails(
       <div style={detailRowStyle}>
         <span style={detailLabelStyle}>error:</span>
         <span style={detailValueStyle}>{String(node.error)}</span>
-      </div>
-      <div style={detailRowStyle}>
-        <span style={detailLabelStyle}>schemaError:</span>
-        <span style={detailValueStyle}>{String(node.schemaError)}</span>
       </div>
       <div style={detailRowStyle}>
         <span style={detailLabelStyle}>schemaErrorMap:</span>

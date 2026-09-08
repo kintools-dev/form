@@ -10,10 +10,11 @@ const inputClasses = (invalid: boolean) =>
       : "border-gray-300 focus:border-blue-500 focus:ring-blue-200"
   }`;
 
-// This example has no per-field validators at all - every message comes
-// from the one whole-form `toSchemaValidator()` validator in `App.ts`, so
-// this reads `field.schemaError` alongside `field.error` instead of taking
-// a `required` property like the other examples' text field does.
+// This example has no per-field validators at all. Every message comes from
+// the one whole-form `toSchemaValidator()` validator in `App.ts`, surfaced
+// through `field.error` (which falls back to the schema slice when the field
+// has no own error), so this text field takes no `required` property like the
+// other examples' do.
 export class TextField extends LitElement {
   // See `SubmitButton.ts`'s own doc comment for why these are `declare`d
   // rather than real class fields, with defaults set in the constructor
@@ -43,7 +44,7 @@ export class TextField extends LitElement {
   override render(): unknown {
     const field = this.#watch.value;
     const showError = field.invalid && field.touched;
-    const error = field.error ?? field.schemaError;
+    const error = field.error;
     const inputId = `${field.name}-${this.#id}`;
 
     return html`

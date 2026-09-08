@@ -18,10 +18,11 @@ export type TextFieldProps<TParentValue> =
     label?: ReactNode;
   };
 
-// This example has no per-field validators at all — every message comes
-// from the one whole-form `toSchemaValidator()` validator in `App.tsx`, so this
-// reads `field.schemaError` alongside `field.error` instead of taking a
-// `validators` prop like the other examples' `TextField` does.
+// This example has no per-field validators at all. Every message comes from
+// the one whole-form `toSchemaValidator()` validator in `App.tsx`, surfaced
+// through `field.error` (which falls back to the schema slice when the field
+// has no own error), so this `TextField` takes no `validators` prop like the
+// other examples' do.
 export function TextField<const TParentValue>({
   api,
   label,
@@ -30,7 +31,7 @@ export function TextField<const TParentValue>({
 }: TextFieldProps<TParentValue>): ReactNode {
   const field = useWatch(api);
   const showError = field.invalid && field.touched;
-  const error = field.error ?? field.schemaError;
+  const error = field.error;
   const value = field.value;
   // `useId`, not `field.id`: `field.id` is a plain module-level counter
   // (stable across reorders, which is what makes it suitable as a React

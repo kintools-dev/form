@@ -220,8 +220,7 @@ function TextField<TParentValue>(
         onBlur={field.handleBlur}
         onChange={field.handleChange}
       />
-      {field.invalid && field.touched &&
-        <span>{field.error ?? field.schemaError}</span>}
+      {field.invalid && field.touched && <span>{field.error}</span>}
     </label>
   );
 }
@@ -293,10 +292,6 @@ contract is `FieldApi<TValue>`), while React Hook Form's `T` is the whole form
 type: `name` is checked against it, nested paths need casts (see
 [Group field](#group-field)), and `Control<any>` is the only way out of the
 generic.
-
-The Kin Form `TextField` also reads `field.error ?? field.schemaError`, so a
-per-field rule and a [schema](#schema-validation) issue surface through the same
-component; React Hook Form has one `error` per field, so nothing to combine.
 
 ## Per-node validation
 
@@ -377,6 +372,10 @@ function SignupForm() {
 | Debouncing           | `validationDebounceMs` (async only)                           | hand-rolled inside `validate`, no built-in |
 | Rule composition     | `validators` array, first truthy wins                         | multiple rules via `register` options      |
 
+When a field also falls under a [schema](#schema-validation), its per-node
+message takes precedence: `field.error` shows that first and the field's schema
+error only as a fallback.
+
 ## Schema validation
 
 Both need a thin adapter from a separate package to plug a schema in:
@@ -410,8 +409,6 @@ function SignupForm() {
     onSubmit: (form) => signUp(form.value),
   });
 
-  // `TextField` shows `field.error ?? field.schemaError`; here only the
-  // schema is set, so `schemaError`.
   return (
     <form onSubmit={form.handleSubmit}>
       <TextField api={form.field("email")} label="Email" />
@@ -463,11 +460,11 @@ function SignupForm() {
 
 **What's different:**
 
-|                          | Kin Form                                           | React Hook Form                                          |
-| ------------------------ | -------------------------------------------------- | -------------------------------------------------------- |
-| Schema scope             | any node (field, group, or form)                   | one `resolver`, whole form only                          |
-| Schema + per-field rules | run independently, both kept                       | `resolver` overrides `register`'s rules                  |
-| Where schema issues land | a field's own `schemaError`, separate from `error` | same `errors`; schema output replaces the per-field ones |
+|                          | Kin Form                                             | React Hook Form                                          |
+| ------------------------ | ---------------------------------------------------- | -------------------------------------------------------- |
+| Schema scope             | any node (field, group, or form)                     | one `resolver`, whole form only                          |
+| Schema + per-field rules | both run; per-node message wins in `error`           | `resolver` overrides `register`'s rules                  |
+| Where schema issues land | `schemaErrorMap`, surfaced per-field through `error` | same `errors`; schema output replaces the per-field ones |
 
 ## Cross-field validation
 

@@ -214,9 +214,8 @@ export type FieldApiOptions<TValue, TParentValue = never> = {
  * A field holds
  *
  * - State: {@linkcode value}, {@linkcode dirty}, {@linkcode touched},
- *   {@linkcode validating}, {@linkcode error}, {@linkcode schemaError},
- *   {@linkcode validators}, {@linkcode asyncValidator},
- *   {@linkcode schemaValidator}.
+ *   {@linkcode validating}, {@linkcode error}, {@linkcode validators},
+ *   {@linkcode asyncValidator}, {@linkcode schemaValidator}.
  *
  * - Event handlers: {@linkcode handleBlur}/{@linkcode handleChange}, for
  *   binding directly to a single UI control.
@@ -304,40 +303,27 @@ export class FieldApi<TValue, TParentValue = never> extends BaseApi {
   }
 
   /**
-   * The result of this field's most recently settled validation run.
-   * `null` if valid.
+   * This field's error message: its own error from its {@linkcode validators}
+   * or {@linkcode asyncValidator} if it has one, otherwise this field's slice
+   * of the nearest ancestor's (or its own) {@linkcode schemaValidator} result,
+   * resolved from {@linkcode schemaErrorMap}.
+   *
+   * The single message to surface in UI.
    */
   get error(): ValidationError {
-    return this.#error;
+    return this.#ownError ?? this.#schemaError;
   }
 
   /**
-   * Whether this field is invalid: its own {@linkcode error}, its
-   * {@linkcode schemaError}, any of {@linkcode children}, or its own
-   * {@linkcode schemaErrorMap}.
+   * Whether this field is invalid: its own {@linkcode error}, any of
+   * {@linkcode children}, or its own {@linkcode schemaErrorMap}.
    *
    * Always `false` while {@linkcode disabled}, regardless of any of the
    * above.
    */
   get invalid(): boolean {
-    return !this.disabled && (!!this.#error || !!this.schemaError ||
+    return !this.disabled && (!!this.#ownError || !!this.#schemaError ||
       this.#anyChildInvalid || this.#schemaErrorMap !== null);
-  }
-
-  /**
-   * This field's own resolved schema error.
-   *
-   * Prefers this field's own {@linkcode schemaErrorMap}'s `""` entry
-   * (from its own {@linkcode schemaValidator}), since that's more specific than
-   * one attached higher up. Otherwise falls back to this field's slice of the
-   * nearest ancestor's `schemaErrorMap`, walking up past {@linkcode parent} if needed, to
-   * whichever ancestor has its own `schemaValidator` first, since that one
-   * takes precedence over anything further up.
-   *
-   * The value is cached, so reading is O(1).
-   */
-  get schemaError(): ValidationError {
-    return this.#schemaError;
   }
 
   /**
@@ -436,7 +422,7 @@ export class FieldApi<TValue, TParentValue = never> extends BaseApi {
 
     if (v.length === 0) {
       this.#syncError = null;
-      this.#setError(this.#asyncValidatorTask.lastResult);
+      this.#setOwnError(this.#asyncValidatorTask.lastResult);
     }
   }
 
@@ -516,16 +502,17 @@ export class FieldApi<TValue, TParentValue = never> extends BaseApi {
    *
    * Distinct from {@linkcode error}:
    *
-   * - `error` is this field's own single message (from a regular
-   * {@linkcode validators} entry and {@linkcode asyncValidator}) and is never
-   * distributed to children.
+   * - `error` is a single message: this field's own from a regular
+   * {@linkcode validators} entry or {@linkcode asyncValidator}, falling back to
+   * this field's resolved slice of a `schemaErrorMap`. This field's own part of
+   * it is never distributed to children.
    *
    * - `schemaErrorMap` is a flat map, typically from one whole-field
    * Standard Schema (see `@kintools/form-validators`'s `toSchemaValidator()`), keyed
    * by the path of the field each issue belongs to. It is *not* automatically
-   * copied onto the individual child fields' own `.error`; a child field that
-   * wants to surface its slice of this map reads it via its own
-   * {@linkcode schemaError}.
+   * copied onto the individual child fields' own `.error`; a child field's own
+   * {@linkcode error} falls back to its resolved slice of the nearest
+   * ancestor's map (or this field's own `""` entry, if it has one) instead.
    */
   get schemaErrorMap():
     | Partial<Record<DeepKeyOrRoot<TValue>, ValidationError>>
@@ -606,7 +593,7 @@ export class FieldApi<TValue, TParentValue = never> extends BaseApi {
   // synced from `parent.value`, which is itself no different at that point).
   // Kept in sync by `#recomputeDirty` from then on.
   #dirty = false;
-  #error: ValidationError = null;
+  #ownError: ValidationError = null;
   #touched = false;
   #disabled = false;
   #validators: Array<Validator<TValue, TParentValue>>;
@@ -637,6 +624,10 @@ export class FieldApi<TValue, TParentValue = never> extends BaseApi {
   >();
   #childrenChangeListeners = new Set<VoidFunction>();
 
+  // This field's own resolved schema error: this field's own
+  // `schemaErrorMap`'s `""` entry if it has one, otherwise its slice of the
+  // nearest ancestor's map (see `#computeSchemaError`/`kResolveSchemaError`).
+  // Feeds `error`/`invalid` only; not exposed as its own public property.
   #schemaError: ValidationError = null;
   #schemaErrorMap:
     | Partial<Record<DeepKeyOrRoot<TValue>, ValidationError>>
@@ -688,7 +679,7 @@ export class FieldApi<TValue, TParentValue = never> extends BaseApi {
         // would clobber a fresher sync error with a stale/irrelevant one.
         onSettled: (error, wasPending) => {
           this.batch(() => {
-            this.#setError(this.#syncError || error);
+            this.#setOwnError(this.#syncError || error);
             if (wasPending) this.validatingChanged();
           });
         },
@@ -939,10 +930,10 @@ export class FieldApi<TValue, TParentValue = never> extends BaseApi {
     await Promise.all(waiters);
   }
 
-  #setError(e: ValidationError): void {
-    if (e === this.#error) return;
+  #setOwnError(e: ValidationError): void {
+    if (e === this.#ownError) return;
     const oldInvalid = this.invalid;
-    this.#error = e;
+    this.#ownError = e;
     if (this.invalid !== oldInvalid) this.invalidChanged();
   }
 
@@ -1044,9 +1035,10 @@ export class FieldApi<TValue, TParentValue = never> extends BaseApi {
   }
 
   /**
-   * Runs {@linkcode validators} immediately and sets {@linkcode error} from
-   * the result. If every one passed and {@linkcode asyncValidator} is
-   * configured, schedules it (debounced) and returns `true`; otherwise
+   * Runs {@linkcode validators} immediately and sets this field's own
+   * contribution to {@linkcode error} from the result. If every one passed and
+   * {@linkcode asyncValidator} is configured, schedules it (debounced) and
+   * returns `true`; otherwise
    * settles it to `null`, discarding a stale in-flight/pending run from a
    * previous, faster generation so it can't later overwrite a fresher sync
    * error, and returns `false`.
@@ -1057,13 +1049,13 @@ export class FieldApi<TValue, TParentValue = never> extends BaseApi {
   #scheduleValidation(): boolean {
     if (this.disabled) {
       this.#syncError = null;
-      this.#setError(null);
+      this.#setOwnError(null);
       this.#asyncValidatorTask.settle(null);
       return false;
     }
 
     this.#syncError = this.#runSyncValidators();
-    this.#setError(this.#syncError);
+    this.#setOwnError(this.#syncError);
     if (!this.#syncError && this.#asyncValidator) {
       this.#asyncValidatorTask.schedule();
       return true;
@@ -1644,7 +1636,8 @@ export class FieldApi<TValue, TParentValue = never> extends BaseApi {
    *
    * Called by {@linkcode parent} when its own `schemaErrorMap` has changed.
    *
-   * Refreshes {@linkcode schemaError} and cascades downs to children.
+   * Refreshes this field's own resolved schema error (feeding
+   * {@linkcode error}/{@linkcode invalid}) and cascades down to children.
    */
   [kParentSchemaErrorsChanged](): void {
     this.#refreshSchemaError();
@@ -1654,8 +1647,8 @@ export class FieldApi<TValue, TParentValue = never> extends BaseApi {
   }
 
   /**
-   * Recomputes {@linkcode schemaError} and, if it actually changed, updates
-   * the cache and notifies.
+   * Recomputes this field's own resolved schema error and, if it actually
+   * changed, updates the cache and notifies.
    */
   #refreshSchemaError(): void {
     const schemaError = this.#computeSchemaError();
@@ -1670,6 +1663,11 @@ export class FieldApi<TValue, TParentValue = never> extends BaseApi {
     }
   }
 
+  // Prefers this field's own `schemaErrorMap`'s `""` entry (from its own
+  // `schemaValidator`), since that's more specific than one attached higher
+  // up. Otherwise falls back to this field's slice of the nearest ancestor's
+  // `schemaErrorMap` via `kResolveSchemaError`, walking up past `parent` to
+  // whichever ancestor has its own `schemaValidator` first.
   #computeSchemaError(): ValidationError {
     return this.#schemaErrorMap?.[""] ??
       this.parent?.[kResolveSchemaError](this.name) ?? null;
