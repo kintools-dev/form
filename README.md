@@ -2,7 +2,6 @@
 
 [![JSR @kintools/form-core](https://jsr.io/badges/@kintools/form-core)](https://jsr.io/@kintools/form-core)
 [![CI](https://github.com/kintools-dev/form/actions/workflows/ci.yml/badge.svg)](https://github.com/kintools-dev/form/actions/workflows/ci.yml)
-[![Coverage](https://codecov.io/gh/kintools-dev/form/branch/main/graph/badge.svg)](https://codecov.io/gh/kintools-dev/form)
 ![License: MIT](https://img.shields.io/badge/License-MIT-166534?style=flat)
 ![Framework-agnostic](https://img.shields.io/badge/Framework--agnostic-166534?style=flat)
 ![Tiny footprint](https://img.shields.io/badge/Tiny%20footprint-166534?style=flat)
