@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.9 - 2026-09-08
+
+- `error` now falls back to a field's resolved schema-distributed error (its
+  slice of the nearest schema-validated ancestor's `schemaErrorMap`) when it has
+  no own `validators`/`asyncValidator` message, so one property covers both. The
+  `schemaError` getter is removed; read `error` (or `schemaErrorMap` directly)
+  instead.
+
 ## 0.1.8 - 2026-09-05
 
 - Trimmed the README to a tagline and a link to kintools.dev/form, dropping the

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.9 - 2026-09-08
+
+- Dropped the `schemaError` row from the field inspector's detail panel: the
+  `error` row above it already includes a schema-distributed message now that
+  `@kintools/form-core`'s `schemaError` getter is gone. Requires
+  `@kintools/form-core` 0.1.9+.
+
 ## 0.1.8 - 2026-09-06
 
 - Fixed the npm build so this package no longer bundles its own copy of
