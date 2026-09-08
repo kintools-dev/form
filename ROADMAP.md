@@ -18,14 +18,15 @@ Guiding principle: everything shipped either teaches a concept or builds trust.
 - Lit bindings shipped as `@kintools/form-lit`
 - Published to npm alongside JSR
 - Honest, dedicated comparison pages against React Hook Form and TanStack Form
+- An SSR guide and a shadcn/ui integration guide and example
 
 ## In progress: teach and prove
 
 - A regular cadence of engineering articles about the underlying problems (forms
   as trees, stable identity, controlled vs. uncontrolled, API design you don't
   have to memorize), not product marketing
-- Next.js/RSC, shadcn/ui, and MUI integration guides and examples
-- An SSR guide
+- A Next.js/RSC integration guide (an example already exists) and a MUI
+  integration guide and example
 - Migration guides from React Hook Form and Formik
 - Benchmarks reproduced in a real browser, not only in Happy DOM
 
