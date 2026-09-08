@@ -245,7 +245,8 @@ concepts you learn are:
   `useAppForm`, `form.AppField`, `useFieldContext`, and for groups
   `withFieldGroup` / `FieldGroupApi` and the `fields` mapping
 
-The [API surface matrix](/form/comparison/#api-surface) lists the full set.
+The [API surface matrix](/form/comparison/#api-surface) sets these side by side
+with the other libraries.
 
 </Container>
 

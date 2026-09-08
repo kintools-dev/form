@@ -11,7 +11,8 @@ description: "A feature matrix, API-surface matrix, bundle-size chart, and wall-
 ## API surface
 
 Not whether a feature exists, but which APIs/hooks/types you have to learn to
-use it:
+use it. Only what a typical app imports by name (a reusable field component, an
+`onSubmit` signature), not every public export:
 
 <ApiSurfaceMatrix />
 
