@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.12 - 2026-09-09
+
+- Bumped the `@kintools/form-core` dependency to `^0.1.10`, which adds
+  `FieldApi.setErrors` for applying server-side validation errors onto fields.
+  No changes to this package's own API.
+
 ## 0.1.11 - 2026-09-06
 
 - Fixed the npm build so this package no longer bundles its own copy of
