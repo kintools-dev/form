@@ -115,6 +115,17 @@ export const examples: ExampleEntry[] = [
     load: () => import("./examples/async-validation/App.ts"),
   },
   {
+    slug: "server-validation",
+    title: "Server-side validation",
+    description: html`
+      A sign-up form whose <code>onSubmit</code> posts to a simulated server
+      and, on rejection, hands the returned path&rarr;message map straight to
+      <code>form.setErrors</code>: field-level and form-level messages that
+      each clear the moment that field is edited again.
+    `,
+    load: () => import("./examples/server-validation/App.ts"),
+  },
+  {
     slug: "flat-array-validation",
     title: "Flat array validation",
     description: html`

@@ -141,6 +141,20 @@ export const examples: ExampleEntry[] = [
     Component: lazy(() => import("./examples/async-validation/App.tsx")),
   },
   {
+    slug: "server-validation",
+    title: "Server-side validation",
+    description: (
+      <>
+        A sign-up form whose <code>onSubmit</code>{" "}
+        posts to a simulated server and, on rejection, hands the returned
+        path&rarr;message map straight to{" "}
+        <code>form.setErrors</code>: field-level and form-level messages that
+        each clear the moment that field is edited again.
+      </>
+    ),
+    Component: lazy(() => import("./examples/server-validation/App.tsx")),
+  },
+  {
     slug: "flat-array-validation",
     title: "Flat array validation",
     description: (
