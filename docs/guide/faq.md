@@ -18,8 +18,7 @@ send us feedback.
 form model, the `FieldApi`/`FormApi` tree with per-node validation, dirty
 tracking, array helpers, and submission, over a `subscribe`/`notify` pub/sub
 base that framework bindings hook into. `@kintools/form-react` and
-`@kintools/form-lit` are both officially shipped, published bindings today, not
-a roadmap promise.
+`@kintools/form-lit` are both published and ready to use today.
 
 ### Is there Vue, Svelte, or Solid support?
 
