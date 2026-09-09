@@ -32,10 +32,9 @@ it, not to keep the package list growing. Open an issue if you'd use one.
 [Standard Schema](https://standardschema.dev)-compliant library, Zod, Valibot,
 ArkType, and others, into a `schemaValidator` that checks a whole group's or the
 whole form's value in one pass, populating `schemaErrorMap` and each field's own
-`error`. It's a separate option from hand-written per-field `validators`, and
-the two coexist without either overwriting the other; `field.error` surfaces
-whichever fired, preferring the field's own validator message if both did. See
-[Schema Validation](/form/guide/schema-validation).
+`error`. It's a separate option from hand-written per-field `validators`; the
+two coexist, and when a field has both, its own per-node message is the one
+`field.error` shows. See [Schema Validation](/form/guide/schema-validation).
 
 ### Does it work with SSR or Next.js?
 
