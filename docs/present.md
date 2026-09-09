@@ -1,11 +1,8 @@
 ---
 layout: false
-title: Kin Form — Presentation
+title: "Kin Form: Presentation"
 description: Kin Form, one section per screen.
-head:
-  - - meta
-    - name: robots
-      content: noindex
+noindex: true
 ---
 
 <a class="present-exit" href="/form/" title="Exit presentation">✕</a>
