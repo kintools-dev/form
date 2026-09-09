@@ -2,7 +2,7 @@
 description: "Builds a login form by binding inputs with Watch/watch directly, then promotes that into reusable TextField and SubmitButton components backed by useWatch/WatchController, for both React and Lit."
 ---
 
-# Basic
+# A Basic Form
 
 [Concepts](/form/guide/concepts) covered the state machine in the abstract; this
 page builds an actual form with it, starting with the simplest way to bind an

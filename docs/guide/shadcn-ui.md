@@ -2,7 +2,7 @@
 description: "Binding shadcn/ui's controlled components (Input, Textarea, Checkbox, Select, Switch, RadioGroup) to @kintools/form-react: compose shadcn's UI-only Field/FieldLabel/FieldError primitives and feed them state from useWatch."
 ---
 
-# shadcn/ui
+# shadcn/ui Integration
 
 <Container type="info">
 

@@ -89,7 +89,7 @@ general-purpose rules system.
 
 Framework support stops at React and Lit for now. Nothing in `core` rules out
 Vue or Solid bindings later, but neither is being built ahead of someone
-actually needing it, and the same restraint applies to devtools: only
+actually needing it, and the same restraint applies to DevTools: only
 `@kintools/form-devtools-react` exists, with no Lit inspector yet.
 
 Migration guides from React Hook Form and Formik aren't published yet either:
