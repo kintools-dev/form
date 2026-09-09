@@ -14,9 +14,12 @@ send us feedback.
 
 ### Does it work outside React?
 
-`@kintools/form-core` has no framework dependency at all, just a value plus a
-pub/sub protocol. `@kintools/form-react` and `@kintools/form-lit` are both
-officially shipped, published bindings today, not a roadmap promise.
+`@kintools/form-core` has no framework dependency at all. It carries the whole
+form model, the `FieldApi`/`FormApi` tree with per-node validation, dirty
+tracking, array helpers, and submission, over a `subscribe`/`notify` pub/sub
+base that framework bindings hook into. `@kintools/form-react` and
+`@kintools/form-lit` are both officially shipped, published bindings today, not
+a roadmap promise.
 
 ### Is there Vue, Svelte, or Solid support?
 
