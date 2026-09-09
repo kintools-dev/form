@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.10 - 2026-09-09
+
+- Add `FieldApi.setErrors(map)`: applies a flat, dot-joined path -> message map
+  (the same shape a `schemaValidator` produces; `""` targets the field itself)
+  onto already-registered descendant fields, marking each touched. A message set
+  this way is kept apart from validator/schema results, outranks a
+  `schemaValidator` error in `error`/`invalid`, and clears when that field's own
+  value next changes. For surfacing a server-side validation pass from
+  `onSubmit`.
+
 ## 0.1.9 - 2026-09-08
 
 - `error` now falls back to a field's resolved schema-distributed error (its
