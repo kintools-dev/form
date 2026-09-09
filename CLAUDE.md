@@ -150,13 +150,19 @@ class enforces one or the other, and the same instance can be read either way.
   `makeArray`), run in order; the first truthy result wins — validators must not
   throw. `ValidatorResult` (`ValidationError`, plus `false`/`undefined` as
   convenient falsy shorthands) is normalized down to `ValidationError`
-  (`string | null`) before being stored as `error`. Debouncing, coalescing
-  concurrent `validate()`/`waitForValidation()` calls, and discarding stale
-  async results (so a superseded run never clobbers a newer one) are all handled
-  by `DebouncedTask` (`core/utils/debounced-task.ts`), which `FieldApi`
-  delegates to rather than implementing itself. Array mutation helpers both
-  update the immutable value (via `updateIn`) _and_ re-key `#children` so field
-  identity follows array index shifts, via one shared
+  (`string | null`) before being stored as `error`. `setErrors(map)` is the one
+  other writer of `error`, for validation the local `validators` can't run (a
+  server round-trip at submit time): it takes a flat path/message map (like a
+  `schemaValidator` result, `""` for this field itself), sets each addressed
+  already-registered field's `#serverError` (which outranks `#schemaError` in
+  `error`/`invalid`) and marks it `touched`; each `#serverError` clears on that
+  field's own next `valueChanged`. Debouncing, coalescing concurrent
+  `validate()`/`waitForValidation()` calls, and discarding stale async results
+  (so a superseded run never clobbers a newer one) are all handled by
+  `DebouncedTask` (`core/utils/debounced-task.ts`), which `FieldApi` delegates
+  to rather than implementing itself. Array mutation helpers both update the
+  immutable value (via `updateIn`) _and_ re-key `#children` so field identity
+  follows array index shifts, via one shared
   `#rekeyArrayFields(base, remapIndex)` helper. `moveItem` shifts everything
   between the two indices (like removing and re-inserting the item elsewhere);
   `swapItems` only exchanges the two endpoints.

@@ -1930,4 +1930,97 @@ Deno.test("FieldApi", async (t) => {
       assertEquals(group.error, "Nested whole-group issue");
     },
   );
+
+  await t.step(
+    "should set an error on a registered field via setErrors, marking it touched",
+    () => {
+      const form = new FieldApi<{ email: string; name: string }>(null, "", {
+        initialValue: { email: "", name: "" },
+      });
+      const email = form.field("email");
+      form.field("name");
+
+      form.setErrors({ email: "Already taken" });
+
+      assertEquals(email.error, "Already taken");
+      assertEquals(email.touched, true);
+      assertEquals(form.invalid, true);
+    },
+  );
+
+  await t.step(
+    "should clear a setErrors message on that field's next value change, leaving others",
+    () => {
+      const form = new FieldApi<{ email: string; name: string }>(null, "", {
+        initialValue: { email: "", name: "" },
+      });
+      const email = form.field("email");
+      const name = form.field("name");
+
+      form.setErrors({ email: "Already taken", name: "Reserved" });
+      email.value = "new@example.com";
+
+      assertEquals(email.error, null);
+      assertEquals(name.error, "Reserved");
+      assertEquals(form.invalid, true);
+    },
+  );
+
+  await t.step(
+    "should ignore a setErrors path with no registered field",
+    () => {
+      const form = new FieldApi<{ email: string }>(null, "", {
+        initialValue: { email: "" },
+      });
+
+      form.setErrors({ email: "Bad" });
+
+      assertEquals(form.invalid, false);
+      assertEquals(form.field("email").error, null);
+    },
+  );
+
+  await t.step(
+    "should target the receiver itself for an empty setErrors path",
+    () => {
+      const form = new FieldApi<{ a: string }>(null, "", {
+        initialValue: { a: "" },
+      });
+
+      form.setErrors({ "": "Whole form is off" });
+
+      assertEquals(form.error, "Whole form is off");
+      assertEquals(form.invalid, true);
+    },
+  );
+
+  await t.step(
+    "should resolve a nested setErrors path through a registered intermediate field",
+    () => {
+      const form = new FieldApi<{ address: { city: string } }>(null, "", {
+        initialValue: { address: { city: "" } },
+      });
+      const city = form.field("address").field("city");
+
+      form.setErrors({ "address.city": "Unknown city" });
+
+      assertEquals(city.error, "Unknown city");
+    },
+  );
+
+  await t.step(
+    "should let a setErrors message outrank a schemaValidator error",
+    async () => {
+      const form = new FieldApi<{ email: string }>(null, "", {
+        initialValue: { email: "" },
+        schemaValidator: () => ({ email: "Required" }),
+      });
+      const email = form.field("email");
+      await form.waitForValidation();
+      assertEquals(email.error, "Required");
+
+      form.setErrors({ email: "Already taken" });
+      assertEquals(email.error, "Already taken");
+    },
+  );
 });

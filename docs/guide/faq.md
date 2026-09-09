@@ -63,10 +63,10 @@ still on the roadmap.
 
 ### What's the bundle size?
 
-`@kintools/form-core` is 4.4 KB gzipped, `@kintools/form-react`'s bindings add
+`@kintools/form-core` is 4.5 KB gzipped, `@kintools/form-react`'s bindings add
 0.8 KB on top, and `@kintools/form-validators` is 0.7 KB, each measured
 independently (bundled and minified with rolldown) since you only pay for what
-you actually import. Core plus React together comes to about 5.1 KB gzipped.
+you actually import. Core plus React together comes to about 5.2 KB gzipped.
 
 ### Where do I ask a question or report a bug?
 

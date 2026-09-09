@@ -6,8 +6,8 @@
  * for a `FieldApi` value, unlike a `_`-prefixed method name.
  *
  * Not part of `@kintools/form-core`'s public exports; `index.ts` never imports
- * this file. Only `FieldApi.ts` itself imports these to define/call the
- * methods; test files import them too, to spy on one directly.
+ * this file. `FieldApi.ts` defines and calls these; `FormApi.ts` calls one or
+ * two, and test files import them to spy on one directly.
  *
  * Each constant is left with its inferred `unique symbol` type (no `: symbol`
  * annotation): that's what lets TypeScript treat `[kDestroy]`/etc. as
@@ -47,6 +47,9 @@ export const kParentSchemaErrorsChanged = Symbol(
 
 /** Key for the method that resolves a schema error for a dot-joined path against an ancestor's `schemaValidator`. */
 export const kResolveSchemaError = Symbol("resolveSchemaError");
+
+/** Key for the method that finds already-registered fields at a dot-joined path, without creating any. */
+export const kFindRegisteredFields = Symbol("findRegisteredFields");
 
 /** Key for the method that renames a field, used only by this class's own array-rekeying helpers. */
 export const kSetName = Symbol("setName");

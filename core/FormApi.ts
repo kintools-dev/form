@@ -6,6 +6,7 @@
  */
 
 import { FieldApi, type FieldApiOptions } from "./FieldApi.ts";
+import { kFindRegisteredFields } from "./FieldApi.internal.ts";
 import type { DeepKey, DeepValue, PromiseOr } from "./types.ts";
 import { getInOr, setIn } from "./utils/immutable.ts";
 
@@ -154,9 +155,7 @@ export class FormApi<TValue = unknown> extends FieldApi<TValue> {
    */
   resetField<TName extends DeepKey<TValue>>(
     name: TName,
-    // Explicit type arguments: left to inference here, tsc crashes
-    // (Debug Failure: No error for last overload signature) instead of
-    // type-checking normally.
+    // Explicit type to avoid Deno's slow types error.
     value: DeepValue<TValue, TName> = getInOr<TValue, TName>(
       this.initialValue as TValue,
       name,
@@ -166,60 +165,10 @@ export class FormApi<TValue = unknown> extends FieldApi<TValue> {
     this.batch(() => {
       this.initialValue = setIn(this.initialValue as TValue, name, value);
       this.value = setIn(this.value, name, value);
-      for (
-        const field of FormApi.#findRegisteredFields(
-          this as FieldApi<unknown>,
-          name,
-        )
-      ) {
+      for (const field of this[kFindRegisteredFields](name, true)) {
         field.touched = false;
       }
     });
-  }
-
-  /**
-   * Finds the already-registered fields a `resetField(name)` call should
-   * clear {@linkcode FieldApi.touched} on, without registering any that
-   * aren't (unlike {@linkcode FieldApi.field}).
-   *
-   * Walks {@linkcode FieldApi.children} down from {@linkcode node}. `name`
-   * may address a field registered directly at this level (returned on its
-   * own), or one nested through an already-registered intermediate field
-   * (recursed into). Failing both, every field registered at a flat path
-   * nested under `name`, e.g. `address.line1`/`address.line2` with no
-   * `address` field: `resetField("address")` moves their slice of the value
-   * and baseline too, so their `touched` should follow.
-   *
-   * `#assertNoPathCollision`'s invariant means the first two cases never
-   * overlap: at any level, at most one of "the exact key" or "a registered
-   * key that's a dot-prefix of it" can exist.
-   */
-  static #findRegisteredFields(
-    node: FieldApi<unknown>,
-    name: string,
-  ): FieldApi<unknown>[] {
-    const children = node.children as unknown as ReadonlyMap<
-      string,
-      FieldApi<unknown>
-    >;
-    const exact = children.get(name);
-    if (exact) return [exact];
-
-    for (const key of children.keys()) {
-      if (name.startsWith(`${key}.`)) {
-        return FormApi.#findRegisteredFields(
-          children.get(key)!,
-          name.slice(key.length + 1),
-        );
-      }
-    }
-
-    const prefix = `${name}.`;
-    const nested: FieldApi<unknown>[] = [];
-    for (const [key, field] of children) {
-      if (key.startsWith(prefix)) nested.push(field);
-    }
-    return nested;
   }
 
   #onSubmitInvalid?: FormApiOptions<TValue>["onSubmitInvalid"];

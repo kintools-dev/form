@@ -15,6 +15,7 @@ import {
   kChildValidatingChanged,
   kChildValueChanged,
   kDestroy,
+  kFindRegisteredFields,
   kParentInitialValueChanged,
   kParentSchemaErrorsChanged,
   kParentValueChanged,
@@ -303,15 +304,17 @@ export class FieldApi<TValue, TParentValue = never> extends BaseApi {
   }
 
   /**
-   * This field's error message: its own error from its {@linkcode validators}
-   * or {@linkcode asyncValidator} if it has one, otherwise this field's slice
-   * of the nearest ancestor's (or its own) {@linkcode schemaValidator} result,
-   * resolved from {@linkcode schemaErrorMap}.
+   * This field's error message to surface in UI: the first of the following
+   * that applies, in order of precedence, or `null` if none does.
    *
-   * The single message to surface in UI.
+   * - Its own error from {@linkcode validators} or {@linkcode asyncValidator}.
+   * - An error set on it via {@linkcode setErrors}.
+   * - Its slice of the nearest ancestor's (or its own)
+   *   {@linkcode schemaValidator} result, resolved from
+   *   {@linkcode schemaErrorMap}.
    */
   get error(): ValidationError {
-    return this.#ownError ?? this.#schemaError;
+    return this.#ownError ?? this.#serverError ?? this.#schemaError;
   }
 
   /**
@@ -322,8 +325,9 @@ export class FieldApi<TValue, TParentValue = never> extends BaseApi {
    * above.
    */
   get invalid(): boolean {
-    return !this.disabled && (!!this.#ownError || !!this.#schemaError ||
-      this.#anyChildInvalid || this.#schemaErrorMap !== null);
+    return !this.disabled && (!!this.#ownError || !!this.#serverError ||
+      !!this.#schemaError || this.#anyChildInvalid ||
+      this.#schemaErrorMap !== null);
   }
 
   /**
@@ -594,6 +598,10 @@ export class FieldApi<TValue, TParentValue = never> extends BaseApi {
   // Kept in sync by `#recomputeDirty` from then on.
   #dirty = false;
   #ownError: ValidationError = null;
+  // Set via `setErrors`, not by any validator. Outranks a `schemaValidator`
+  // error in `error`/`invalid`, and is cleared when this field's own value
+  // changes (see `valueChanged`).
+  #serverError: ValidationError = null;
   #touched = false;
   #disabled = false;
   #validators: Array<Validator<TValue, TParentValue>>;
@@ -938,6 +946,107 @@ export class FieldApi<TValue, TParentValue = never> extends BaseApi {
   }
 
   /**
+   * Sets error messages on fields at or under this one from a flat, dot-joined
+   * path-to-message map (paths relative to this field, `""` for this field
+   * itself).
+   *
+   * For surfacing the result of a validation pass this field's own
+   * {@linkcode validators} can't run, typically a server round-trip inside a
+   * form's `onSubmit`.
+   *
+   * Only affects fields already registered via {@linkcode field}; a path with
+   * no registered field is ignored. Each addressed field is also marked
+   * {@linkcode touched}, so the message shows in UI that gates display on it.
+   * A message set here outranks a {@linkcode schemaValidator} error and is
+   * cleared the next time that field's value changes.
+   *
+   * @example
+   * ```ts
+   * onSubmit: async (form) => {
+   *   const res = await api.save(form.value);
+   *   if (!res.ok) form.setErrors(res.fieldErrors); // { email: "Taken" }
+   * },
+   * ```
+   */
+  setErrors(
+    errors: Partial<Record<DeepKeyOrRoot<TValue>, ValidationError>>,
+  ): void {
+    console.log(errors);
+    this.batch(() => {
+      for (const [name, message] of Object.entries(errors)) {
+        const field = name === ""
+          ? (this as FieldApi<unknown>)
+          : this[kFindRegisteredFields](name, false)[0];
+        if (!field) continue;
+        field.#setServerError(message || null);
+        field.touched = true;
+      }
+    });
+  }
+
+  /**
+   * @internal
+   *
+   * Returns the already-registered fields at {@linkcode name} (dot-joined,
+   * relative to this field), without registering any that aren't (unlike
+   * {@linkcode field}).
+   *
+   * At most one field matches: one registered directly at this level, or one
+   * reached through an already-registered intermediate field. The exception
+   * is {@linkcode includeFlatDescendants}: with it set, when nothing is
+   * registered at `name` itself, every field registered at a flat path
+   * strictly under it (`address.line1`/`address.line2` with no `address`
+   * field) is returned instead. `FormApi.resetField` needs that, since it
+   * moves those fields' slice of the value and baseline so their `touched`
+   * should follow; {@linkcode setErrors} doesn't, since a message keyed at a
+   * group path with no group field has nowhere sensible to land.
+   *
+   * `#assertNoPathCollision`'s invariant means the direct and through-an-
+   * intermediate cases never overlap: at any level, at most one of "the exact
+   * key" or "a registered key that's a dot-prefix of it" can exist.
+   */
+  [kFindRegisteredFields](
+    name: string,
+    includeFlatDescendants: boolean,
+  ): FieldApi<unknown>[] {
+    const children = this.#children as unknown as ReadonlyMap<
+      string,
+      FieldApi<unknown>
+    >;
+    const exact = children.get(name);
+    if (exact) return [exact];
+
+    for (const key of children.keys()) {
+      if (name.startsWith(`${key}.`)) {
+        return children.get(key)![kFindRegisteredFields](
+          name.slice(key.length + 1),
+          includeFlatDescendants,
+        );
+      }
+    }
+
+    if (!includeFlatDescendants) return [];
+
+    const prefix = `${name}.`;
+    const nested: FieldApi<unknown>[] = [];
+    for (const [key, field] of children) {
+      if (key.startsWith(prefix)) nested.push(field);
+    }
+    return nested;
+  }
+
+  #setServerError(e: ValidationError): void {
+    if (e === this.#serverError) return;
+    const oldInvalid = this.invalid;
+    this.#serverError = e;
+    if (this.invalid !== oldInvalid) {
+      this.invalidChanged();
+    } else {
+      this.notify();
+    }
+  }
+
+  /**
    * Called synchronously when {@linkcode invalid} has changed.
    *
    * {@linkcode immediate} is `false` when the source of the change is a
@@ -1023,6 +1132,10 @@ export class FieldApi<TValue, TParentValue = never> extends BaseApi {
 
     this.#scheduleValidation();
     this.#scheduleSchemaValidation();
+
+    // An error injected via `setErrors` referred to the value it was set
+    // against, so it's stale once that value changes.
+    if (this.#serverError !== null) this.#setServerError(null);
 
     if (this.#notifiesParent) {
       this.parent?.[kChildValueChanged](this);

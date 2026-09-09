@@ -1,7 +1,16 @@
 import "./_test-setup.ts";
 import { assertEquals, assertStrictEquals } from "@std/assert";
-import { act, cleanup, renderHook } from "@testing-library/react";
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  renderHook,
+  screen,
+} from "@testing-library/react";
+import type { FormApi } from "@kintools/form-core";
 import { useForm } from "./useForm.ts";
+import { useWatch } from "./useWatch.ts";
 
 Deno.test("useForm", async (t) => {
   await t.step(
@@ -82,6 +91,63 @@ Deno.test("useForm", async (t) => {
 
         assertEquals(invalidCalls, 1);
         assertEquals(result.current.touched, true);
+      } finally {
+        cleanup();
+      }
+    },
+  );
+
+  await t.step(
+    "setErrors from onSubmit renders on the field and clears on the next edit",
+    async () => {
+      try {
+        let form!: FormApi<{ email: string }>;
+
+        const EmailField = () => {
+          const field = useWatch(form.field("email"));
+          return (
+            <>
+              <input
+                data-testid="email"
+                value={field.value}
+                onChange={(e) => field.handleChange(e.target.value)}
+              />
+              {field.touched && field.error && (
+                <span data-testid="email-error">{field.error}</span>
+              )}
+            </>
+          );
+        };
+
+        const TestForm = () => {
+          form = useForm<{ email: string }>({
+            initialValue: { email: "taken@example.com" },
+            onSubmit: (f) => {
+              f.setErrors({ email: "Already registered" });
+            },
+          });
+          return (
+            <form onSubmit={form.handleSubmit}>
+              <EmailField />
+            </form>
+          );
+        };
+
+        render(<TestForm />);
+        assertEquals(screen.queryByTestId("email-error"), null);
+
+        await act(async () => {
+          await form.handleSubmit();
+        });
+        assertEquals(
+          screen.getByTestId("email-error").textContent,
+          "Already registered",
+        );
+
+        fireEvent.change(screen.getByTestId("email"), {
+          target: { value: "new@example.com" },
+        });
+        assertEquals(screen.queryByTestId("email-error"), null);
       } finally {
         cleanup();
       }

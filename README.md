@@ -77,13 +77,13 @@ then gzipped. Reproduce with `deno task --cwd scripts bundle-size`. Not directly
 comparable to Bundlephobia, which uses a different minifier (terser).
 
 ```text
-@kintools/form-core                              ██████░░░░░░░░░░░░░░░░░░    4.4 KB
+@kintools/form-core                              ██████░░░░░░░░░░░░░░░░░░    4.5 KB
 @kintools/form-react (bindings only)             █░░░░░░░░░░░░░░░░░░░░░░░    0.8 KB
 @kintools/form-lit (bindings only)               ██░░░░░░░░░░░░░░░░░░░░░░    1.3 KB
 @kintools/form-validators                        █░░░░░░░░░░░░░░░░░░░░░░░    0.7 KB
 
-Kin Form (core + react bindings)                 ███████░░░░░░░░░░░░░░░░░    5.1 KB
-Kin Form (core + lit bindings)                   ███████░░░░░░░░░░░░░░░░░    5.4 KB
+Kin Form (core + react bindings)                 ███████░░░░░░░░░░░░░░░░░    5.2 KB
+Kin Form (core + lit bindings)                   ███████░░░░░░░░░░░░░░░░░    5.5 KB
 React Hook Form                                  ██████████████████░░░░░░   13.7 KB
 Formik                                           ██████████████████░░░░░░   13.9 KB
 TanStack Form                                    ████████████████████████   18.5 KB
