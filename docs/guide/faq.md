@@ -8,11 +8,9 @@ description: "Frequently asked questions and honest non-goals: production-readin
 
 ### Is Kin Form production-ready?
 
-Both packages are still pre-1.0 (`@kintools/form-core` at 0.1.6,
-`@kintools/form-react` at 0.1.7), and every publish runs through CI with
-Codecov-tracked test coverage. Weigh that alongside a small community and a
-short track record as real inputs to your own risk assessment, not something the
-docs will talk you out of.
+Kin Form is still pre-1.0, but the API is stable in practice now and every
+publish runs through CI with test coverage. We encourage you to try it out and
+send us feedback.
 
 ### Does it work outside React?
 
