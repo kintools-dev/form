@@ -166,49 +166,60 @@ export class FormApi<TValue = unknown> extends FieldApi<TValue> {
     this.batch(() => {
       this.initialValue = setIn(this.initialValue as TValue, name, value);
       this.value = setIn(this.value, name, value);
-      const field = FormApi.#findRegisteredField(
-        this as FieldApi<unknown>,
-        name,
-      );
-      if (field) field.touched = false;
+      for (
+        const field of FormApi.#findRegisteredFields(
+          this as FieldApi<unknown>,
+          name,
+        )
+      ) {
+        field.touched = false;
+      }
     });
   }
 
   /**
-   * Finds the field already registered at `name`, without registering one
-   * that isn't (unlike {@linkcode FieldApi.field}).
+   * Finds the already-registered fields a `resetField(name)` call should
+   * clear {@linkcode FieldApi.touched} on, without registering any that
+   * aren't (unlike {@linkcode FieldApi.field}).
    *
-   * Walks {@linkcode FieldApi.children} down from {@linkcode node}: `name`
-   * may address a field registered directly at this level, or one nested
-   * through an already-registered intermediate field (mirroring how
-   * {@linkcode FieldApi.field} itself resolves a dotted path against
-   * `#assertNoPathCollision`'s invariant: at any level, at most one of "the
-   * exact key" or "a registered key that's a dot-prefix of it" can exist).
+   * Walks {@linkcode FieldApi.children} down from {@linkcode node}. `name`
+   * may address a field registered directly at this level (returned on its
+   * own), or one nested through an already-registered intermediate field
+   * (recursed into). Failing both, every field registered at a flat path
+   * nested under `name`, e.g. `address.line1`/`address.line2` with no
+   * `address` field: `resetField("address")` moves their slice of the value
+   * and baseline too, so their `touched` should follow.
+   *
+   * `#assertNoPathCollision`'s invariant means the first two cases never
+   * overlap: at any level, at most one of "the exact key" or "a registered
+   * key that's a dot-prefix of it" can exist.
    */
-  static #findRegisteredField(
+  static #findRegisteredFields(
     node: FieldApi<unknown>,
     name: string,
-  ): FieldApi<unknown> | undefined {
+  ): FieldApi<unknown>[] {
     const children = node.children as unknown as ReadonlyMap<
       string,
       FieldApi<unknown>
     >;
     const exact = children.get(name);
-    if (exact) return exact;
+    if (exact) return [exact];
 
-    let prefixKey: string | undefined;
     for (const key of children.keys()) {
       if (name.startsWith(`${key}.`)) {
-        prefixKey = key;
-        break;
+        return FormApi.#findRegisteredFields(
+          children.get(key)!,
+          name.slice(key.length + 1),
+        );
       }
     }
-    if (prefixKey === undefined) return undefined;
 
-    return FormApi.#findRegisteredField(
-      children.get(prefixKey)!,
-      name.slice(prefixKey.length + 1),
-    );
+    const prefix = `${name}.`;
+    const nested: FieldApi<unknown>[] = [];
+    for (const [key, field] of children) {
+      if (key.startsWith(prefix)) nested.push(field);
+    }
+    return nested;
   }
 
   #onSubmitInvalid?: FormApiOptions<TValue>["onSubmitInvalid"];

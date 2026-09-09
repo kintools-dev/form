@@ -522,6 +522,31 @@ Deno.test("FormApi", async (t) => {
   );
 
   await t.step(
+    "resetField: should reset every field registered below the path, with no field registered at the path itself",
+    () => {
+      const form = new FormApi<{ address: { line1: string; line2: string } }>({
+        initialValue: { address: { line1: "1 Main St", line2: "Apt 2" } },
+      });
+      // Leaf fields registered directly as flat paths, no "address" field.
+      const line1 = form.field("address.line1");
+      const line2 = form.field("address.line2");
+      line1.value = "9 Elm St";
+      line1.touched = true;
+      line2.value = "Apt 9";
+      line2.touched = true;
+
+      form.resetField("address");
+
+      assertEquals(line1.value, "1 Main St");
+      assertEquals(line1.touched, false);
+      assertEquals(line2.value, "Apt 2");
+      assertEquals(line2.touched, false);
+      assertEquals(form.touched, false);
+      assertEquals(form.dirty, false);
+    },
+  );
+
+  await t.step(
     "should have already settled dirty and child values by the time subscribers are notified",
     () => {
       const form = new FormApi<{ child: { name: string } }>({
