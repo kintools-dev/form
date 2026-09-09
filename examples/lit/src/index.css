@@ -9,4 +9,11 @@
   em {
     @apply font-medium text-gray-700;
   }
+
+  /* The field/button components render into light DOM, so a custom element
+     like `<basic-text-field>` is `display: inline` by default and the
+     `space-y-*` / `mt-*` a form puts on its rows would have no effect. */
+  form > * {
+    display: block;
+  }
 }
