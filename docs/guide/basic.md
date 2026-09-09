@@ -1,5 +1,5 @@
 ---
-description: "Builds a login form by binding inputs with Watch/watch directly, then promotes that into reusable TextField and SubmitButton components backed by useWatch/WatchController, for both React and Lit."
+description: "Build a login form by binding inputs with Watch/watch, then promote that into reusable TextField and SubmitButton components, in React and Lit."
 ---
 
 # A Basic Form

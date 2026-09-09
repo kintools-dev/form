@@ -1,5 +1,5 @@
 ---
-description: "How Kin Form's pub/sub model works under the hood (subscribe/notify, batched notifications) and how to subscribe from React (useWatch, Watch) or Lit (watch, WatchController), including narrowing re-renders with select."
+description: "Kin Form's pub/sub model (subscribe/notify, batched) and subscribing from React (useWatch, Watch) or Lit (watch, WatchController)."
 ---
 
 # Reactivity

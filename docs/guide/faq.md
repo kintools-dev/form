@@ -1,5 +1,5 @@
 ---
-description: "Frequently asked questions and honest non-goals: production-readiness, framework support beyond React and Lit, schema validation, SSR, DevTools, and where migration guides currently stand."
+description: "Frequently asked questions and honest non-goals: production readiness, framework support, schema validation, SSR, DevTools, and migration guides."
 ---
 
 # FAQ & Non-Goals

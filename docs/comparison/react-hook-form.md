@@ -1,5 +1,5 @@
 ---
-description: "A side-by-side code comparison of Kin Form against react-hook-form@7.81.0 across field binding, per-node validation and debouncing, schema validation, cross-field validation, dirty tracking, submission handling, async initial values, reactivity, form composition, and multistep forms."
+description: "A side-by-side comparison of Kin Form and React Hook Form: field binding, validation, dirty tracking, submission, reactivity, composition, multistep."
 ---
 
 # vs React Hook Form

@@ -1,5 +1,5 @@
 ---
-description: "The array mutation helpers (pushItem, insertItem, moveItem, swapItems, removeItem, replaceItem) that update a FieldApi's array value and re-key its child registry so field identity, including the stable id used as a list key, survives a reorder."
+description: "The array helpers (pushItem, insertItem, moveItem, swapItems, removeItem, replaceItem) that mutate a FieldApi array and re-key its children on reorder."
 ---
 
 # Dynamic Arrays

@@ -1,5 +1,5 @@
 ---
-description: "Why Kin Form treats every node in a form (leaf, nested group, or the form itself) as the same `FieldApi` class, decoupling a field's value type from its parent's shape so components like `TextField` reuse across forms, and how that compares to React Hook Form, Formik, and TanStack Form."
+description: "Why Kin Form makes every form node the same FieldApi class, decoupling a field's value type from its parent's shape so TextField reuses across forms."
 ---
 
 # Why Kin Form?

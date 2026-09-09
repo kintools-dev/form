@@ -1,5 +1,5 @@
 ---
-description: "How onValueChanged runs side effects (like clearing a dependent field or persisting a draft to localStorage) whenever a node's value settles, on any node including the form root, and why debouncing it is left to the caller."
+description: "How onValueChanged runs side effects (clear a dependent field, persist a draft) when a value settles, on any node, with debouncing left to you."
 ---
 
 # Listeners

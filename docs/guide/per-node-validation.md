@@ -1,5 +1,5 @@
 ---
-description: "How per-node validators and the single asyncValidator option work: run order, debouncing with validationDebounceMs, handleBlur flushing pending runs, running validate() explicitly, and attaching validators to nested groups or the form."
+description: "How per-node validators and asyncValidator work: run order, validationDebounceMs, handleBlur flushing, calling validate(), validators on groups."
 ---
 
 # Per-node Validation

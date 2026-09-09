@@ -1,5 +1,5 @@
 ---
-description: "A side-by-side code comparison of Kin Form against @tanstack/react-form@1.33.5 across field binding, per-node validation and debouncing, schema validation, cross-field validation, dirty tracking, submission handling, async initial values, reactivity, form composition, and multistep forms."
+description: "A side-by-side comparison of Kin Form and TanStack Form: field binding, validation, dirty tracking, submission, reactivity, composition, multistep."
 ---
 
 # vs TanStack Form

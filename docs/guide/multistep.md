@@ -1,5 +1,5 @@
 ---
-description: "How useMultistep/MultistepController orchestrate a wizard's current step on top of one FieldApi per step: validating and gating next(), branching or persisting progress in onBeforeNext, and unvalidated back()/jump() navigation."
+description: "How useMultistep/MultistepController run a wizard on one FieldApi per step: gating next(), branching or persisting in onBeforeNext, plus back()/jump()."
 ---
 
 # Multistep Forms

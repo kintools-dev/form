@@ -1,5 +1,5 @@
 ---
-description: "How toSchemaValidator() adapts a Standard Schema library (zod, valibot, arktype) into a schemaValidator that validates a whole group or form in one pass, populating schemaErrorMap and surfacing through each field's own error alongside per-node validators."
+description: "How toSchemaValidator() adapts a Standard Schema library (zod, valibot, arktype) into a schemaValidator that checks a whole group or form in one pass."
 ---
 
 # Schema Validation

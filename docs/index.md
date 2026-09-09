@@ -1,4 +1,5 @@
 ---
+description: "Kin Form: a fast, framework-agnostic form state library for TypeScript. Zero-dependency core, type-safe field paths, React and Lit bindings built in."
 layout: home
 ---
 

@@ -1,5 +1,5 @@
 ---
-description: "The BaseApi to FieldApi to FormApi class hierarchy, the shared state every node exposes (value, error, touched, validating, dirty, name, id), and how field() resolves a typed path relative to the node it's called on."
+description: "The BaseApi to FieldApi to FormApi hierarchy, the state every node exposes (value, error, touched, validating, dirty), and how field() resolves paths."
 ---
 
 # Concepts

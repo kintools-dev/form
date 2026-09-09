@@ -1,5 +1,5 @@
 ---
-description: "How a nested object in a form's value is decomposed into its own FieldApi with a lazily-populated child registry: resolving the intermediate field before its children, the path-collision error when a node is registered both nested and flat, and aggregated touched/invalid/validating state."
+description: "How a nested object becomes its own FieldApi with a lazy child registry: resolving the intermediate field first, path collisions, and aggregated state."
 ---
 
 # Nested Objects

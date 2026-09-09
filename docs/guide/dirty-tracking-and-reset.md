@@ -1,5 +1,5 @@
 ---
-description: "How the dirty flag does a deep-equality check against a baseline set at construction, and how reset() and the per-field resetField() move that baseline, restore values, and clear touched across the tree."
+description: "How the dirty flag deep-compares against a construction-time baseline, and how reset() and resetField() move that baseline and restore values."
 ---
 
 # Dirty Tracking & Reset

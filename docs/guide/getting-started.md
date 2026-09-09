@@ -1,5 +1,5 @@
 ---
-description: "Install commands for @kintools/form-react, @kintools/form-lit, and the optional @kintools/form-validators package via npm, pnpm, yarn, or deno, plus links to the next guide pages."
+description: "Install @kintools/form-react or @kintools/form-lit, plus the optional @kintools/form-validators, with npm, pnpm, yarn, or deno."
 ---
 
 # Getting Started

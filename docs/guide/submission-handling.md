@@ -1,5 +1,5 @@
 ---
-description: "How `handleSubmit` validates and waits before calling `onSubmit`/`onSubmitError`, plus how to disable a submit button with `submitting`/`dirty` and disable a whole form via cascading `FieldApi.disabled`."
+description: "How handleSubmit validates and waits before onSubmit/onSubmitError, how to gate a submit button on submitting/dirty, and cascading FieldApi.disabled."
 ---
 
 # Submission Handling

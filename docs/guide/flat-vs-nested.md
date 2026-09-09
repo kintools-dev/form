@@ -1,5 +1,5 @@
 ---
-description: "When to model a nested value as its own FieldApi per level versus flatten it to dotted paths off the form root, comparing the same checkout form built both ways and showing that schemaValidator works identically either way while hand-written per-field validators favor nesting."
+description: "When to give a nested value its own FieldApi per level versus flatten it to dotted paths, comparing the same checkout form built both ways."
 ---
 
 # Flat vs. Nested Structure

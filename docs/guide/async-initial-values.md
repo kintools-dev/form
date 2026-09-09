@@ -1,5 +1,5 @@
 ---
-description: "Two ways to populate a form once its real initial value arrives asynchronously: constructing with a placeholder and calling reset() when data loads, versus delaying the form's mount until the data is ready."
+description: "Two ways to fill a form when its initial value arrives asynchronously: a placeholder plus reset() on load, or delaying mount until data is ready."
 ---
 
 # Async Initial Values

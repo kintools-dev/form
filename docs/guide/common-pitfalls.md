@@ -1,5 +1,5 @@
 ---
-description: "An index of silent Kin Form gotchas that don't throw or fail type-checking: watching in the form-owning component, disabled not reaching the DOM, stale validators/dependents, missing dependents, index-as-key, and dirty baseline not moving after submit."
+description: "Silent Kin Form gotchas that pass type-checking: watching in the form-owning component, disabled not reaching the DOM, stale dependents, index-as-key."
 ---
 
 # Common Pitfalls

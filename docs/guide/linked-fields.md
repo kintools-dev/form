@@ -1,5 +1,5 @@
 ---
-description: "How the dependents option re-validates sibling fields (relative to the parent, not the form root) whenever a field's value changes, such as re-checking confirmPassword when password changes, and how it differs from reading a sibling's value directly."
+description: "How the dependents option re-validates sibling fields (relative to the parent) when a value changes, e.g. re-checking confirmPassword against password."
 ---
 
 # Linked Fields

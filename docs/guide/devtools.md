@@ -1,5 +1,5 @@
 ---
-description: "Installing and setting up @kintools/form-devtools-react, an inspector panel that visualizes a React form's live tree state (value, error, touched, validating) via DevtoolsProvider and useFormDevtools."
+description: "Set up @kintools/form-devtools-react: an inspector panel showing a React form's live tree state via DevtoolsProvider and useFormDevtools."
 ---
 
 # DevTools
