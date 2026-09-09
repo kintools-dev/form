@@ -84,6 +84,14 @@ This is the same "delay mounting the form" pattern from
 [Async Initial Values](/form/guide/async-initial-values), just with the server
 doing the waiting instead of a client-side loading state.
 
+## Server-side validation errors
+
+Surfacing per-field errors from a server round-trip at submit time (what
+TanStack Form's SSR guide covers as "server validation") isn't an SSR concern in
+Kin Form: `onSubmit` makes the request and passes the response to
+`form.setErrors`, the same in a server-rendered app or a client-only one. See
+[Submission Handling](/form/guide/submission-handling#server-side-validation-errors).
+
 ## Full example
 
 [`examples/nextjs`](https://github.com/kintools-dev/form/tree/main/examples/nextjs)

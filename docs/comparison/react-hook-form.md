@@ -723,6 +723,79 @@ const { handleSubmit } = useForm<Signup>({
 | Binding to `<form>`      | `onSubmit={form.handleSubmit}`                          | `onSubmit={handleSubmit(onValid, onInvalid)}` |
 | Preventing page reload   | automatic; event arg optional (works from RN `onPress`) | automatic, inside `handleSubmit`              |
 
+### Server-side validation errors
+
+A submit that fails a check only the server can run (uniqueness, cross-record
+rules) comes back with per-field messages. Kin Form takes the whole map in one
+call; React Hook Form sets them one field at a time.
+
+<SideBySide>
+
+<CodeGroup>
+
+<CodeGroupItem label="Kin Form">
+
+```tsx {5}
+const form = useForm<Signup>({
+  initialValue: { email: "", password: "" },
+  onSubmit: async (form) => {
+    const res = await signUp(form.value);
+    if (res.fieldErrors) form.setErrors(res.fieldErrors); // { email: "Taken" }
+  },
+});
+
+<form onSubmit={form.handleSubmit}>;
+```
+
+</CodeGroupItem>
+
+<CodeGroupItem label="React Hook Form">
+
+```tsx {7-10}
+const { handleSubmit, setError } = useForm<Signup>({
+  defaultValues: { email: "", password: "" },
+});
+
+const onValid = async (values: Signup) => {
+  const res = await signUp(values);
+  if (res.fieldErrors) {
+    for (const [name, message] of Object.entries(res.fieldErrors)) {
+      setError(name as keyof Signup, { type: "server", message });
+    }
+  }
+};
+
+<form onSubmit={handleSubmit(onValid)}>;
+```
+
+</CodeGroupItem>
+
+</CodeGroup>
+
+</SideBySide>
+
+**What's different:**
+
+|                    | Kin Form                                     | React Hook Form                                    |
+| ------------------ | -------------------------------------------- | -------------------------------------------------- |
+| Applying a set     | `form.setErrors(map)`, one call              | `setError` per field; loop the map yourself        |
+| Message shape      | flat-path-to-message map (same as a schema)  | one `name` + `{ type, message }` per call          |
+| Scope              | any node: `form` or `form.field("address")`  | the form                                           |
+| Clearing           | automatic, on each field's next value change | `clearErrors(name)`; an edit alone doesn't wipe it |
+| Form-level message | `""` key in the same map                     | `setError("root.server", ...)`, a reserved name    |
+
+**Kin Form**: `setErrors` takes the same flat-path-to-message shape a
+[`schemaValidator`](/form/guide/schema-validation) produces, on any node, and
+each message clears itself once the user edits that field.
+
+**React Hook Form**: `setError` is per-call and stays until `clearErrors`: more
+bookkeeping for a multi-field response, more explicit control over when it
+clears.
+
+With a React 19 Server Action, both wire the same `useEffect` to sync the
+returned `state` into the form. Its body is `form.setErrors(state.fieldErrors)`
+for Kin Form, the `setError` loop for React Hook Form.
+
 ## Async initial values
 
 React Hook Form accepts an async function for `defaultValues` and exposes its

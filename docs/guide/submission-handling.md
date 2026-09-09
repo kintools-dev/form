@@ -1,5 +1,5 @@
 ---
-description: "How handleSubmit validates and waits before onSubmit/onSubmitError, how to gate a submit button on submitting/dirty, and cascading FieldApi.disabled."
+description: "How handleSubmit validates before onSubmit/onSubmitError, surfacing server errors with setErrors, gating a button on submitting/dirty, and cascading disabled."
 ---
 
 # Submission Handling
@@ -67,6 +67,75 @@ A no-op on a re-entrant call while already `submitting`. The `event` parameter
 is optional and used only for `preventDefault()`, so the same call works from a
 React Native `onPress`, any caller with no event, or a web `<form onSubmit>` as
 shown above.
+
+## Server-side validation errors
+
+Some checks only run on the server: uniqueness, cross-record rules, anything
+needing data the client doesn't have. When `onSubmit`'s request comes back with
+per-field errors (an HTTP 422, typically), hand them to `form.setErrors`:
+
+<CodeGroup>
+
+<CodeGroupItem label="React">
+
+```tsx
+const form = useForm({
+  initialValue: { email: "", password: "" },
+  onSubmit: async (form) => {
+    const res = await fetch("/api/sign-up", {
+      method: "POST",
+      body: JSON.stringify(form.value),
+    });
+    if (res.status === 422) {
+      const { errors } = await res.json(); // { email: "Already registered" }
+      form.setErrors(errors);
+    }
+  },
+});
+```
+
+</CodeGroupItem>
+
+<CodeGroupItem label="Lit">
+
+```lit
+#form = new FormApi({
+  initialValue: { email: "", password: "" },
+  onSubmit: async (form) => {
+    const res = await fetch("/api/sign-up", {
+      method: "POST",
+      body: JSON.stringify(form.value),
+    });
+    if (res.status === 422) {
+      const { errors } = await res.json();
+      form.setErrors(errors);
+    }
+  },
+});
+```
+
+</CodeGroupItem>
+
+</CodeGroup>
+
+`setErrors` takes a flat, dot-joined path-to-message map, the same shape a
+[`schemaValidator`](/form/guide/schema-validation) produces: `"email"`,
+`"address.city"`, or `""` for a message about the form as a whole. It's on every
+node, so `form.setErrors(...)` addresses the whole tree while
+`form.field("address").setErrors(...)` scopes to a subtree.
+
+Each message:
+
+- Lands only on a field already created with `field()`; a path with no field is
+  ignored.
+- Marks that field `touched`, so it shows even if the user never focused it.
+- Outranks a `schemaValidator` error on the same field, and clears the next time
+  that field's value changes. Re-submitting is what refreshes it.
+
+None of this is SSR-specific: it's the same call whether the form is
+server-rendered or a plain client-side SPA. For a live "is this taken?" check
+that runs while the user types rather than at submit, use
+[`asyncValidator`](/form/guide/per-node-validation) instead.
 
 ## Disabling the submit button while submitting
 

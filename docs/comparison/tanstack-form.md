@@ -868,6 +868,73 @@ submit function threw," so a failed request inside `onSubmit` is yours to catch,
 and an uncaught throw flips `canSubmit` to `false` until an input changes. Kin
 Form's `onSubmitError` fires automatically and leaves the form submittable.
 
+### Server-side validation errors
+
+A submit that fails a check only the server can run comes back with per-field
+messages to surface on the form.
+
+<SideBySide>
+
+<CodeGroup>
+
+<CodeGroupItem label="Kin Form">
+
+```tsx {5}
+const form = useForm<Signup>({
+  initialValue: { email: "", password: "" },
+  onSubmit: async (form) => {
+    const res = await signUp(form.value);
+    if (res.fieldErrors) form.setErrors(res.fieldErrors); // { email: "Taken" }
+  },
+});
+```
+
+</CodeGroupItem>
+
+<CodeGroupItem label="TanStack Form">
+
+```tsx {6-10}
+const form = useForm({
+  defaultValues: { email: "", password: "" },
+  onSubmit: async ({ value, formApi }) => {
+    const res = await signUp(value);
+    if (res.fieldErrors) {
+      formApi.setErrorMap({
+        onSubmit: { form: res.formError, fields: res.fieldErrors },
+      });
+    }
+  },
+});
+```
+
+</CodeGroupItem>
+
+</CodeGroup>
+
+</SideBySide>
+
+**What's different:**
+
+|                              | Kin Form                                          | TanStack Form                                                                                                 |
+| ---------------------------- | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Applying a set               | `form.setErrors(map)`                             | `formApi.setErrorMap({ onSubmit: { form, fields } })`, or return that shape from a `validators.onSubmitAsync` |
+| Message shape                | flat dotted-path → message map (same as a schema) | `{ form?, fields? }` nested under an `onSubmit` key                                                           |
+| Scope                        | any node                                          | the form                                                                                                      |
+| Clearing                     | automatic, on each field's next value change      | on next submit                                                                                                |
+| Progressive-enhancement flow | none: the same call                               | `createServerValidate` + `mergeForm` + `useTransform`, in per-framework packages                              |
+
+Both surface the response imperatively in `onSubmit`; the call is what differs.
+Kin Form's `setErrors` takes a flat path → message map (the same shape a
+[`schemaValidator`](/form/guide/schema-validation) produces), works on any node,
+and clears each message once that field is edited. TanStack Form's `setErrorMap`
+writes a `{ form, fields }` object under the `onSubmit` error-map key,
+form-only, cleared on the next submit.
+
+For no-JS progressive enhancement TanStack Form adds a separate
+`createServerValidate`/`mergeForm` apparatus in per-framework packages; Kin Form
+has no equivalent, and no need for one, the `setErrors` call is the same either
+way.
+
 ## Async initial values
 
 Neither accepts an async `defaultValues` the way React Hook Form does, so this
