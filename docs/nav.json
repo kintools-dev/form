@@ -15,7 +15,8 @@
           { "text": "Why Kin Form?", "link": "/guide/" },
           { "text": "Getting Started", "link": "/guide/getting-started" },
           { "text": "Concepts", "link": "/guide/concepts" },
-          { "text": "Basic", "link": "/guide/basic" }
+          { "text": "Basic", "link": "/guide/basic" },
+          { "text": "FAQ & Non-Goals", "link": "/guide/faq" }
         ]
       },
       {
