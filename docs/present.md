@@ -5,7 +5,7 @@ description: Kin Form, one section per screen.
 noindex: true
 ---
 
-<a class="present-exit" href="/form/" title="Exit presentation">✕</a>
+<a class="present-exit" href="/form" title="Exit presentation">✕</a>
 
 <div class="home present">
 
@@ -136,7 +136,7 @@ subscribed.</Prose>
       <PerformanceHighlight title="Flat field update burst (800×)" />
     </div>
   </div>
-  <p className="pt-3">Full comparison, including where Kin Form isn't the right fit: <Cta href="/form/comparison/">see the details →</Cta></p>
+  <p className="pt-3">Full comparison, including where Kin Form isn't the right fit: <Cta href="/form/comparison">see the details →</Cta></p>
 </section>
 
 <section class="demo">

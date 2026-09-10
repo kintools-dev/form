@@ -11,7 +11,7 @@ about whether a given feature exists and more about how large the API surface
 is, how many distinct primitives you assemble to build a form, and where the
 type-safety and ergonomics diverge. Like the
 [React Hook Form page](/form/comparison/react-hook-form), this one works through
-the same topics the [guide](/form/guide/) covers, one at a time, against
+the same topics the [guide](/form/guide) covers, one at a time, against
 `@tanstack/react-form@1.33.5`.
 
 ## Field registration & binding model

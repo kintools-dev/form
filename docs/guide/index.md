@@ -194,7 +194,7 @@ comparison.
   rules are awkward to wire up.
 - Heaviest bundle of the three: 18.5 KB.
 - The slowest of the three in Kin Form's own benchmark; see
-  [the full numbers](/form/comparison/) before taking that at face value.
+  [the full numbers](/form/comparison) before taking that at face value.
 
 ## What's next
 

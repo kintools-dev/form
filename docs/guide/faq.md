@@ -53,7 +53,7 @@ as they change. It's React-only today; there's no Lit equivalent yet.
 
 ### How does it compare to React Hook Form, Formik, or TanStack Form?
 
-The [comparison pages](/form/comparison/) carry the actual feature matrix,
+The [comparison pages](/form/comparison) carry the actual feature matrix,
 API-surface matrix, bundle-size chart, and wall-clock performance numbers, plus
 a
 [detailed, code-by-code comparison against React Hook Form](/form/comparison/react-hook-form).

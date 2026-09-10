@@ -45,7 +45,7 @@ form.field("email", {
 ```
 
 Validators run **in order**; the first truthy result wins. A single validator
-(not wrapped in an array) is also accepted. See [Validators](/form/validators/)
+(not wrapped in an array) is also accepted. See [Validators](/form/validators)
 for the built-in factories (`required`, `minLength`, `email`, `password`, ...),
 or [Schema Validation](/form/guide/schema-validation) to validate a whole group
 or form with zod/valibot instead of one hand-written validator per field.

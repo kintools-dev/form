@@ -160,7 +160,7 @@ only updates the part of the form that depends on it.</Prose>
       <PerformanceHighlight title="Flat field update burst (800×)" />
     </Card>
   </Grid>
-  <p className="mt-6">Full comparison, including where Kin Form isn't the right fit: <Cta href="/form/comparison/">see the details →</Cta></p>
+  <p className="mt-6">Full comparison, including where Kin Form isn't the right fit: <Cta href="/form/comparison">see the details →</Cta></p>
 </Section>
 
 <Section>

@@ -82,5 +82,5 @@ deno add jsr:@kintools/form-validators
   debouncing, and running validation explicitly
 - [Nested Objects](/form/guide/nested-objects) and
   [Dynamic Arrays](/form/guide/dynamic-arrays)
-- [Validators](/form/validators/) — `required`, `email`, `minLength`, a
+- [Validators](/form/validators) — `required`, `email`, `minLength`, a
   `toSchemaValidator()` adapter for zod/valibot, and more

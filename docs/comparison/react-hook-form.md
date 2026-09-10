@@ -6,7 +6,7 @@ description: "A side-by-side comparison of Kin Form and React Hook Form: field b
 
 React Hook Form is the most widely used of the three (by a wide and growing
 margin), so it's the one worth the deepest comparison. This page works through
-the same topics the [guide](/form/guide/) covers, one at a time, against
+the same topics the [guide](/form/guide) covers, one at a time, against
 `react-hook-form@7.81.0`.
 
 ## Field registration & binding model
